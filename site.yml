@@ -1,68 +1,58 @@
 # Install on CentOS 6+7
 ---
 #============================================================================== all
-- hosts: all
-  become: true
-  # check_mode: yes  # yes=dry-run
+#- hosts: all
+#  become: true
+#  # check_mode: yes  # yes=dry-run
+#  roles:
+#    - common
 #============================================================================== all
-  tasks:
-
-# ansible_os_family = dict(
-#  RedHat = 'RedHat', Fedora = 'RedHat', CentOS = 'RedHat', Scientific = 'RedHat',
-#  SLC = 'RedHat', Ascendos = 'RedHat', CloudLinux = 'RedHat', PSBM = 'RedHat',
-#  OracleLinux = 'RedHat', OVS = 'RedHat', OEL = 'RedHat', Amazon = 'RedHat',
-#  XenServer = 'RedHat', Ubuntu = 'Debian', Debian = 'Debian', SLES = 'Suse',
-#  SLED = 'Suse', OpenSuSE = 'Suse', SuSE = 'Suse', Gentoo = 'Gentoo',
-#  Archlinux = 'Archlinux', Mandriva = 'Mandrake', Mandrake = 'Mandrake',
-#  Solaris = 'Solaris', Nexenta = 'Solaris', OmniOS = 'Solaris', OpenIndiana = 'Solaris',
-#  SmartOS = 'Solaris', AIX = 'AIX', Alpine = 'Alpine', MacOSX = 'Darwin',
-#  FreeBSD = 'FreeBSD', HPUX = 'HP-UX'
-#)
-
-#- debug: var="{{ item }}"
-#  with_items:
-#  - ansible_os_family
-#  - ansible_distribution
-#  - ansible_distribution_major_version
-#  - ansible_distribution_release
-#  - ansible_distribution_version
-
-    - name: Verify Ansible meets common version requirements.
-      assert:
-        that: "ansible_version.full is version_compare('2.8.12', '>=')"
-        msg: >
-          "You must update Ansible to at least 2.8.12 to use this role."
-    #- debug: var=ansible_version.full
-
-    # display IP address from inventory file
-    - debug: var=ansible_host
-
-    # don't use old "{ items }" & with_items loop deprecated in Ansible 2.10
-    # instead list the package names as a list as name argument
-    - name: install CentOS required packages
-      yum:
-        name: ['ntp', 'lsof']
-        state: installed
-        update_cache: yes
-
-    - name: configure and enable NTP
-      service: 
-        name: ntpd 
-        state: started 
-        enabled: yes
-    - name: set timezone
-      timezone: name=America/Los_Angeles
-
-    - name: check TOD and timezone
-      command: date
-      register: tod 
-    - debug: var=tod.stdout_lines
-
-    # ensure ntp has time to connect with external servers (centos7)
-    - name: ntpdc
-      command: ntpdc -c peer
-      register: ntpdc
-    - debug: var=ntpdc.stdout_lines
+#  tasks:
+#
+##- debug: var="{{ item }}"
+##  with_items:
+##  - ansible_os_family
+##  - ansible_distribution
+##  - ansible_distribution_major_version
+##  - ansible_distribution_release
+##  - ansible_distribution_version
+#
+#    - name: Verify Ansible meets common version requirements.
+#      assert:
+#        that: "ansible_version.full is version_compare('2.8.12', '>=')"
+#        msg: >
+#          "You must update Ansible to at least 2.8.12 to use this role."
+#    #- debug: var=ansible_version.full
+#
+#    # display IP address from inventory file
+#    - debug: var=ansible_host
+#
+#    # don't use old "{ items }" & with_items loop deprecated in Ansible 2.10
+#    # instead list the package names as a list as name argument
+#    - name: install CentOS required packages
+#      yum:
+#        name: ['ntp', 'lsof']
+#        state: installed
+#        update_cache: yes
+#
+#    - name: configure and enable NTP
+#      service: 
+#        name: ntpd 
+#        state: started 
+#        enabled: yes
+#    - name: set timezone
+#      timezone: name=America/Los_Angeles
+#
+#    - name: check TOD and timezone
+#      command: date
+#      register: tod 
+#    - debug: var=tod.stdout_lines
+#
+#    # ensure ntp has time to connect with external servers (centos7)
+#    - name: ntpdc
+#      command: ntpdc -c peer
+#      register: ntpdc
+#    - debug: var=ntpdc.stdout_lines
 
 #============================================================================== gl1
 - hosts: gl1
@@ -156,67 +146,70 @@
         name: httpd 
         state: restarted
 
-#============================================================================== lbr1
-- hosts: lbrs
+#============================================================================== lbr
+- hosts: lbr
   become: true
-#============================================================================== lbr1
-  tasks:
-    - name: install haproxy
-      yum: 
-        name: haproxy 
-        state: installed 
-        update_cache: yes
+  roles:
+  - common
+  - haproxy
 
-    - name: replace rsyslog
-      copy:
-        src: rsyslog.conf
-        dest: /etc/rsyslog.conf
-        backup: yes
-        owner: root
-        group: root
-        mode: 0644
-
-    - name: create haproxy logs
-      copy:
-        dest: /etc/rsyslog.d/haproxy.conf
-        content: |
-          local2.info    /var/log/haproxy-access.log  #For Access Log
-          local2.notice  /var/log/haproxy-info.log    #For Service Backend, load balancer
-        owner: root
-        group: root
-        mode: 0644
-      notify:
-        - restart rsyslog
-
-    - name: configure haproxy w/ template
-      template: 
-        # check_mode: yes
-        src: haproxy.cfg.j2
-        dest: /etc/haproxy/haproxy.cfg
-        validate: /sbin/haproxy -f %s -c
-        backup: yes
-      notify:
-        - restart haproxy
-
-    - name: tail haproxy.cfg
-      command: tail -20 /etc/haproxy/haproxy.cfg
-      register: results
-    - debug: var=results.stdout_lines
-
-    - name: enable and run haproxy
-      service: 
-        name: haproxy 
-        state: started 
-        enabled: yes
-      register: haproxy_started
-#    - debug: var=haproxy_started
-
-  handlers:
-    - name: restart haproxy
-      service: 
-        name: haproxy 
-        state: restarted
-    - name: restart rsyslog
-      service: 
-        name: rsyslog
-        state: restarted
+#  tasks:
+#    - name: install haproxy
+#      yum: 
+#        name: haproxy 
+#        state: installed 
+#        update_cache: yes
+#
+#    - name: replace rsyslog
+#      copy:
+#        src: rsyslog.conf
+#        dest: /etc/rsyslog.conf
+#        backup: yes
+#        owner: root
+#        group: root
+#        mode: 0644
+#
+#    - name: create haproxy logs
+#      copy:
+#        dest: /etc/rsyslog.d/haproxy.conf
+#        content: |
+#          local2.info    /var/log/haproxy-access.log  #For Access Log
+#          local2.notice  /var/log/haproxy-info.log    #For Service Backend, load balancer
+#        owner: root
+#        group: root
+#        mode: 0644
+#      notify:
+#        - restart rsyslog
+#
+#    - name: configure haproxy w/ template
+#      template: 
+#        # check_mode: yes
+#        src: haproxy.cfg.j2
+#        dest: /etc/haproxy/haproxy.cfg
+#        validate: /sbin/haproxy -f %s -c
+#        backup: yes
+#      notify:
+#        - restart haproxy
+#
+#    - name: tail haproxy.cfg
+#      command: tail -20 /etc/haproxy/haproxy.cfg
+#      register: results
+#    - debug: var=results.stdout_lines
+#
+#    - name: enable and run haproxy
+#      service: 
+#        name: haproxy 
+#        state: started 
+#        enabled: yes
+#      register: haproxy_started
+##    - debug: var=haproxy_started
+#
+#  handlers:
+#    - name: restart haproxy
+#      service: 
+#        name: haproxy 
+#        state: restarted
+#    - name: restart rsyslog
+#      service: 
+#        name: rsyslog
+#        state: restarted
