@@ -1,4 +1,5 @@
 # playbook for load balancer hosts
+# this will install both roles, then run the handlers for both roles
 ---
 - hosts: lbr
   become: true
