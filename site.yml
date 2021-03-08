@@ -48,15 +48,24 @@
 #============================================================================== gl2
 - hosts: gl2
   become: true
+  #  submodule git@github.com:geerlingguy/ansible-role-apache.git
   roles:
-    - ansible-role-apache
+    - role: gerringguy.apache
+      vars:
+        apache_listen_port: 8080
+        apache_vhosts:
+        - servername: "{{ ansible_hostname }}"
+          documentroot: /var/www/html
+          extra_parameters: |
+            RewriteCond %{HTTP_HOST} !^www\. [NC]
+            RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
   tasks:
     - name: enhance welcome message
       replace:
         path: /usr/share/httpd/noindex/index.html
         regexp: '<h1>(Testing 123..)</h1>'
-        replace: '<h1>\1. on {{ ansible_hostname }}</h1>'
+        replace: '<h1>\1<br>on {{ ansible_hostname }}</h1>'
         backup: yes
 
 #============================================================================== lbr

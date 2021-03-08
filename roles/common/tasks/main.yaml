@@ -25,7 +25,7 @@
 # Fedora requires dnf module with exclude feature
 # Fedora 32 won't resolve ansible_distribution variables w/ ansible 2.7
 # use pip install 'ansible==2.8.12' --update
-- name: Verify Ansible meets common-role's version requirements.
+- name: Verify Ansible meets projects's version requirements.
   assert:
     that: "ansible_version.full is version_compare('2.8.12', '>=')"
     msg: >
