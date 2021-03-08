@@ -44,10 +44,10 @@ Vagrant.configure(2) do | config |
     gl2.vm.hostname = 'gl2'
   end
 
-#   config.vm.define "gl3" do | gl3 |
-#     gl3.vm.network 'private_network', ip: '192.168.10.103'
-#     gl3.vm.hostname = 'gl3'
-#   end
+  config.vm.define "gl3" do | gl3 |
+    gl3.vm.network 'private_network', ip: '192.168.10.103'
+    gl3.vm.hostname = 'gl3'
+  end
 
   config.vm.define "lbr1", primary: true do | lbr1 |
     lbr1.vm.network 'private_network', ip: '192.168.10.100'
