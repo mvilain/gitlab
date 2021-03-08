@@ -1,0 +1,7 @@
+# playbook for load balancer hosts
+---
+- hosts: lbr
+  become: true
+  roles:
+    - common
+    - haproxy

@@ -1,0 +1,13 @@
+# group_vars for glservers group
+---
+group_vars: "glservers"
+
+# Variables for the gl server configuration
+
+httpd_port: 80
+
+# this is the repository that holds our sample glapp
+repository: https://github.com/bennojoy/myglapp.git
+
+# this is the sha1sum of V5 of the test glapp.
+glapp_version: 351e47276cc66b018f4890a04709d4cc3d3edb0d

@@ -1,0 +1,52 @@
+---
+# tasks file for haproxy
+
+- name: install haproxy
+  yum: 
+    name: haproxy 
+    state: installed 
+    update_cache: yes
+
+- name: replace rsyslog
+  copy:
+    src: rsyslog.conf
+    dest: /etc/rsyslog.conf
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create haproxy logs
+  copy:
+    dest: /etc/rsyslog.d/haproxy.conf
+    content: |
+      local2.info    /var/log/haproxy-access.log  #For Access Log
+      local2.notice  /var/log/haproxy-info.log    #For Service Backend, load balancer
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart rsyslog
+
+- name: configure haproxy w/ template
+  template: 
+    # check_mode: yes
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    validate: /sbin/haproxy -f %s -c
+    backup: yes
+  notify:
+    - restart haproxy
+
+- name: tail haproxy.cfg
+  command: tail -20 /etc/haproxy/haproxy.cfg
+  register: results
+- debug: var=results.stdout_lines
+
+- name: enable and run haproxy
+  service: 
+    name: haproxy 
+    state: started 
+    enabled: yes
+  register: haproxy_started
+#    - debug: var=haproxy_started
