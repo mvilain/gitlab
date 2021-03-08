@@ -1,6 +1,0 @@
-[submodule "roles/ansible-role-apache"]
-	path = roles/ansible-role-apache
-	url = git@github.com:geerlingguy/ansible-role-apache.git
-[submodule "roles/ansible-common-role"]
-	path = roles/ansible-common-role
-	url = ssh://git@github.com/mvilain/ansible-common-role.git
