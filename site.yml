@@ -1,19 +1,55 @@
 # Install on CentOS 6+7
 ---
+#============================================================================== all
 - hosts: all
   become: true
   # check_mode: yes  # yes=dry-run
-
+#============================================================================== all
   tasks:
+
+# ansible_os_family = dict(
+#  RedHat = 'RedHat', Fedora = 'RedHat', CentOS = 'RedHat', Scientific = 'RedHat',
+#  SLC = 'RedHat', Ascendos = 'RedHat', CloudLinux = 'RedHat', PSBM = 'RedHat',
+#  OracleLinux = 'RedHat', OVS = 'RedHat', OEL = 'RedHat', Amazon = 'RedHat',
+#  XenServer = 'RedHat', Ubuntu = 'Debian', Debian = 'Debian', SLES = 'Suse',
+#  SLED = 'Suse', OpenSuSE = 'Suse', SuSE = 'Suse', Gentoo = 'Gentoo',
+#  Archlinux = 'Archlinux', Mandriva = 'Mandrake', Mandrake = 'Mandrake',
+#  Solaris = 'Solaris', Nexenta = 'Solaris', OmniOS = 'Solaris', OpenIndiana = 'Solaris',
+#  SmartOS = 'Solaris', AIX = 'AIX', Alpine = 'Alpine', MacOSX = 'Darwin',
+#  FreeBSD = 'FreeBSD', HPUX = 'HP-UX'
+#)
+
+#- debug: var="{{ item }}"
+#  with_items:
+#  - ansible_os_family
+#  - ansible_distribution
+#  - ansible_distribution_major_version
+#  - ansible_distribution_release
+#  - ansible_distribution_version
+
+    - name: Verify Ansible meets common version requirements.
+      assert:
+        that: "ansible_version.full is version_compare('2.8.12', '>=')"
+        msg: >
+          "You must update Ansible to at least 2.8.12 to use this role."
+    #- debug: var=ansible_version.full
+
+    # display IP address from inventory file
     - debug: var=ansible_host
+
+    # don't use old "{ items }" & with_items loop deprecated in Ansible 2.10
+    # instead list the package names as a list as name argument
     - name: install CentOS required packages
-      yum: name={{item}} state=installed update_cache=yes
-      with_items:
-        - ntp
-        - lsof
+      yum:
+        name: ['ntp', 'lsof']
+        state: installed
+        update_cache: yes
 
     - name: configure and enable NTP
-      service: name=ntpd state=started enabled=yes
+      service: 
+        name: ntpd 
+        state: started 
+        enabled: yes
     - name: set timezone
       timezone: name=America/Los_Angeles
 
@@ -28,17 +64,23 @@
       register: ntpdc
     - debug: var=ntpdc.stdout_lines
 
-
+#============================================================================== gl1
 - hosts: gl1
   become: true
-
+#============================================================================== gl1
   pre_tasks:
     - name: install epel-release
-      yum: name=epel-release state=installed update_cache=yes
+      yum: 
+        name: epel-release
+        state: installed 
+        update_cache: yes
 
   tasks:
     - name: install nginx
-      yum: name=nginx state=installed update_cache=yes
+      yum: 
+        name: nginx
+        state: installed 
+        update_cache: yes
       register: nginx_installed
     # - debug: var=nginx_installed
 
@@ -50,27 +92,32 @@
         backup: yes
 
     - name: start and enable nginx
-      service: name=nginx state=started enabled=yes
+      service: 
+        name: nginx 
+        state: started 
+        enabled: yes
       register: nginx_started
     # - debug: var=nginx_started
 
-
+#============================================================================== gl2
 - hosts: gl2
   become: true
-
+#============================================================================== gl2
   tasks:
     - name: install apache
-      yum: name=httpd state=installed update_cache=yes
+      yum:
+        name: httpd
+        state: installed 
+        update_cache: yes
 
     # CentOS apachectl is a script that doesn't allow parameters by default
-    # so validate won't work here because ansible requires %s parameter
+    # so validate param won't work here because ansible requires %s parameter
     - name: configure apache
       replace: 
         path: /etc/httpd/conf/httpd.conf
         regexp: "{{ item.regex }}"
         replace: "{{ item.replace }}"
         backup: yes
-#        validate: 'apachectl configtest'
       with_items:
         - { regex: '^Listen\s+80\s*$' , replace: 'Listen 0.0.0.0:80' }
         - { regex: '^#ServerName.*$' , replace: 'ServerName gl2:80'}
@@ -97,20 +144,28 @@
     # - debug: var=http_index
 
     - name: enable and run apache
-      service: name=httpd state=started enabled=yes
+      service: 
+        name: httpd
+        state: started
+        enabled: yes
       register: apache_started
 
   handlers:
     - name: restart apache
-      service: name=httpd state=restarted
+      service: 
+        name: httpd 
+        state: restarted
 
-
+#============================================================================== lbr1
 - hosts: lbrs
   become: true
+#============================================================================== lbr1
   tasks:
-
     - name: install haproxy
-      yum: name=haproxy state=installed update_cache=yes
+      yum: 
+        name: haproxy 
+        state: installed 
+        update_cache: yes
 
     - name: replace rsyslog
       copy:
@@ -125,8 +180,8 @@
       copy:
         dest: /etc/rsyslog.d/haproxy.conf
         content: |
-          local2.=info     /var/log/haproxy-access.log    #For Access Log
-          local2.notice    /var/log/haproxy-info.log      #For Service Info - Backend, loadbalancer
+          local2.info    /var/log/haproxy-access.log  #For Access Log
+          local2.notice  /var/log/haproxy-info.log    #For Service Backend, load balancer
         owner: root
         group: root
         mode: 0644
@@ -149,12 +204,19 @@
     - debug: var=results.stdout_lines
 
     - name: enable and run haproxy
-      service: name=haproxy state=started enabled=yes
+      service: 
+        name: haproxy 
+        state: started 
+        enabled: yes
       register: haproxy_started
 #    - debug: var=haproxy_started
 
   handlers:
     - name: restart haproxy
-      service: name=haproxy state=restarted
+      service: 
+        name: haproxy 
+        state: restarted
     - name: restart rsyslog
-      service: name=rsyslog state=restarted
+      service: 
+        name: rsyslog
+        state: restarted
