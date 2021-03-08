@@ -4,6 +4,14 @@ This project uses Vagrant to create three GitLab servers, a database server, and
 a haproxy load balancer to cycle between the three servers.  All three servers
 keep their database of users and repositories in the database server.
 
+## Requirements
+
+This project uses several roles that are in the transition to becoming 2.9's new Collections.  So that this project will run on 2.8, I've used these as roles rather than full-on collections which require 2.9.
+
+- ansible-role-apache
+- ansible-role-nginx
+- ansible-role-nginx-config
+
 
 ## to do
 
