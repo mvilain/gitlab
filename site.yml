@@ -1,0 +1,160 @@
+# Install on CentOS 6+7
+---
+- hosts: all
+  become: true
+  # check_mode: yes  # yes=dry-run
+
+  tasks:
+    - debug: var=ansible_host
+    - name: install CentOS required packages
+      yum: name={{item}} state=installed update_cache=yes
+      with_items:
+        - ntp
+        - lsof
+
+    - name: configure and enable NTP
+      service: name=ntpd state=started enabled=yes
+    - name: set timezone
+      timezone: name=America/Los_Angeles
+
+    - name: check TOD and timezone
+      command: date
+      register: tod 
+    - debug: var=tod.stdout_lines
+
+    # ensure ntp has time to connect with external servers (centos7)
+    - name: ntpdc
+      command: ntpdc -c peer
+      register: ntpdc
+    - debug: var=ntpdc.stdout_lines
+
+
+- hosts: gl1
+  become: true
+
+  pre_tasks:
+    - name: install epel-release
+      yum: name=epel-release state=installed update_cache=yes
+
+  tasks:
+    - name: install nginx
+      yum: name=nginx state=installed update_cache=yes
+      register: nginx_installed
+    # - debug: var=nginx_installed
+
+    - name: update nginx index.html
+      replace: 
+        path: /usr/share/nginx/html/index.html
+        regexp: '<strong>nginx</strong> on Fedora'
+        replace: '<strong>nginx</strong> on {{ ansible_hostname }}'
+        backup: yes
+
+    - name: start and enable nginx
+      service: name=nginx state=started enabled=yes
+      register: nginx_started
+    # - debug: var=nginx_started
+
+
+- hosts: gl2
+  become: true
+
+  tasks:
+    - name: install apache
+      yum: name=httpd state=installed update_cache=yes
+
+    # CentOS apachectl is a script that doesn't allow parameters by default
+    # so validate won't work here because ansible requires %s parameter
+    - name: configure apache
+      replace: 
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "{{ item.regex }}"
+        replace: "{{ item.replace }}"
+        backup: yes
+#        validate: 'apachectl configtest'
+      with_items:
+        - { regex: '^Listen\s+80\s*$' , replace: 'Listen 0.0.0.0:80' }
+        - { regex: '^#ServerName.*$' , replace: 'ServerName gl2:80'}
+      notify:
+        - restart apache
+
+    - name: validate apache config
+      shell: /sbin/apachectl configtest
+      args:
+        warn: no
+      register: configtest
+    - debug: var=configtest.stderr_lines
+        
+    - name: set index.html
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <h1> Welcome to {{ ansible_hostname }} </h1>
+
+        owner: root
+        group: root
+        mode: 0644
+      register: http_index
+    # - debug: var=http_index
+
+    - name: enable and run apache
+      service: name=httpd state=started enabled=yes
+      register: apache_started
+
+  handlers:
+    - name: restart apache
+      service: name=httpd state=restarted
+
+
+- hosts: lbrs
+  become: true
+  tasks:
+
+    - name: install haproxy
+      yum: name=haproxy state=installed update_cache=yes
+
+    - name: replace rsyslog
+      copy:
+        src: rsyslog.conf
+        dest: /etc/rsyslog.conf
+        backup: yes
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: create haproxy logs
+      copy:
+        dest: /etc/rsyslog.d/haproxy.conf
+        content: |
+          local2.=info     /var/log/haproxy-access.log    #For Access Log
+          local2.notice    /var/log/haproxy-info.log      #For Service Info - Backend, loadbalancer
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - restart rsyslog
+
+    - name: configure haproxy w/ template
+      template: 
+        # check_mode: yes
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        validate: /sbin/haproxy -f %s -c
+        backup: yes
+      notify:
+        - restart haproxy
+
+    - name: tail haproxy.cfg
+      command: tail -20 /etc/haproxy/haproxy.cfg
+      register: results
+    - debug: var=results.stdout_lines
+
+    - name: enable and run haproxy
+      service: name=haproxy state=started enabled=yes
+      register: haproxy_started
+#    - debug: var=haproxy_started
+
+  handlers:
+    - name: restart haproxy
+      service: name=haproxy state=restarted
+    - name: restart rsyslog
+      service: name=rsyslog state=restarted

@@ -1,0 +1,46 @@
+# haproxy demo inventory
+
+[glservers]
+gl1 ansible_host=192.168.10.101
+gl2 ansible_host=192.168.10.102
+gl3 ansible_host=192.168.10.103
+
+[glservers:vars]
+# Variables for the gl server configuration
+
+httpd_port=80
+
+# this is the repository that holds our sample glapp
+repository=https://github.com/bennojoy/myglapp.git
+
+# this is the sha1sum of V5 of the test glapp.
+glapp_version=351e47276cc66b018f4890a04709d4cc3d3edb0d
+
+[lbrs]
+lbr1 ansible_host=192.168.10.100
+
+[lbrs:vars]
+# Variables for the load balancer server configuration
+
+# HAProxy supports "http" and "tcp". For SSL, SMTP, etc, use "tcp".
+mode=http
+
+# Port on which HAProxy should listen
+listenport=80
+
+# A name for the proxy daemon, this wil be the suffix in the logs.
+daemonname=haproxy
+
+# Balancing Algorithm. Available options:
+# roundrobin, source, leastconn, source, uri
+# (if persistance is required use, "source")
+balance=roundrobin
+
+# Group 'all' with all servers
+[all:children]
+glservers
+lbrs
+
+[all:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key

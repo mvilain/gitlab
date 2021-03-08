@@ -1,0 +1,62 @@
+# https://github.com/ansible/ansible-examples/blob/master/lamp_haproxy/roles/haproxy/templates/haproxy.cfg.j2
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    log         127.0.0.1 local2    #Log configuration
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000                
+    user        root             # haproxy running under "root" because
+    group       root             # Vagrant+virtual box won't forword port 80
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats level admin
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    {{ mode }}
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+listen stats
+    bind *:81
+    stats enable
+    stats uri /
+    stats realm Haproxy\ Statistics
+#    stats auth username:password
+#---------------------------------------------------------------------
+# FrontEnd 
+#---------------------------------------------------------------------
+# frontend {{ daemonname }}
+#     bind *:{{listenport}}
+#     default_backend http_back
+#---------------------------------------------------------------------
+# BackEnd 
+#---------------------------------------------------------------------
+backend http_back
+{% for host in groups.lbrs %}
+listen {{ daemonname }} 0.0.0.0:{{ listenport }}
+{% endfor %}
+    balance {{ balance }}
+{% for host in groups.glservers %}
+    server {{ host }} {{ hostvars[host].ansible_host }}:{{ hostvars[host].httpd_port }} check
+{% endfor %}
