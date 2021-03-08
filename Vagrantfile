@@ -9,7 +9,6 @@ Vagrant.configure(2) do | config |
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
-  # config.vm.box = 'centos/7'
   config.vm.box = 'centos/7'
   # config.vm.network 'forwarded_port', guest: 80, host: 8080
   config.ssh.insert_key = false
