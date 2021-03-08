@@ -49,14 +49,14 @@
 - hosts: gl2
   become: true
   roles:
-    - apache
+    - ansible-role-apache
 
   tasks:
     - name: enhance welcome message
       replace:
         path: /usr/share/httpd/noindex/index.html
         regexp: '<h1>(Testing 123..)</h1>'
-        replace: '<h1>\1 on {{ ansible_hostname }}</h1>'
+        replace: '<h1>\1. on {{ ansible_hostname }}</h1>'
         backup: yes
 
 #============================================================================== lbr
