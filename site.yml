@@ -8,7 +8,7 @@
   become: true
   # check_mode: yes  # yes=dry-run
   roles:
-    - common
+    - ansible-role-common
 
 #============================================================================== gl1
 - hosts: gl1
@@ -50,7 +50,7 @@
   become: true
   #  submodule git@github.com:geerlingguy/ansible-role-apache.git
   roles:
-    - role: gerringguy.apache
+    - role: ansible-role-apache
       vars:
         apache_listen_port: 8080
         apache_vhosts:
