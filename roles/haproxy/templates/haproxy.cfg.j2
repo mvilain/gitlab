@@ -52,7 +52,6 @@ frontend {{ daemonname }}
    default_backend http_back
 #---------------------------------------------------------------------
 # BackEnd
-# #apache_listen_port used in ansible-role-apache role in group_vars/lbr
 #---------------------------------------------------------------------
 backend http_back
 {% for host in groups.lbr %}
