@@ -11,7 +11,7 @@
     - ansible-role-common
 
 #============================================================================== gl1
-- hosts: gl1
+- hosts: gl1,gl3
   become: true
   #  submodule https://github.com/nginxinc/ansible-role-nginx.git
   roles:
