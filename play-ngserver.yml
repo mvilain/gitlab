@@ -1,0 +1,27 @@
+# playbook for nginx in gitlab server hosts
+# this will install both roles, then run the handlers for both roles
+# ansible should pull variables from group_vars/glservers anyway
+---
+- hosts: glservers
+
+  vars_files:
+    - group_vars/glservers
+  become: true
+
+  roles:
+    - role: ansible-role-common
+
+  #  submodule https://github.com/nginxinc/ansible-role-nginx.git
+  roles:
+    - role: ansible-role-nginx
+
+  tasks:
+    - name: update nginx index.html
+      replace: 
+        path: /usr/share/nginx/html/index.html
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.replace }}"
+        backup: yes
+      with_items:
+        - { regexp: 'width: 35em;' , replace: 'width: 40em;' }
+        - { regexp: '<h1>Welcome to nginx!</h1>' , replace: '<h1 style="font-size: 2.5em">Welcome to nginx on {{ ansible_hostname }}!</h1>' }

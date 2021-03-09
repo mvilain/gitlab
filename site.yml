@@ -13,37 +13,20 @@
 #============================================================================== gl1
 - hosts: gl1
   become: true
-#============================================================================== gl1
-  pre_tasks:
-    - name: install epel-release
-      yum: 
-        name: epel-release
-        state: installed 
-        update_cache: yes
+  #  submodule https://github.com/nginxinc/ansible-role-nginx.git
+  roles:
+    - role: ansible-role-nginx
 
   tasks:
-    - name: install nginx
-      yum: 
-        name: nginx
-        state: installed 
-        update_cache: yes
-      register: nginx_installed
-    # - debug: var=nginx_installed
-
     - name: update nginx index.html
       replace: 
         path: /usr/share/nginx/html/index.html
-        regexp: '<strong>nginx</strong> on Fedora'
-        replace: '<strong>nginx</strong> on {{ ansible_hostname }}'
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.replace }}"
         backup: yes
-
-    - name: start and enable nginx
-      service: 
-        name: nginx 
-        state: started 
-        enabled: yes
-      register: nginx_started
-    # - debug: var=nginx_started
+      with_items:
+        - { regexp: 'width: 35em;' , replace: 'width: 40em;' }
+        - { regexp: '<h1>Welcome to nginx!</h1>' , replace: '<h1 style="font-size: 2.5em">Welcome to nginx on {{ ansible_hostname }}!</h1>' }
 
 #============================================================================== gl2
 - hosts: gl2

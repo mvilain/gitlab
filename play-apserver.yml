@@ -1,4 +1,4 @@
-# playbook for gitlab server hosts
+# playbook for apache in gitlab server hosts
 # this will install both roles, then run the handlers for both roles
 # ansible should pull variables from group_vars/glservers anyway
 ---
