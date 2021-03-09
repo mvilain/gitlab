@@ -15,7 +15,7 @@ Vagrant.configure(2) do | config |
   config.vm.synced_folder '.', '/vagrant', disabled: false
   config.vm.provider :virtualbox do |vb|
     #vb.gui = true
-    vb.memory = '1024'
+    vb.memory = '2048'
   end
 
   # provision on all machines -- set hosts and allow ssh w/o checking
