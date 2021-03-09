@@ -1,4 +1,5 @@
 # https://github.com/ansible/ansible-examples/blob/master/lamp_haproxy/roles/haproxy/templates/haproxy.cfg.j2
+# %{{ ansible_managed }}
 #---------------------------------------------------------------------
 # Global settings
 #---------------------------------------------------------------------
@@ -44,19 +45,20 @@ listen stats
     stats realm Haproxy\ Statistics
 #    stats auth username:password
 #---------------------------------------------------------------------
-# FrontEnd 
+# FrontEnd
 #---------------------------------------------------------------------
-# frontend {{ daemonname }}
-#     bind *:{{listenport}}
-#     default_backend http_back
+frontend {{ daemonname }}
+   bind *:{{listenport}}
+   default_backend http_back
 #---------------------------------------------------------------------
-# BackEnd 
+# BackEnd
+# #apache_listen_port used in ansible-role-apache role in group_vars/lbr
 #---------------------------------------------------------------------
 backend http_back
-{% for host in groups.lbrs %}
+{% for host in groups.lbr %}
 listen {{ daemonname }} 0.0.0.0:{{ listenport }}
 {% endfor %}
     balance {{ balance }}
 {% for host in groups.glservers %}
-    server {{ host }} {{ hostvars[host].ansible_host }}:{{ hostvars[host].httpd_port }} check
+    server {{ host }} {{ hostvars[host].ansible_host }}:{{ hostvars[host].apache_listen_port }} check
 {% endfor %}

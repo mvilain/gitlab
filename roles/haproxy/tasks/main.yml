@@ -28,6 +28,7 @@
   notify:
     - restart rsyslog
 
+# apache_listen_port used in ansible-role-apache role in group_vars/lbr
 - name: configure haproxy w/ template
   template: 
     # check_mode: yes
