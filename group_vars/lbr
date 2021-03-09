@@ -17,3 +17,5 @@ daemonname: haproxy
 # roundrobin, source, leastconn, source, uri
 # (if persistance is required use, "source")
 balance: roundrobin
+
+# gitlab servers use ansible-role-apache role which defines apache_listen_port
