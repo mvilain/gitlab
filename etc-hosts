@@ -1,3 +1,5 @@
+# be sure to update group_vars/lbr
+
 192.168.10.100 lbr1
 192.168.10.101 gl1
 192.168.10.102 gl2

@@ -1,5 +1,6 @@
 # gitlab demo inventory
 
+# be sure to update group_vars/lbr
 [glservers]
 gl1 ansible_host=192.168.10.101
 gl2 ansible_host=192.168.10.102
