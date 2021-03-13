@@ -28,3 +28,8 @@ haproxy_backend_servers:
     address: 192.168.10.102:80
   - name: gl3
     address: 192.168.10.103:80
+
+# haproxy running under "root" because
+# Vagrant+virtual box won't forword port 80
+haproxy_user: root
+haproxy_group: root
