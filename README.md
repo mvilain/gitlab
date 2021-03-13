@@ -10,7 +10,16 @@ This project uses several roles that are in the transition to becoming 2.9's new
 
 - ansible-role-apache
 - ansible-role-nginx
-- ansible-role-nginx-config
+
+These modules work well in creating default setups for apache and nginx.
+
+- ansible-role-haproxy  --> haproxy
+
+This role sets up haproxy without any monitoring page and doesn't automatically add servers to the configuration from an ansible group.  If you use the http health check provided, the default install of apache 2.4 will return 'Forbidden' which will fail.
+
+Also, the haproxy process doesn't agregate logs in a separate file.
+
+Instead of using this role as is, combine the features of it with my own module.
 
 
 ## to do
