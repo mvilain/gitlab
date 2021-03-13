@@ -26,7 +26,8 @@
         backup: yes
       with_items:
         - { regexp: 'width: 35em;' , replace: 'width: 40em;' }
-        - { regexp: '<h1>Welcome to nginx!</h1>' , replace: '<h1 style="font-size: 2.5em">Welcome to nginx on {{ ansible_hostname }}!</h1>' }
+        - { regexp: '<h1>Welcome to nginx!</h1>' , 
+            replace: '<h1 style="font-size: 2.5em">Welcome to nginx on {{ ansible_hostname }}!</h1>' }
 
 #============================================================================== gl2
 - hosts: gl2
@@ -55,4 +56,19 @@
 - hosts: lbr
   become: true
   roles:
-  - haproxy
+  - ansible-role-haproxy
+
+  # geerlingguy's module doesn't do everything, so pick up the slack
+  tasks:
+    - name: additional haproxy setup
+      import_tasks: haproxy_tasks.yml
+
+  handlers:
+   - name: restart haproxy
+     service: 
+       name: haproxy 
+       state: restarted
+   - name: restart rsyslog
+     service: 
+       name: rsyslog
+       state: restarted
