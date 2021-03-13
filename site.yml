@@ -56,19 +56,4 @@
 - hosts: lbr
   become: true
   roles:
-  - ansible-role-haproxy
-
-  # geerlingguy's module doesn't do everything, so pick up the slack
-  tasks:
-    - name: additional haproxy setup
-      import_tasks: haproxy_tasks.yml
-
-  handlers:
-   - name: restart haproxy
-     service: 
-       name: haproxy 
-       state: restarted
-   - name: restart rsyslog
-     service: 
-       name: rsyslog
-       state: restarted
+  - haproxy

@@ -1,11 +1,28 @@
----
 # tasks file for haproxy
+---
 
-- name: install haproxy
-  yum: 
-    name: haproxy 
-    state: installed 
-    update_cache: yes
+- name: install HAProxy
+  package: 
+    name: haproxy
+    state: present
+
+- name: enable HAProxy for Debian
+  lineinfile:
+    dest: /etc/default/haproxy
+    regexp: "^ENABLED.+$"
+    line: "ENABLED=1"
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: get HAProxy version
+  command: haproxy -v
+  register: haproxy_version_result
+  changed_when: false
+  check_mode: false
+
+- name: set HAProxy version
+  set_fact:
+    haproxy_version: "{{ '1.5' if '1.5.' in haproxy_version_result.stdout else '1.4' }}"
 
 - name: replace rsyslog
   copy:
@@ -29,18 +46,18 @@
     - restart rsyslog
 
 # apache_listen_port used in ansible-role-apache role in group_vars/lbr
-- name: configure haproxy w/ template
+- name: configure HAProxy
   template: 
-    # check_mode: yes
     src: haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
-    validate: /sbin/haproxy -f %s -c
+    validate: /sbin/haproxy -f %s -c -q
+    mode: 0644
     backup: yes
   notify:
     - restart haproxy
 
 - name: tail haproxy.cfg
-  command: tail -20 /etc/haproxy/haproxy.cfg
+  command: tail -40 /etc/haproxy/haproxy.cfg
   register: results
 - debug: var=results.stdout_lines
 
@@ -50,4 +67,4 @@
     state: started 
     enabled: yes
   register: haproxy_started
-#    - debug: var=haproxy_started
+#- debug: var=haproxy_started

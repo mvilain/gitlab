@@ -2,48 +2,5 @@
 ---
 group_vars: "lbr"
 
-# Variables for the load balancer server configuration
+# override variables for load balancer server configuration in haproxy/defaults/main.yml
 
-# HAProxy supports "http" and "tcp". For SSL, SMTP, etc, use "tcp".
-mode: http
-
-# Port on which HAProxy should listen
-listenport: 80
-
-# A name for the proxy daemon, this wil be the suffix in the logs.
-haproxy_daemonname: haproxy
-
-# haproxy running under "root" because
-# Vagrant+virtual box won't forword port 80
-haproxy_user: root
-haproxy_group: root
-
-haproxy_socket: /var/lib/haproxy/stats
-haproxy_chroot: /var/lib/haproxy
-
-# Frontend settings.
-haproxy_frontend_name: 'hafrontend'
-haproxy_frontend_bind_address: '*'
-haproxy_frontend_port: 80
-haproxy_frontend_mode: 'http'
-
-# Backend settings.
-haproxy_backend_name: 'habackend'
-haproxy_backend_mode: 'http'
-
-# Balancing Algorithm. Available options: roundrobin, source, leastconn, source, uri
-# (if persistance is required use, "source")
-haproxy_backend_balance_method: 'roundrobin'
-
-# fails for apache 2.4 because it returns "403 Forbidden" on default welcome page
-haproxy_backend_httpchk: 'HEAD / HTTP/1.1\r\nHost:localhost'
-
-# List of backend servers.
-haproxy_backend_servers: []
-# - name: app1
-#   address: 192.168.0.1:80
-# - name: app2
-#   address: 192.168.0.2:80
-
-# Extra global vars (see README for example usage).
-haproxy_global_vars: []
