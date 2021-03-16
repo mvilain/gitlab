@@ -6,8 +6,6 @@
 
 
 Vagrant.configure(2) do | config |
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
   config.vm.box = 'centos/7'
   # config.vm.network 'forwarded_port', guest: 80, host: 8080
@@ -15,7 +13,7 @@ Vagrant.configure(2) do | config |
   config.vm.synced_folder '.', '/vagrant', disabled: false
   config.vm.provider :virtualbox do |vb|
     #vb.gui = true
-    vb.memory = '2048'
+    vb.memory = '4096'
   end
 
   # provision on all machines -- set hosts and allow ssh w/o checking
