@@ -4,53 +4,53 @@
 # do the common installed stuff first so handlers for it run 
 # before a node-specific role is run with it's own handlers
 #
-- hosts: all
+- hosts: glservers
   become: true
   # check_mode: yes  # yes=dry-run
   roles:
-    - ansible-role-common
+    - gitlab
 
 #============================================================================== gl1
-- hosts: gl1,gl3
-  become: true
-  #  submodule https://github.com/nginxinc/ansible-role-nginx.git
-  roles:
-    - role: ansible-role-nginx
-
-  tasks:
-    - name: update nginx index.html
-      replace: 
-        path: /usr/share/nginx/html/index.html
-        regexp: "{{ item.regexp }}"
-        replace: "{{ item.replace }}"
-        backup: yes
-      with_items:
-        - { regexp: 'width: 35em;' , replace: 'width: 40em;' }
-        - { regexp: '<h1>Welcome to nginx!</h1>' , 
-            replace: '<h1 style="font-size: 2.5em">Welcome to nginx on {{ ansible_hostname }}!</h1>' }
+#- hosts: gl1,gl3
+#  become: true
+#  #  submodule https://github.com/nginxinc/ansible-role-nginx.git
+#  roles:
+#    - role: ansible-role-nginx
+#
+#  tasks:
+#    - name: update nginx index.html
+#      replace: 
+#        path: /usr/share/nginx/html/index.html
+#        regexp: "{{ item.regexp }}"
+#        replace: "{{ item.replace }}"
+#        backup: yes
+#      with_items:
+#        - { regexp: 'width: 35em;' , replace: 'width: 40em;' }
+#        - { regexp: '<h1>Welcome to nginx!</h1>' , 
+#            replace: '<h1 style="font-size: 2.5em">Welcome to nginx on {{ ansible_hostname }}!</h1>' }
 
 #============================================================================== gl2
-- hosts: gl2
-  become: true
-  #  submodule git@github.com:geerlingguy/ansible-role-apache.git
-  roles:
-    - role: ansible-role-apache
-      vars:
-        apache_listen_port: 80
-        apache_vhosts:
-        - servername: "{{ ansible_hostname }}"
-          documentroot: /var/www/html
-          extra_parameters: |
-            RewriteCond %{HTTP_HOST} !^www\. [NC]
-            RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-
-  tasks:
-    - name: enhance welcome message
-      replace:
-        path: /usr/share/httpd/noindex/index.html
-        regexp: '<h1>(Testing 123..)</h1>'
-        replace: '<h1>\1<br>on {{ ansible_hostname }}</h1>'
-        backup: yes
+#- hosts: gl2
+#  become: true
+#  #  submodule git@github.com:geerlingguy/ansible-role-apache.git
+#  roles:
+#    - role: ansible-role-apache
+#      vars:
+#        apache_listen_port: 80
+#        apache_vhosts:
+#        - servername: "{{ ansible_hostname }}"
+#          documentroot: /var/www/html
+#          extra_parameters: |
+#            RewriteCond %{HTTP_HOST} !^www\. [NC]
+#            RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+#
+#  tasks:
+#    - name: enhance welcome message
+#      replace:
+#        path: /usr/share/httpd/noindex/index.html
+#        regexp: '<h1>(Testing 123..)</h1>'
+#        replace: '<h1>\1<br>on {{ ansible_hostname }}</h1>'
+#        backup: yes
 
 #============================================================================== lbr
 - hosts: lbr
