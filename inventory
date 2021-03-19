@@ -1,16 +1,10 @@
 # gitlab demo inventory
 
 # be sure to update group_vars/lbr
-# ansible.cfg sets global python_interpeter to /usr/libexec/platform-python
+# ansible.cfg sets global default python_interpeter=/usr/libexec/platform-python
 [glservers]
 c7  ansible_host=192.168.10.107
 c8  ansible_host=192.168.10.108
-# d9  ansible_host=192.168.10.109
-# d10 ansible_host=192.168.10.110
-u16 ansible_host=192.168.10.116
-u18 ansible_host=192.168.10.118
-u20 ansible_host=192.168.10.120
-
 [glservers:vars]
 # look in group_vars/glservers
 
@@ -18,14 +12,15 @@ u20 ansible_host=192.168.10.120
 [glservers_py3]
 d9  ansible_host=192.168.10.109
 d10 ansible_host=192.168.10.110
-
+u16 ansible_host=192.168.10.116
+u18 ansible_host=192.168.10.118
+u20 ansible_host=192.168.10.120
 [glservers_py3:vars]
 ansible_python_interpreter=/usr/bin/python3
 
 
 [lbr]
 lbr1 ansible_host=192.168.10.100
-
 [lbr:vars]
 # look in group_vars/lbr
 
