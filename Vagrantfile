@@ -34,6 +34,7 @@ Vagrant.configure("2") do |config|
 #      yum install -y epel-release
 #       yum install -y python3 libselinux-python3 #python36-rpm
     SHELL
+    # still uses python2 for ansible
     c7.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
@@ -51,7 +52,7 @@ Vagrant.configure("2") do |config|
       dnf install -y epel-release
       dnf config-manager --set-enabled powertools
       dnf makecache
-      dnf install -y ansible python3-firewall
+      dnf install -y ansible
       alternatives --set python /usr/bin/python3
     SHELL
     c8.vm.provision "ansible" do |ansible|
