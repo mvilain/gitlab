@@ -1,6 +1,7 @@
 # gitlab demo inventory
 
 # be sure to update group_vars/lbr
+# ansible.cfg sets global python_interpeter to /usr/libexec/platform-python
 [glservers]
 c7  ansible_host=192.168.10.107
 c8  ansible_host=192.168.10.108
@@ -13,6 +14,13 @@ u20 ansible_host=192.168.10.120
 [glservers:vars]
 # look in group_vars/glservers
 
+
+[glservers_py3]
+#c8  ansible_host=192.168.10.108
+
+[glservers_py3:vars]
+ansible_python_interpreter=/usr/bin/python3
+
 [lbr]
 lbr1 ansible_host=192.168.10.100
 
@@ -21,7 +29,8 @@ lbr1 ansible_host=192.168.10.100
 
 # Group 'all' with all servers
 [all:children]
-glservers
+glservers 
+glservers_py3
 lbr
 
 [all:vars]

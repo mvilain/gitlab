@@ -4,7 +4,7 @@
 # do the common installed stuff first so handlers for it run 
 # before a node-specific role is run with it's own handlers
 #
-- hosts: glservers
+- hosts: glservers glservers_py3
   become: true
   # check_mode: yes  # yes=dry-run
   roles:

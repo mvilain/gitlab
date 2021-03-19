@@ -31,7 +31,8 @@ Vagrant.configure("2") do |config|
     c7.vm.network 'private_network', ip: '192.168.10.107'
     c7.vm.hostname = 'c7'
     c7.vm.provision "shell", inline: <<-SHELL
-      yum install -y python libselinux-python python-firewall
+#      yum install -y epel-release
+#       yum install -y python3 libselinux-python3 #python36-rpm
     SHELL
     c7.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
@@ -65,11 +66,11 @@ Vagrant.configure("2") do |config|
   config.vm.define "d9" do |d9|
     d9.vm.box = "debian/stretch64"
     d9.ssh.insert_key = false
-    d9.vm.network 'private_network', ip: '192.168.10.209'
+    d9.vm.network 'private_network', ip: '192.168.10.109'
     d9.vm.hostname = 'd9'
     d9.vm.provision "shell", inline: <<-SHELL
         apt-get update
-        apt-get install -y apt-transport-https
+        apt-get install -y apt-transport-https python-apt
     SHELL
     d9.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
@@ -83,7 +84,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "d10" do |d10|
     d10.vm.box = "debian/buster64"
     d10.ssh.insert_key = false
-    d10.vm.network 'private_network', ip: '192.168.10.210'
+    d10.vm.network 'private_network', ip: '192.168.10.110'
     d10.vm.hostname = 'd10'
     d10.vm.provision "shell", inline: <<-SHELL
         apt-get update --allow-releaseinfo-change -y
