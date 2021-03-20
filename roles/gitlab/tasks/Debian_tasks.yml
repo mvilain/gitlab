@@ -1,0 +1,29 @@
+---
+- assert:
+    that: "ansible_distribution_major_version is version_compare('9', '>=')"
+    msg: "Debian version supported"
+#- debug: var=ansible_distribution_major_version
+
+- name: install Debian packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - curl
+    - openssh-server
+    - ca-certificates
+    - perl
+
+- name: install postfix for mail notifications
+  package:
+    name: postfix
+    state: present
+
+- name: start postfix
+  service:
+    name: postfix
+    enabled: true
+    state: started
+
+# run the repo install script
+# install the gitlab package

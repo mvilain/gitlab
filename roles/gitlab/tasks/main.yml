@@ -1,0 +1,130 @@
+---
+# ansible_os_family = dict(
+# RedHat = 'RedHat', 
+# Fedora = 'RedHat', 
+# CentOS = 'RedHat', 
+# Scientific = 'RedHat',
+# SLC = 'RedHat', 
+# Ascendos = 'RedHat', 
+# CloudLinux = 'RedHat', 
+# PSBM = 'RedHat',
+#  OracleLinux = 'RedHat', 
+# OVS = 'RedHat', 
+# OEL = 'RedHat', 
+# Amazon = 'RedHat',
+# XenServer = 'RedHat', 
+# Ubuntu = 'Debian', 
+# Debian = 'Debian', 
+# SLES = 'Suse',
+# SLED = 'Suse', 
+# OpenSuSE = 'Suse', 
+# SuSE = 'Suse', 
+# Gentoo = 'Gentoo',
+#  Archlinux = 'Archlinux', 
+# Mandriva = 'Mandrake', 
+# Mandrake = 'Mandrake',
+# Solaris = 'Solaris', 
+# Nexenta = 'Solaris', 
+# OmniOS = 'Solaris', 
+# OpenIndiana = 'Solaris',
+# SmartOS = 'Solaris', 
+# AIX = 'AIX', 
+# Alpine = 'Alpine', 
+# MacOSX = 'Darwin',
+# FreeBSD = 'FreeBSD', 
+# HPUX = 'HP-UX'
+#)
+
+#- debug: var="{{ item }}"
+#  with_items:
+#  - ansible_os_family
+#  - ansible_distribution
+#  - ansible_distribution_major_version
+#  - ansible_distribution_release
+#  - ansible_distribution_version
+
+- name: Load variables file from vars/ based on the OS type, or a default if not found
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}_vars.yml"
+    - "{{ ansible_os_family }}_vars.yml"
+    - main.yml
+
+- include_tasks: "{{ ansible_distribution }}_tasks.yml"
+
+- name: Check if GitLab configuration file already exists.
+  stat: path=/etc/gitlab/gitlab.rb
+  register: gitlab_config_file
+
+- name: Check if GitLab is already installed.
+  stat: path=/usr/bin/gitlab-ctl
+  register: gitlab_file
+
+# Install GitLab dependencies defined in vars/{{ansible_os_family}}_vars.yml
+- name: Install GitLab dependencies.
+  package:
+    name: "{{ gitlab_dependencies }}"
+    state: present
+  register: gitlab_depends
+#- debug: var=gitlab_depends.results
+
+- name: Download GitLab repository installation script.
+  get_url:
+    url: "{{ gitlab_repo_script_url }}"
+    dest: /tmp/gitlab_install_repository.sh
+    validate_certs: "{{ gitlab_download_validate_certs }}"
+  when: not gitlab_file.stat.exists
+
+- name: Install GitLab repository.
+  command: bash /tmp/gitlab_install_repository.sh
+  args:
+    warn: no
+  register: gitlab_repo
+  when: not gitlab_file.stat.exists
+- debug: var=gitlab_repo.stdout_lines
+
+- name: Define the Gitlab package name.
+  set_fact:
+    gitlab_package_name: "{{ gitlab_edition }}{{ gitlab_package_version_separator }}{{ gitlab_version }}"
+  when: gitlab_version | default(false)
+
+#- name: Install GitLab
+#  package:
+#    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
+#    state: present
+#    async: 300
+#    poll: 5
+#  when: not gitlab_file.stat.exists
+
+## Start and configure GitLab. Sometimes the first run fails, but after that,
+## restarts fix problems, so ignore failures on this run.
+#- name: Reconfigure GitLab (first run).
+#  command: >
+#    gitlab-ctl reconfigure
+#    creates=/var/opt/gitlab/bootstrapped
+#  failed_when: false
+#
+#- name: Create GitLab SSL configuration folder.
+#  file:
+#    path: /etc/gitlab/ssl
+#    state: directory
+#    owner: root
+#    group: root
+#    mode: 0700
+#  when: gitlab_create_self_signed_cert
+#
+#- name: Create self-signed certificate.
+#  command: >
+#    openssl req -new -nodes -x509 -subj "{{ gitlab_self_signed_cert_subj }}"
+#    -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca
+#    creates={{ gitlab_ssl_certificate }}
+#  when: gitlab_create_self_signed_cert
+#
+#- name: Copy GitLab configuration file.
+#  template:
+#    src: "{{ gitlab_config_template }}"
+#    dest: /etc/gitlab/gitlab.rb
+#    owner: root
+#    group: root
+#    mode: 0600
+#  notify: restart gitlab

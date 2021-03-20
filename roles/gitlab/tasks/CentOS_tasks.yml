@@ -1,0 +1,70 @@
+---
+- assert:
+    that: "ansible_distribution_major_version is version_compare('7', '>=')"
+    msg: "CentOS version supported"
+#- debug: var=ansible_distribution_major_version
+
+#- name: install CentOS packages
+#  package:
+#    name: "{{ item }}"
+#    state: present
+#  loop:
+#    - openssh-server
+#    - perl
+#
+#- name: install CentOS7 packages
+#  package:
+#    name: "{{ item }}"
+#    state: present
+#  loop:
+#    - policycoreutils-python
+#  when: ansible_distribution_major_version|int == 7
+#
+#- name: install CentOS8 packages
+#  package:
+#    name: "{{ item }}"
+#    state: present
+#  loop:
+#    - policycoreutils
+#  when: ansible_distribution_major_version|int == 8
+
+- name: start sshd and firewalld
+  service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - sshd
+    - firewalld
+
+# firewalld has migrated to the community posix collection 
+# which can be installed with ansible-galaxy
+#    ansible-galaxy collection install ansible.posix
+# use command instead even if this isn't idempotent
+- name: enable firewalld http and https
+  command: firewall-cmd --permanent --add-service="{{ item }}"
+  args:
+    warn: no
+  register: firewall
+  loop:
+    - http
+    - https
+#- debug: var=firewall
+
+- name: reload firewalld
+  command: firewall-cmd --reload
+  args:
+    warn: no
+  register: reload
+#- debug: var=reload
+
+- name: install postfix for mail notifications
+  package:
+    name: postfix
+    state: present
+
+- name: start postfix
+  service:
+    name: postfix
+    enabled: true
+    state: started

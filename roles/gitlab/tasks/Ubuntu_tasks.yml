@@ -1,0 +1,27 @@
+---
+- assert:
+    that: "ansible_distribution_major_version is version_compare('16', '>=')"
+    msg: "Ubuntu version supported"
+#- debug: var=ansible_distribution_major_version
+
+- name: install Ubuntu packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - curl 
+    - openssh-server 
+    - ca-certificates 
+    - tzdata
+    - perl
+
+- name: install postfix for mail notifications
+  package:
+    name: postfix
+    state: present
+
+- name: start postfix
+  service:
+    name: postfix
+    enabled: true
+    state: started
