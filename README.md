@@ -6,21 +6,14 @@ keep their database of users and repositories in the database server.
 
 ## Requirements
 
-This project uses several roles that are in the transition to becoming 2.9's new Collections.  So that this project will run on 2.8, I've used these as roles rather than full-on collections which require 2.9.
-
-- ansible-role-apache
-- ansible-role-nginx
-
-https://docs.ansible.com/ansible/latest/collections/community/general/gitlab_project_module.html
-
-
 - ansible-role-haproxy  --> haproxy
 
 This role sets up haproxy without any monitoring page and doesn't automatically add servers to the configuration from an ansible group.  If you use the http health check provided, the default install of apache 2.4 will return 'Forbidden' which will fail.
 
 Also, the haproxy process doesn't agregate logs in a separate file.
 
-Instead of using this role as is, combine the features of it with my own module.
+Instead of using this managed role as is, I combine it's features with my own module.
+
 
 - [https://github.com/geerlingguy/ansible-role-gitlab](ansible-role-gitlab) was created in 2014 and is a bit old
 
@@ -38,9 +31,6 @@ from [https://about.gitlab.com/install/#centos-7](Installing Gitlab on CentoS 7)
 
 won't respond to ping?  It's OK if node is up but http doesn't respond to heartbeat
 
-
-
-https://medium.com/sopra-steria-norge/managing-your-infrastructure-with-ansible-and-gitlab-ci-cd-c820188270d6
 
 
 ## Appendix A
