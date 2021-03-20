@@ -6,8 +6,10 @@
 
 - name: install Debian packages
   package:
-    name: postfix
+    name: "{{ item }}"
     state: present
+  loop:
+    - "{{ gitlab_dependencies }}"
 
 - name: start postfix
   service:

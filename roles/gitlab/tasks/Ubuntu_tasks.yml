@@ -4,11 +4,12 @@
     msg: "Ubuntu version supported"
 #- debug: var=ansible_distribution_major_version
 
-
 - name: install Ubuntu packages
   package:
-    name: postfix
+    name: "{{ item }}"
     state: present
+  loop:
+    - "{{ gitlab_dependencies }}"
 
 - name: start postfix
   service:

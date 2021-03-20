@@ -1,8 +1,81 @@
 ---
-- name: Include OS-specific variables from defaults/
-  include_vars: "{{ ansible_os_family }}.yml"
+# ansible_os_family = dict(
+#   RedHat = 'RedHat',
+#   Fedora = 'RedHat',
+#   CentOS = 'RedHat',
+#   Scientific = 'RedHat',
+#   SLC = 'RedHat',
+#   Ascendos = 'RedHat',
+#   CloudLinux = 'RedHat',
+#   PSBM = 'RedHat',
+#   OracleLinux = 'RedHat',
+#   OVS = 'RedHat',
+#   OEL = 'RedHat',
+#   Amazon = 'RedHat',
+#   XenServer = 'RedHat',
+#   Ubuntu = 'Debian',
+#   Debian = 'Debian',
+#   SLES = 'Suse',
+#   SLED = 'Suse',
+#   OpenSuSE = 'Suse',
+#   SuSE = 'Suse',
+#   Gentoo = 'Gentoo',
+#   Archlinux = 'Archlinux',
+#   Mandriva = 'Mandrake',
+#   Mandrake = 'Mandrake',
+#   Solaris = 'Solaris',
+#   Nexenta = 'Solaris',
+#   OmniOS = 'Solaris',
+#   OpenIndiana = 'Solaris',
+#   SmartOS = 'Solaris',
+#   AIX = 'AIX',
+#   Alpine = 'Alpine',
+#   MacOSX = 'Darwin',
+#   FreeBSD = 'FreeBSD',
+#   HPUX = 'HP-UX'
+#)
 
+#- debug: var="{{ item }}"
+#  with_items:
+#  - ansible_os_family
+#  - ansible_distribution
+#  - ansible_distribution_major_version
+#  - ansible_distribution_release
+#  - ansible_distribution_version
+
+# first_found function is broken in 2.8+ https://github.com/ansible/ansible/issues/70772
+# can't use this to look for a version of vars files that's specific to version
+#- name: Include OS-specific variables from vars/
+#  include_vars: "{{ item }}"
+#  with_first_found:
+#    - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+#    - "{{ ansible_os_family }}.yml"
+#    - "main.yml"
+
+#- name: Install GitLab and its dependencies
+#  package:
+#    name: "{{ item }}"
+#    state: present
+#  loop:
+#    - "{{ gitlab_dependencies }}"
+
+# gitlab_dependencies includes openssh-server and postfix,
+# so ensure they're enabled and running
+#- name: start postfix and sshd
+#  service:
+#    name: "{{ item }}"
+#    enabled: true
+#    state: started
+#  loop:
+#    - postfix
+#    - sshd
+
+# 2.8+ this works but {{ ansible_distribution }} does not
+- include_vars: "{{ ansible_os_family }}.yml"
+
+# so use OS-specific install tasks instead
 - include_tasks: "{{ ansible_distribution }}_tasks.yml"
+
 
 - name: Check if GitLab configuration file already exists.
   stat: path=/etc/gitlab/gitlab.rb
@@ -11,13 +84,6 @@
 - name: Check if GitLab is already installed.
   stat: path=/usr/bin/gitlab-ctl
   register: gitlab_file
-
-# Install GitLab and its dependencies.
-  package:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - "{{ gitlab_dependencies }}"
 
 - name: Download GitLab repository installation script.
   get_url:

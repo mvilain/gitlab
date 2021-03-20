@@ -4,10 +4,27 @@
     msg: "CentOS version supported"
 #- debug: var=ansible_distribution_major_version
 
-- name: install CentOS packages
+- name: install CentOS7 packages
   package:
-    name: postfix
+    name: "{{ item }}"
     state: present
+  loop:
+    - policycoreutils-python
+    - openssh-server
+    - perl
+    - postfix
+  when: ansible_distribution_major_version | int == 7
+
+- name: install CentOS8 packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - policycoreutils
+    - openssh-server
+    - perl
+    - postfix
+  when: ansible_distribution_major_version | int == 8
 
 - name: start postfix
   service:
@@ -15,14 +32,11 @@
     enabled: true
     state: started
 
-- name: start sshd and firewalld
+- name: start firewalld
   service:
-    name: "{{ item }}"
+    name: firewalld
     enabled: true
     state: started
-  loop:
-    - sshd
-    - firewalld
 
 # firewalld has migrated to the community posix collection 
 # which can be installed with ansible-galaxy

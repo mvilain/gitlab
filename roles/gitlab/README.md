@@ -23,6 +23,12 @@ Available variables are listed below, along with default values (see `defaults/m
     gitlab_domain: gitlab
     gitlab_external_url: "https://{{ gitlab_domain }}/"
 
+The following varies with the OS and version. It's a dictionary of packages to install depending on if the OS+version yaml file is defined. This contruct is to get around naming conventions between a CentOS 7 and CentOS 8 package. The package name is the same for Debian or Ubuntu, so just use the OS family name instead.
+
+    gitlab_dependencies: []
+
+
+
 The domain and URL at which the GitLab instance will be accessible. This is set as the `external_url` configuration setting in `gitlab.rb`, and if you want to run GitLab on a different port (besides 80/443), you can specify the port here (e.g. `https://gitlab:8443/` for port 8443).
 
     gitlab_git_data_dir: "/var/opt/gitlab/git-data"
