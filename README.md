@@ -13,20 +13,6 @@ This project uses several roles that are in the transition to becoming 2.9's new
 
 https://docs.ansible.com/ansible/latest/collections/community/general/gitlab_project_module.html
 
-These modules work well in creating default setups for apache and nginx.
-
-Here's how to remove submodules:
-
-- Delete the relevant section from the .gitmodules file.
-- Stage the .gitmodules changes git add .gitmodules
-- Delete the relevant section from .git/config.
-- Run git rm --cached path_to_submodule (no trailing slash).
-- Run rm -rf .git/modules/path_to_submodule (no trailing slash).
-- Commit git commit -m "Removed submodule "
-- Delete the now untracked submodule files rm -rf path_to_submodule
-
-from [https://gist.github.com/myusuf3/7f645819ded92bda6677](How to delete a submodule)
-
 
 - ansible-role-haproxy  --> haproxy
 
@@ -56,48 +42,19 @@ won't respond to ping?  It's OK if node is up but http doesn't respond to heartb
 
 https://medium.com/sopra-steria-norge/managing-your-infrastructure-with-ansible-and-gitlab-ci-cd-c820188270d6
 
-### .gitlab-ci.yml
 
-'
-stages:
-    - dev
-    - test
+## Appendix A
 
+### removing submodules from git
 
-image: registry.gitlab.com/torese/docker-ansible
+Here's how to remove submodules:
 
-variables:
-    ANSIBLE_HOST_KEY_CHECKING: 'false'
-    ANSIBLE_FORCE_COLOR: 'true'
+- Delete the relevant section from the .gitmodules file.
+- Stage the .gitmodules changes git add .gitmodules
+- Delete the relevant section from .git/config.
+- Run git rm --cached path_to_submodule (no trailing slash).
+- Run rm -rf .git/modules/path_to_submodule (no trailing slash).
+- Commit git commit -m "Removed submodule "
+- Delete the now untracked submodule files rm -rf path_to_submodule
 
-.run_playbook:
-    allow_failure: false
-    tags:
-        - aws
-    script:
-        - ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa 2>/dev/null <<< y >/dev/null
-        - rm -f ~/.ssh/id_rsa.pub
-        - echo "-----BEGIN RSA PRIVATE KEY-----" > ~/.ssh/id_rsa
-        - echo $SSH_PRIVATE_KEY | tr ' ' '\n' | tail -n+5 | head -n-4 >> ~/.ssh/id_rsa
-        - echo "-----END RSA PRIVATE KEY-----" >> ~/.ssh/id_rsa
-
-        - ansible-playbook playbook.yml -u automation --private-key=~/.ssh/id_rsa \
-              -i $inventory -e "app_servers=$hosts"
-
-deploy_dev:
-    extends: .run_playbook
-    variables:
-        inventory: inventory
-        hosts: dev 
-    stage: dev
-    environment: Dev
-
-        
-deploy_test:
-    extends: .run_playbook
-    variables:
-        inventory: inventory
-        hosts: test 
-    stage: test
-    environment: Test
-'
+from [https://gist.github.com/myusuf3/7f645819ded92bda6677](How to delete a submodule)

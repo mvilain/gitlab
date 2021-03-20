@@ -1,0 +1,41 @@
+stages:
+    - dev
+    - test
+
+
+image: registry.gitlab.com/torese/docker-ansible
+
+variables:
+    ANSIBLE_HOST_KEY_CHECKING: 'false'
+    ANSIBLE_FORCE_COLOR: 'true'
+
+.run_playbook:
+    allow_failure: false
+    tags:
+        - aws
+    script:
+        - ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa 2>/dev/null <<< y >/dev/null
+        - rm -f ~/.ssh/id_rsa.pub
+        - echo "-----BEGIN RSA PRIVATE KEY-----" > ~/.ssh/id_rsa
+        - echo $SSH_PRIVATE_KEY | tr ' ' '\n' | tail -n+5 | head -n-4 >> ~/.ssh/id_rsa
+        - echo "-----END RSA PRIVATE KEY-----" >> ~/.ssh/id_rsa
+
+        - ansible-playbook playbook.yml -u automation --private-key=~/.ssh/id_rsa \
+              -i $inventory -e "app_servers=$hosts"
+
+deploy_dev:
+    extends: .run_playbook
+    variables:
+        inventory: inventory
+        hosts: dev 
+    stage: dev
+    environment: Dev
+
+        
+deploy_test:
+    extends: .run_playbook
+    variables:
+        inventory: inventory
+        hosts: test 
+    stage: test
+    environment: Test

@@ -6,3 +6,4 @@ gitlab_dependencies:
   - openssh-server
   - ca-certificates
   - perl
+  - postfix

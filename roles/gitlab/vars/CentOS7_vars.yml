@@ -5,3 +5,4 @@ gitlab_dependencies:
   - policycoreutils-python
   - openssh-server
   - perl
+  - postfix

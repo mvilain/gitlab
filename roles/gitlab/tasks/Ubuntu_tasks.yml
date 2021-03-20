@@ -4,18 +4,8 @@
     msg: "Ubuntu version supported"
 #- debug: var=ansible_distribution_major_version
 
-- name: install Ubuntu packages
-  package:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - curl 
-    - openssh-server 
-    - ca-certificates 
-    - tzdata
-    - perl
 
-- name: install postfix for mail notifications
+- name: install Ubuntu packages
   package:
     name: postfix
     state: present

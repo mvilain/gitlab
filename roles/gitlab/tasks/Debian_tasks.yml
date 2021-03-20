@@ -6,16 +6,6 @@
 
 - name: install Debian packages
   package:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - curl
-    - openssh-server
-    - ca-certificates
-    - perl
-
-- name: install postfix for mail notifications
-  package:
     name: postfix
     state: present
 

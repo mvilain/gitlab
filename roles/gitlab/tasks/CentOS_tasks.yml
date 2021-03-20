@@ -4,29 +4,16 @@
     msg: "CentOS version supported"
 #- debug: var=ansible_distribution_major_version
 
-#- name: install CentOS packages
-#  package:
-#    name: "{{ item }}"
-#    state: present
-#  loop:
-#    - openssh-server
-#    - perl
-#
-#- name: install CentOS7 packages
-#  package:
-#    name: "{{ item }}"
-#    state: present
-#  loop:
-#    - policycoreutils-python
-#  when: ansible_distribution_major_version|int == 7
-#
-#- name: install CentOS8 packages
-#  package:
-#    name: "{{ item }}"
-#    state: present
-#  loop:
-#    - policycoreutils
-#  when: ansible_distribution_major_version|int == 8
+- name: install CentOS packages
+  package:
+    name: postfix
+    state: present
+
+- name: start postfix
+  service:
+    name: postfix
+    enabled: true
+    state: started
 
 - name: start sshd and firewalld
   service:
@@ -57,14 +44,3 @@
     warn: no
   register: reload
 #- debug: var=reload
-
-- name: install postfix for mail notifications
-  package:
-    name: postfix
-    state: present
-
-- name: start postfix
-  service:
-    name: postfix
-    enabled: true
-    state: started
