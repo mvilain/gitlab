@@ -39,3 +39,5 @@ deploy_test:
         hosts: test 
     stage: test
     environment: Test
+
+#https://medium.com/sopra-steria-norge/managing-your-infrastructure-with-ansible-and-gitlab-ci-cd-c820188270d6
