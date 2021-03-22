@@ -2,7 +2,6 @@
 gitlab_package_version_separator: '-'
 gitlab_repo_script_url: "https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.rpm.sh"
 gitlab_dependencies:
-  - policycoreutils-python
   - openssh-server
   - perl
   - postfix

@@ -52,24 +52,6 @@
 #    - "{{ ansible_os_family }}.yml"
 #    - "main.yml"
 
-#- name: Install GitLab and its dependencies
-#  package:
-#    name: "{{ item }}"
-#    state: present
-#  loop:
-#    - "{{ gitlab_dependencies }}"
-
-# gitlab_dependencies includes openssh-server and postfix,
-# so ensure they're enabled and running
-#- name: start postfix and sshd
-#  service:
-#    name: "{{ item }}"
-#    enabled: true
-#    state: started
-#  loop:
-#    - postfix
-#    - sshd
-
 # 2.8+ this works but {{ ansible_distribution }} does not
 - include_vars: "{{ ansible_os_family }}.yml"
 
@@ -85,14 +67,14 @@
   stat: path=/usr/bin/gitlab-ctl
   register: gitlab_file
 
-- name: Download GitLab repository installation script.
+- name: Download GitLab repository installation script
   get_url:
     url: "{{ gitlab_repo_script_url }}"
     dest: /tmp/gitlab_install_repository.sh
     validate_certs: "{{ gitlab_download_validate_certs }}"
   when: not gitlab_file.stat.exists
 
-- name: Install GitLab repository.
+- name: Install GitLab repository
   command: bash /tmp/gitlab_install_repository.sh
   args:
     warn: no
@@ -100,48 +82,51 @@
   when: not gitlab_file.stat.exists
 - debug: var=gitlab_repo.stdout_lines
 
-- name: Define the Gitlab package name.
+- name: Define the Gitlab package name
   set_fact:
     gitlab_package_name: "{{ gitlab_edition }}{{ gitlab_package_version_separator }}{{ gitlab_version }}"
   when: gitlab_version | default(false)
+#- debug: var=gitlab_package_name
 
-#- name: Install GitLab
-#  package:
-#    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
-#    state: present
-#    async: 300
-#    poll: 5
-#  when: not gitlab_file.stat.exists
+- name: Install GitLab (this will take a while)
+  package:
+    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
+    state: present
+  when: not gitlab_file.stat.exists
+  register: gitlab.install
+- debug: var=gitlab.install
 
-## Start and configure GitLab. Sometimes the first run fails, but after that,
-## restarts fix problems, so ignore failures on this run.
-#- name: Reconfigure GitLab (first run).
-#  command: >
-#    gitlab-ctl reconfigure
-#    creates=/var/opt/gitlab/bootstrapped
-#  failed_when: false
-#
-#- name: Create GitLab SSL configuration folder.
-#  file:
-#    path: /etc/gitlab/ssl
-#    state: directory
-#    owner: root
-#    group: root
-#    mode: 0700
-#  when: gitlab_create_self_signed_cert
-#
-#- name: Create self-signed certificate.
-#  command: >
-#    openssl req -new -nodes -x509 -subj "{{ gitlab_self_signed_cert_subj }}"
-#    -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca
-#    creates={{ gitlab_ssl_certificate }}
-#  when: gitlab_create_self_signed_cert
-#
-#- name: Copy GitLab configuration file.
-#  template:
-#    src: "{{ gitlab_config_template }}"
-#    dest: /etc/gitlab/gitlab.rb
-#    owner: root
-#    group: root
-#    mode: 0600
-#  notify: restart gitlab
+# Start and configure GitLab. Sometimes the first run fails, but after that,
+# restarts fix problems, so ignore failures on this run.
+- name: Reconfigure GitLab with chef (first run)
+  command: >
+    gitlab-ctl reconfigure
+    creates=/var/opt/gitlab/bootstrapped
+  failed_when: false
+  register: gitlab_reconfig
+- debug: var=gitlab_reconfig
+
+- name: Create GitLab SSL configuration folder
+  file:
+    path: /etc/gitlab/ssl
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  when: gitlab_create_self_signed_cert
+
+- name: Create self-signed certificate.
+  command: >
+    openssl req -new -nodes -x509 -subj "{{ gitlab_self_signed_cert_subj }}"
+    -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca
+    creates={{ gitlab_ssl_certificate }}
+  when: gitlab_create_self_signed_cert
+
+- name: Copy GitLab configuration file
+  template:
+    src: "{{ gitlab_config_template }}"
+    dest: /etc/gitlab/gitlab.rb
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart gitlab
