@@ -19,9 +19,9 @@ Instead of using this managed role as is, I combine it's features with my own mo
 
 it doesn't use the gitlab installation repos in
 
-[https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh]
+[https://packages.gitlab.vilain.com/install/repositories/gitlab/gitlab-ce/script.{rpm|deb}.sh]
 
-from [https://about.gitlab.com/install/#centos-7](Installing Gitlab on CentoS 7)
+from [https://about.gitlab.vilain.com/install/](Installing Gitlab) which depends on the OS being installed.
 
 
 

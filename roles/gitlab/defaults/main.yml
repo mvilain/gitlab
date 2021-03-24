@@ -1,5 +1,5 @@
 ---
-# General config.
+# General config (debian/ubuntu install won't allow domain w/o ".")
 gitlab_domain: gitlab
 gitlab_external_url: "https://{{ gitlab_domain }}/"
 gitlab_git_data_dir: "/var/opt/gitlab/git-data"

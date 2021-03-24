@@ -20,5 +20,26 @@
     - postfix
     - sshd
 
+- name: set LOCALE
+  block:
+    - copy:
+        dest: /etc/default/locale
+        content: >
+          LANG=NONE
+        mode: 0644
+        owner: root
+        group: root
+    - replace:
+        path: /etc/locale.gen
+        backup: yes
+        regexp: '^# (en_US.UTF-8 UTF-8)'
+        replace: '\1'
+    - command: locale-gen
+      args:
+        warn: no
+      register: locale_gen
+- debug: var=locale_gen.stdout_lines
+
+
 # run the repo install script
 # install the gitlab package

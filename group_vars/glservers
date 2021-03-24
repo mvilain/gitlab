@@ -1,4 +1,0 @@
-# group_vars for glservers group
----
-group_vars: "glservers"
-

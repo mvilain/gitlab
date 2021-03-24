@@ -2,10 +2,10 @@
 # this will install both roles, then run the handlers for both roles
 # ansible should pull variables from group_vars/glservers anyway
 ---
-- hosts: glservers
+- hosts: gitlab
 
   vars_files:
-    - group_vars/glservers
+    - group_vars/gitlab
   become: true
 
   roles:

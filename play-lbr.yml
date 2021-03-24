@@ -4,5 +4,4 @@
 - hosts: lbr
   become: true
   roles:
-#    - role: ansible-role-common
     - role: haproxy

@@ -88,23 +88,30 @@
   when: gitlab_version | default(false)
 #- debug: var=gitlab_package_name
 
+
+- debug: 
+    msg: >
+      Sometimes the first run fails, but after that, reprovisioning will
+      run the chef script and fix problems, so ignore failures on this run
 - name: Install GitLab (this will take a while)
   package:
     name: "{{ gitlab_package_name | default(gitlab_edition) }}"
     state: present
   when: not gitlab_file.stat.exists
-  register: gitlab.install
-- debug: var=gitlab.install
+  register: gitlab_install
+  check_mode: yes
+- debug: var=gitlab_install
 
-# Start and configure GitLab. Sometimes the first run fails, but after that,
-# restarts fix problems, so ignore failures on this run.
+# 'args' is a task keyword, passed at the same level as the module
 - name: Reconfigure GitLab with chef (first run)
-  command: >
-    gitlab-ctl reconfigure
-    creates=/var/opt/gitlab/bootstrapped
+  command: gitlab-ctl reconfigure
+  args:
+    warn: false
+    creates: /var/opt/gitlab/bootstrapped
   failed_when: false
   register: gitlab_reconfig
-- debug: var=gitlab_reconfig
+  check_mode: yes
+#- debug: var=gitlab_reconfig.stdout_lines
 
 - name: Create GitLab SSL configuration folder
   file:
@@ -113,20 +120,28 @@
     owner: root
     group: root
     mode: 0700
-  when: gitlab_create_self_signed_cert
+  when: gitlab_create_self_signed_cert | bool
 
 - name: Create self-signed certificate.
   command: >
-    openssl req -new -nodes -x509 -subj "{{ gitlab_self_signed_cert_subj }}"
-    -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca
-    creates={{ gitlab_ssl_certificate }}
-  when: gitlab_create_self_signed_cert
+    openssl req -new -nodes -x509 
+    -subj "{{ gitlab_self_signed_cert_subj }}"
+    -days 3650 -keyout {{ gitlab_ssl_certificate_key }} 
+    -out {{ gitlab_ssl_certificate }} -extensions v3_ca
+  args:
+    warn: false
+    creates: "{{ gitlab_ssl_certificate }}"
+  when: gitlab_create_self_signed_cert | bool
+  register: gitlab_cert
+  check_mode: yes
+- debug: var=gitlab_cert.stderr_lines
 
 - name: Copy GitLab configuration file
   template:
     src: "{{ gitlab_config_template }}"
     dest: /etc/gitlab/gitlab.rb
+    backup: yes
     owner: root
     group: root
     mode: 0600
-  notify: restart gitlab
+#  notify: restart gitlab

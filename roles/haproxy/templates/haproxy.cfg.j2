@@ -86,6 +86,6 @@ backend {{ haproxy_backend_name }}
     option httpchk {{ haproxy_backend_httpchk }}
 {% endif %}
      cookie SERVERID insert indirect
-{% for host in groups.glservers %}
+{% for host in groups.gitlab %}
      server {{ host }} {{ hostvars[host].ansible_host }}:{{ hostvars[host].apache_listen_port }} cookie {{ host }} check
 {% endfor %}
