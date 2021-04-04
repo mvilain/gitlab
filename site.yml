@@ -4,17 +4,15 @@
 # do the common installed stuff first so handlers for it run 
 # before a node-specific role is run with it's own handlers
 #
-- hosts: glservers glservers_py3
+- hosts: gitlab gitlab_py3
   become: true
   # check_mode: yes  # yes=dry-run
-  environment:
-    external_url: "https://gitlab.vilain.com"
   roles:
     - gitlab
 
 
 #============================================================================== gl1
-#- hosts: gl1,gl3
+#- hosts: gitlab7,gitlab8
 #  become: true
 #  #  submodule https://github.com/nginxinc/ansible-role-nginx.git
 #  roles:
@@ -33,7 +31,7 @@
 #            replace: '<h1 style="font-size: 2.5em">Welcome to nginx on {{ ansible_hostname }}!</h1>' }
 
 #============================================================================== gl2
-#- hosts: gl2
+#- hosts: gitlab9
 #  become: true
 #  #  submodule git@github.com:geerlingguy/ansible-role-apache.git
 #  roles:
