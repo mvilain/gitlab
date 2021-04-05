@@ -2,6 +2,7 @@
 # ansible_os_family = dict(
 #   RedHat = 'RedHat',
 #   Fedora = 'RedHat',
+#   AlmaLinux = 'RedHat',
 #   CentOS = 'RedHat',
 #   Scientific = 'RedHat',
 #   SLC = 'RedHat',
@@ -62,6 +63,7 @@
 - name: Check if GitLab configuration file already exists.
   stat: path=/etc/gitlab/gitlab.rb
   register: gitlab_config_file
+#- debug: var=gitlab_config_file
 
 - name: Check if GitLab is already installed.
   stat: path=/usr/bin/gitlab-ctl
@@ -71,15 +73,34 @@
   get_url:
     url: "{{ gitlab_repo_script_url }}"
     dest: /tmp/gitlab_install_repository.sh
+    mode: 0755
     validate_certs: "{{ gitlab_download_validate_certs }}"
   when: not gitlab_file.stat.exists
+
+# this script doesn't support AlmaLinux directly yet 202104.03
+# so call the script accordingly with environment variables to force EL8
+# os=el dist=8
+- name: Install GitLab repository
+  command: /tmp/gitlab_install_repository.sh
+  args:
+    warn: no
+  environment:
+    os: "el"
+    dist: "8"
+  register: gitlab_repo
+  when:
+    - not gitlab_file.stat.exists
+    - ansible_facts['distribution'] == "AlmaLinux"
 
 - name: Install GitLab repository
   command: bash /tmp/gitlab_install_repository.sh
   args:
     warn: no
   register: gitlab_repo
-  when: not gitlab_file.stat.exists
+  when:
+    - not gitlab_file.stat.exists
+    - ansible_facts['distribution'] != "AlmaLinux"
+
 - debug: var=gitlab_repo.stdout_lines
 
 - name: Define the Gitlab package name
@@ -87,31 +108,6 @@
     gitlab_package_name: "{{ gitlab_edition }}{{ gitlab_package_version_separator }}{{ gitlab_version }}"
   when: gitlab_version | default(false)
 #- debug: var=gitlab_package_name
-
-
-- debug: 
-    msg: >
-      Sometimes the first run fails, but after that, reprovisioning will
-      run the chef script and fix problems, so ignore failures on this run
-- name: Install GitLab (this will take a while)
-  package:
-    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
-    state: present
-  when: not gitlab_file.stat.exists
-  register: gitlab_install
-  check_mode: yes
-- debug: var=gitlab_install
-
-# 'args' is a task keyword, passed at the same level as the module
-- name: Reconfigure GitLab with chef (first run)
-  command: gitlab-ctl reconfigure
-  args:
-    warn: false
-    creates: /var/opt/gitlab/bootstrapped
-  failed_when: false
-  register: gitlab_reconfig
-  check_mode: yes
-#- debug: var=gitlab_reconfig.stdout_lines
 
 - name: Create GitLab SSL configuration folder
   file:
@@ -122,6 +118,20 @@
     mode: 0700
   when: gitlab_create_self_signed_cert | bool
 
+# if you want to override domain from 'gitlab' to something else,
+# do it in the playbook with vars section
+- name: Copy GitLab configuration file
+  template:
+    src: "{{ gitlab_config_template }}"
+    dest: /etc/gitlab/gitlab.rb
+    backup: yes
+    owner: root
+    group: root
+    mode: 0600
+  register: gitlab_config_file
+#- debug: var=gitlab_config_file
+
+# uses domain variable defaults/main.yml or vars in playbook
 - name: Create self-signed certificate.
   command: >
     openssl req -new -nodes -x509 
@@ -133,15 +143,41 @@
     creates: "{{ gitlab_ssl_certificate }}"
   when: gitlab_create_self_signed_cert | bool
   register: gitlab_cert
-  check_mode: yes
 - debug: var=gitlab_cert.stderr_lines
 
-- name: Copy GitLab configuration file
-  template:
-    src: "{{ gitlab_config_template }}"
-    dest: /etc/gitlab/gitlab.rb
-    backup: yes
-    owner: root
-    group: root
-    mode: 0600
-#  notify: restart gitlab
+#- debug:
+#    msg: >
+#      Sometimes install and configure fails initially, but reprovisioning will
+#      rerun chef and fix problems, so ignore failures on this run
+
+# don't use EXTERNAL_URL environment variable because the ssl certs will be wrong
+# set gitlab_domain variable in playbook instead
+- name: Install GitLab (this will take a while)
+  package:
+    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
+    state: present
+  when: not gitlab_file.stat.exists
+#  environment:
+#    EXTERNAL_URL: "http://{{ ansible_hostname}}.vilain.com"
+  ignore_errors: True
+  register: gitlab_install
+#  check_mode: yes
+- debug: var=gitlab_install.stdout_lines
+
+# centos8 doesn't log the chef configuration step of installation
+# output
+- local_action:
+    module: copy
+    content: "{{ gitlab_install.stdout_lines }}"
+    dest: "{{ ansible_hostname }}_gitlab-ce-install.log"
+    mode: 0644
+
+- name: Reconfigure GitLab to fix any errors from install
+  command: gitlab-ctl reconfigure
+  args:
+    warn: false
+    creates: /var/opt/gitlab/bootstrapped
+  failed_when: false
+  register: gitlab_reconfig
+#  check_mode: yes
+- debug: var=gitlab_reconfig.stdout_lines
