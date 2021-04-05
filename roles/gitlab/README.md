@@ -1,7 +1,9 @@
 # Ansible Role: GitLab
 
 Much of this role is taken from 
-[https://github.com/geerlingguy/ansible-role-gitlab](Guy Geerling's gitlab role). It's from 2014 and out of date.  This role installs GitLab, a Ruby-based front-end to Git, on any RedHat/CentOS or Debian/Ubuntu linux system using the Omnibus Linux packages described on the [https://about.gitlab.com/install](gitlab web site)
+[https://github.com/geerlingguy/ansible-role-gitlab](Guy Geerling's gitlab role). It's from 2014 and out of date.  This role installs GitLab, a Ruby-based front-end to Git, on any RedHat/CentOS or Debian/Ubuntu linux system using the Omnibus Linux packages described on the [https://about.gitlab.com/install](gitlab web site).
+
+This role was updated to use AlmaLinux in addition to CentOS 8 which is being essentially EOL'ed.  Future revisions will focus on AlmaLinux or forks of the CentOS 8 branch rather than updating CentOS 8.
 
 GitLab's default administrator account details are below; be sure to login immediately after installation and change these credentials!
 
@@ -173,7 +175,7 @@ None.
       vars_files:
         - vars/main.yml
       roles:
-        - { role: geerlingguy.gitlab }
+        - gitlab
 
 *Inside `vars/main.yml`*:
 
