@@ -9,6 +9,11 @@
   # check_mode: yes  # yes=dry-run
   roles:
     - gitlab
+  vars:
+    gitlab_domain: "{{ ansible_hostname}}.vilain.com"
+#    gitlab_ssl_certificate: "/etc/gitlab/ssl/{{ gitlab_domain }}.crt"
+#    gitlab_ssl_certificate_key: "/etc/gitlab/ssl/{{ gitlab_domain }}.key"
+
 
 
 #============================================================================== gl1
