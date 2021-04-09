@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
   # provision on all machines to allow ssh w/o checking
   #
   config.vm.provision "shell", inline: <<-SHELLALL
-    cat /vagrant/etc-hosts >> /etc/hosts
+#     cat /vagrant/etc-hosts >> /etc/hosts
     echo "...disabling CheckHostIP..."
     sed -i.orig -e "s/#   CheckHostIP yes/CheckHostIP no/" /etc/ssh/ssh_config
   SHELLALL
