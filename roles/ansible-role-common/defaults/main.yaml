@@ -6,6 +6,7 @@ common_packages:
   - lsof
   - make
   - net-tools
+  - bind-utils
   - vim
   - wget
 
