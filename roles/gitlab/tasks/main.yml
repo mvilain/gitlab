@@ -53,6 +53,16 @@
 #    - "{{ ansible_os_family }}.yml"
 #    - "main.yml"
 
+# https://gist.github.com/rothgar/8793800
+# https://stackoverflow.com/questions/36328907/ansible-get-all-the-ip-addresses-of-a-group
+- name: Generate /etc/hosts file
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    backup: yes
+  register: hosts_generated
+#- debug: var=hosts_generated
+
 # 2.8+ this works but {{ ansible_distribution }} does not
 - include_vars: "{{ ansible_os_family }}.yml"
 
@@ -66,7 +76,8 @@
 #- debug: var=gitlab_config_file
 
 - name: Check if GitLab is already installed.
-  stat: path=/usr/bin/gitlab-ctl
+  stat:
+    path: /usr/bin/gitlab-ctl
   register: gitlab_file
 
 - name: Download GitLab repository installation script
@@ -162,13 +173,13 @@
   ignore_errors: True
   register: gitlab_install
 #  check_mode: yes
-- debug: var=gitlab_install.stdout_lines
+- debug: var=gitlab_install
 
 # centos8 doesn't log the chef configuration step of installation
 # output
 - local_action:
     module: copy
-    content: "{{ gitlab_install.stdout_lines }}"
+    content: "{{ gitlab_install }}"
     dest: "{{ ansible_hostname }}_gitlab-ce-install.log"
     mode: 0644
 
