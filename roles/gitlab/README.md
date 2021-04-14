@@ -10,12 +10,17 @@ GitLab's default administrator account details are below; be sure to login immed
     root
     5iveL!fe
 
+This role works fine for non-encrypted http sites with either the domain in DNS or with a IP address in the URL.  However, the Let's Encrypt code when https is enabled for installation does not work on uVerse's NAT networks.  They lock down ports incoming traffic to ports besides 80 on customer's NAT networks, so using a dynamic DNS and port mapping with their router doesn't work.  And Certbot or other Acme clients most definitely will not work.
+
 ## Requirements
 
-None.
+In order to run Let's Encrypt's Certbot, you need to have incoming traffic to your network.  A dynamically allocated DNS service can provide access to incoming traffic on a home NAT network.
 
+https://www.noip.com/support/knowledgebase/free-dynamic-dns-getting-started-guide-ip-version/
 
+Setup the uVerse router
 
+https://internetofhomethings.com/homethings/?tag=nvg589-port-forwarding
 
 
 ## Role Variables
@@ -31,7 +36,7 @@ The following varies with the OS and version. It's a dictionary of packages to i
 
 
 
-The domain and URL at which the GitLab instance will be accessible. This is set as the `external_url` configuration setting in `gitlab.rb`, and if you want to run GitLab on a different port (besides 80/443), you can specify the port here (e.g. `https://gitlab:8443/` for port 8443).
+The domain and URL at which the GitLab instance will be accessible. This is set as the `external_url` variable setting in `gitlab.rb`, and if you want to run GitLab on a different port (besides 80/443), you can specify the port here (e.g. `https://gitlab:8443/` for port 8443).
 
     gitlab_git_data_dir: "/var/opt/gitlab/git-data"
 
