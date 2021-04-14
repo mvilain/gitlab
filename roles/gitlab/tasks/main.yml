@@ -168,12 +168,12 @@
     name: "{{ gitlab_package_name | default(gitlab_edition) }}"
     state: present
   when: not gitlab_file.stat.exists
-#  environment:
-#    EXTERNAL_URL: "http://{{ ansible_hostname}}.vilain.com"
   ignore_errors: True
   register: gitlab_install
 #  check_mode: yes
-- debug: var=gitlab_install
+- debug: 
+    var: gitlab_install.stdout_lines
+  when: gitlab_install|selectattr("stdout_lines", "defined")|list|length >0
 
 # centos8 doesn't log the chef configuration step of installation
 # output
@@ -187,8 +187,9 @@
   command: gitlab-ctl reconfigure
   args:
     warn: false
-    creates: /var/opt/gitlab/bootstrapped
+#    creates: /var/opt/gitlab/bootstrapped
   failed_when: false
   register: gitlab_reconfig
-#  check_mode: yes
-- debug: var=gitlab_reconfig.stdout_lines
+- debug: 
+    var: gitlab_reconfig.stdout_lines
+  when: gitlab_reconfig|selectattr("stdout_lines", "defined")|list|length >0
