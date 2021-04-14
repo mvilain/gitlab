@@ -11,9 +11,7 @@
     - gitlab
   vars:
     gitlab_domain: "{{ ansible_hostname}}.vilain.com"
-#    gitlab_ssl_certificate: "/etc/gitlab/ssl/{{ gitlab_domain }}.crt"
-#    gitlab_ssl_certificate_key: "/etc/gitlab/ssl/{{ gitlab_domain }}.key"
-
+    gitlab_external_url: "https://{{ gitlab_domain }}/"
 
 
 #============================================================================== gl1
