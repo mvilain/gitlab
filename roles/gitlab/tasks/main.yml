@@ -120,6 +120,7 @@
   when: gitlab_version | default(false)
 #- debug: var=gitlab_package_name
 
+# be sure to create the /etc/gitlab folder regardless of creating ssl subfolder
 - name: Create GitLab SSL configuration folder
   file:
     path: /etc/gitlab/ssl
@@ -127,7 +128,7 @@
     owner: root
     group: root
     mode: 0700
-  when: gitlab_create_self_signed_cert | bool
+#  when: gitlab_create_self_signed_cert | bool
 
 # if you want to override domain from 'gitlab' to something else,
 # do it in the playbook with vars section
@@ -172,8 +173,8 @@
   register: gitlab_install
 #  check_mode: yes
 - debug: 
-    var: gitlab_install.stdout_lines
-  when: gitlab_install|selectattr("stdout_lines", "defined")|list|length >0
+    var: gitlab_install.stderr_lines
+  when: gitlab_install|selectattr("stderr_lines", "defined")|list|length >0
 
 # centos8 doesn't log the chef configuration step of installation
 # output
@@ -187,9 +188,9 @@
   command: gitlab-ctl reconfigure
   args:
     warn: false
-#    creates: /var/opt/gitlab/bootstrapped
+    creates: /var/opt/gitlab/bootstrapped
   failed_when: false
   register: gitlab_reconfig
 - debug: 
-    var: gitlab_reconfig.stdout_lines
-  when: gitlab_reconfig|selectattr("stdout_lines", "defined")|list|length >0
+    var: gitlab_reconfig.stderr_lines
+  when: gitlab_reconfig|selectattr("stderr_lines", "defined")|list|length >0
