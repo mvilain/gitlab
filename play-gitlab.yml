@@ -2,9 +2,9 @@
 # this will install both roles, then run the handlers for both roles
 # ansible should pull variables from group_vars/gitlab anyway
 ---
-- hosts: gitlab
+- hosts: gitlab gitlab_py3
     vars:
-      gitlab_domain: "{{ ansible_hostname}}.vilain.com"
+      gitlab_domain: "{{ ansible_hostname}}"
   vars_files:
     - group_vars/gitlab
   become: true
