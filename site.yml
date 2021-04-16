@@ -10,7 +10,7 @@
   roles:
     - gitlab
   vars:
-    gitlab_domain: "{{ ansible_hostname}}"
+    gitlab_domain: "{{ ansible_hostname }}.aws-vilain.com"
     gitlab_external_url: "https://{{ gitlab_domain }}/"
 
 #============================================================================== lbr
