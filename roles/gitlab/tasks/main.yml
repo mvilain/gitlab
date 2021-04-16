@@ -66,12 +66,10 @@
 # 2.8+ this works but {{ ansible_distribution }} does not
 - include_vars: "{{ ansible_os_family }}.yml"
 
-# so use OS-specific install tasks instead
-- include_tasks: "{{ ansible_distribution }}_tasks.yml"
-
 
 - name: Check if GitLab configuration file already exists.
-  stat: path=/etc/gitlab/gitlab.rb
+  stat: 
+    path: /etc/gitlab/gitlab.rb
   register: gitlab_config_file
 #- debug: var=gitlab_config_file
 
@@ -147,7 +145,7 @@
 - name: Create self-signed certificate.
   command: >
     openssl req -new -nodes -x509 
-    -subj "{{ gitlab_self_signed_cert_subj }}"
+    -subj "{{ gitlab_self_signed_cert_subj }}" 
     -days 3650 -keyout {{ gitlab_ssl_certificate_key }} 
     -out {{ gitlab_ssl_certificate }} -extensions v3_ca
   args:
@@ -157,32 +155,20 @@
   register: gitlab_cert
 - debug: var=gitlab_cert.stderr_lines
 
-#- debug:
-#    msg: >
-#      Sometimes install and configure fails initially, but reprovisioning will
-#      rerun chef and fix problems, so ignore failures on this run
 
-# don't use EXTERNAL_URL environment variable because the ssl certs will be wrong
-# set gitlab_domain variable in playbook instead
-- name: Install GitLab (this will take a while)
-  package:
-    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
-    state: present
-  when: not gitlab_file.stat.exists
-  ignore_errors: True
-  register: gitlab_install
-#  check_mode: yes
-- debug: 
-    var: gitlab_install.stderr_lines
-  when: gitlab_install|selectattr("stderr_lines", "defined")|list|length >0
+# NOTE: gitlab package is installed in here because it generates a LOT of output
+# as it runs chef as part of the install.  tasks use a shell command with redirect
+# to capture the log output for perusal later and copy it to the project directory
+#
+- include_tasks: "{{ ansible_distribution }}_tasks.yml"
 
-# centos8 doesn't log the chef configuration step of installation
-# output
-- local_action:
-    module: copy
-    content: "{{ gitlab_install }}"
+- name: fetch install log
+  fetch:
+    src: "{{ gitlab_install_log }}"
     dest: "{{ ansible_hostname }}_gitlab-ce-install.log"
-    mode: 0644
+    flat: yes
+  register: copy_log
+- debug: var=copy_log
 
 - name: Reconfigure GitLab to fix any errors from install
   command: gitlab-ctl reconfigure

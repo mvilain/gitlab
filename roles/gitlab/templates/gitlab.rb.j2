@@ -106,8 +106,14 @@ registry_nginx['ssl_certificate_key'] = "{{ gitlab_registry_nginx_ssl_certificat
 {% endfor %}
 {% endif %}
 
+{% if gitlab_create_self_signed_cert == "true" %}
 letsencrypt['enable'] = "true"                      # GitLab 10.5 and 10.6 require this option
 letsencrypt['contact_emails'] = ['encrypt@vilain.com'] # Optional
+{% else %}
+letsencrypt['enable'] = "false"                      # GitLab 10.5 and 10.6 require this option
+#letsencrypt['contact_emails'] = ['gitlab@{{ gitlab_domain }}'] # Optional
+{% endif %}
+
 
 # To change other settings, see:
 # https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md#changing-gitlab-yml-settings

@@ -12,6 +12,8 @@ GitLab's default administrator account details are below; be sure to login immed
 
 This role works fine for non-encrypted http sites with either the domain in DNS or with a IP address in the URL.  However, the Let's Encrypt code when https is enabled for installation does not work on uVerse's NAT networks.  They lock down ports incoming traffic to ports besides 80 on customer's NAT networks, so using a dynamic DNS and port mapping with their router doesn't work.  And Certbot or other Acme clients most definitely will not work.
 
+Hostnames without a FQDN also fail with Let's Encrypt.
+
 ## Requirements
 
 In order to run Let's Encrypt's Certbot, you need to have incoming traffic to your network.  A dynamically allocated DNS service can provide access to incoming traffic on a home NAT network.
