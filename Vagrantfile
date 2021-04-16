@@ -72,8 +72,8 @@ Vagrant.configure("2") do |config|
     gitlab9.vm.network 'private_network', ip: '192.168.10.109'
     gitlab9.vm.hostname = 'gitlab9'
     gitlab9.vm.provision "shell", inline: <<-SHELL
-        apt-get update
-        apt-get install -y apt-transport-https python-apt
+      apt-get update
+      apt-get install -y apt-transport-https python-apt
     SHELL
     gitlab9.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
@@ -90,8 +90,8 @@ Vagrant.configure("2") do |config|
     gitlab10.vm.network 'private_network', ip: '192.168.10.110'
     gitlab10.vm.hostname = 'gitlab10'
     gitlab10.vm.provision "shell", inline: <<-SHELL
-        apt-get update --allow-releaseinfo-change -y
-        apt-get install -y apt-transport-https
+      apt-get update --allow-releaseinfo-change -y
+      apt-get install -y apt-transport-https
     SHELL
     gitlab10.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
@@ -100,13 +100,13 @@ Vagrant.configure("2") do |config|
     end
   end
 
-
+# deprecated notice for gitlab on Ubuntu 16 4/15/2021
   config.vm.define "gitlab16" do |gitlab16|
     gitlab16.vm.box = "ubuntu/xenial64"
     gitlab16.vm.network 'private_network', ip: '192.168.10.116'
     gitlab16.vm.hostname = 'gitlab16'
     gitlab16.vm.provision "shell", inline: <<-SHELL
-        apt-get -y install python3
+      apt-get -y install python3
     SHELL
     gitlab16.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
@@ -121,7 +121,7 @@ Vagrant.configure("2") do |config|
     gitlab18.vm.network 'private_network', ip: '192.168.10.118'
     gitlab18.vm.hostname = 'gitlab18'
     gitlab18.vm.provision "shell", inline: <<-SHELL
-        apt-get -y install python3
+      apt-get -y install python3
     SHELL
     gitlab18.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
@@ -139,7 +139,7 @@ Vagrant.configure("2") do |config|
     gitlab20.vm.network 'private_network', ip: '192.168.10.120'
     gitlab20.vm.hostname = 'gitlab20'
     gitlab20.vm.provision "shell", inline: <<-SHELL
-        apt-get -y install python3
+      apt-get -y install python3
     SHELL
     gitlab20.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
