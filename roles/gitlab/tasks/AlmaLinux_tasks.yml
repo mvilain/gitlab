@@ -61,7 +61,8 @@
 # set gitlab_domain variable in playbook instead
 - name: Install GitLab (this will take a while)
   shell: >
-    dnf install -y "{{ gitlab_package_name | default(gitlab_edition) }}" > "{{ gitlab_install_log }}"
+    dnf install -y "{{ gitlab_package_name | default(gitlab_edition) }}" > \
+    "{{ gitlab_install_log }}"
   args:
     warn: false
 #    creates: "{{ gitlab_install_log }}"
