@@ -9,6 +9,7 @@ gitlab_version: ''
 gitlab_backup_path: "/var/opt/gitlab/backups"
 gitlab_config_template: "gitlab.rb.j2"
 gitlab_install_log: "gitlab_install.log"
+gitlab_reconfig_log: "gitlab_reconfig.log"
 
 # SSL Configuration.
 gitlab_redirect_http_to_https: "true"
