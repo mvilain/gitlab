@@ -4,7 +4,8 @@
 ---
 - hosts: gitlab gitlab_py3
     vars:
-      gitlab_domain: "{{ ansible_hostname}}.local"
+      gitlab_domain: "{{ ansible_hostname}}.aws-vilain.com"
+      gitlab_external_url: "http://{{ gitlab_domain }}/"
   vars_files:
     - group_vars/gitlab
   become: true

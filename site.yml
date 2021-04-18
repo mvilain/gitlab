@@ -11,7 +11,7 @@
     - gitlab
   vars:
     gitlab_domain: "{{ ansible_hostname }}.aws-vilain.com"
-    gitlab_external_url: "https://{{ gitlab_domain }}/"
+    gitlab_external_url: "http://{{ gitlab_domain }}/"
 
 #============================================================================== lbr
 - hosts: lbr
