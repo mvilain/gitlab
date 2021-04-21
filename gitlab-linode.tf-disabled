@@ -1,0 +1,69 @@
+// linode-gitlab.tf -- define the gitlab aws instances
+//================================================== VARIABLES (in terraform.tfvars)
+variable "aws_region" {
+  type    = string
+}
+variable "aws_alma8_name" {
+  type    = list(string)
+}
+variable "aws_centos7_name" {
+  type    = list(string)
+}
+variable "aws_centos8_name" {
+  type    = list(string)
+}
+variable "aws_debian9_name" {
+  type    = list(string)
+}
+variable "aws_debian10_name" {
+  type    = list(string)
+}
+variable "aws_ubuntu16_name" {
+  type    = list(string)
+}
+variable "aws_ubuntu18_name" {
+  type    = list(string)
+}
+variable "aws_ubuntu20_name" {
+  type    = list(string)
+}
+
+
+variable "linode_token" {
+  type    = string
+}
+
+variable "linode_root_pass" {
+  type    = string
+}
+
+variable "linode_ssh_key" {
+  type    = string
+}
+
+variable "linode_region" {
+  type    = string
+}
+
+######################################################################
+terraform {
+  required_providers {
+    linode = {
+      source = "linode/linode"
+      version = "1.16.0"
+    }
+  }
+}
+
+# use environment variables for access and secret key
+provider "linode" {
+  token = "$LINODE_TOKEN"
+}
+
+data "linode_region" "region" {
+  id = "us-east"
+}
+
+// ================================================== NETWORK + SUBNETS
+
+//================================================== INSTANCES
