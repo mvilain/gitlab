@@ -1,53 +1,58 @@
 // aws-gitlab.tf -- define the gitlab aws instances
 //================================================== VARIABLES (in terraform.tfvars)
 variable "aws_region" {
+  description = "default region to setup all resources"
   type        = string
 }
 variable "aws_alma8_name" {
-  type        = list(string)
   description = "us-west-2 # ami-01a87a7d55032db2e"
+  type        = list(string)
 }
 variable "aws_centos7_name" {
-  type        = list(string)
   description = "us-west-2 # ami-01e36b7901e884a10"
+  type        = list(string)
 }
 variable "aws_centos8_name" {
-  type        = list(string)
   description = "us-west-2 # ami-082a036ec7c372e4c"
+  type        = list(string)
 }
 variable "aws_debian9_name" {
-  type        = list(string)
   description = "us-west-2 # ami-0c18820215678d337"
+  type        = list(string)
 }
 variable "aws_debian10_name" {
-  type        = list(string)
   description = "us-west-2 # ami-0a449b766e034390d"
+  type        = list(string)
 }
 variable "aws_ubuntu16_name" {
-  type        = list(string)
   description = "us-west-2 # ami-0a65caa9c575c1c0c"
+  type        = list(string)
 }
 variable "aws_ubuntu18_name" {
-  type        = list(string)
   description = "us-west-2 # ami-00833850c832e03a2"
+  type        = list(string)
 }
 variable "aws_ubuntu20_name" {
-  type        = list(string)
   description = "us-west-2 # ami-06b3455df6cbbf3a2"
+  type        = list(string)
 }
 
 
+variable "linode_region" {
+  description = "region where linode is running"
+  type        = string
+}
 variable "linode_token" {
-  type    = string
+  description = "Linode access token"
+  type        = string
 }
 variable "linode_root_pass" {
-  type    = string
+  description = "root password for linode"
+  type        = string
 }
 variable "linode_ssh_key" {
-  type    = string
-}
-variable "linode_region" {
-  type    = string
+  description = "ssh key for accessing linode"
+  type    = list(string)
 }
 
 ######################################################################
@@ -71,6 +76,64 @@ data "aws_region" "current" {}
 # data.aws_region.endpoint - The EC2 endpoint for the selected region.
 # data.aws_region.description - region's description in this format: "Location (Region name)".
 
+//================================================== S3 ENCRYPTED BACKEND+LOCKS
+resource "aws_s3_bucket" "tf-backend" {
+  bucket = "mvilain-prod-tfstate-backend"
+  acl    = "private"
+
+#  lifecycle {
+#    prevent_destroy = true
+#  }
+  
+  versioning {
+  enabled = true
+  }
+  
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+resource "aws_dynamodb_table" "tf_locks" {
+  name         = "mvilain-prod-tfstate-locks"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name       = "LockID"
+    type       = "S"
+  }
+}
+
+#terraform {
+#  backend "local" {
+#    path = "./terraform.tfstate"
+#  }
+#}
+#terraform {
+#    backend "s3" {
+#    bucket         = "mvilain-prod-tfstate-backend"
+#    key            = "global/s3/terraform.tfstate"
+#    region         = "us-east-2"
+#    dynamodb_table = "mvilain-prod-tfstate-locks"
+#    encrypt        = true
+#  }
+#}
+#terraform {
+#  backend "s3" {
+#    bucket         = "mvilain-prod-tfstate-backend"
+#    key            = "vpc/terraform.tfstate"
+#    region         = "us-east-2"
+#    profile        = "tesera"
+#    dynamodb_table = "mvilain-prod-tfstate-locks"
+#    encrypt        = true
+#    kms_key_id     = "arn:aws:kms:us-east-2:<account_id>:key/<key_id>"
+#  }
+#}
 // ================================================== NETWORK + SUBNETS
 # data "aws_vpc" "default" {
 #   default    = true
