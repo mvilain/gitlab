@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 # gitlab demo Vagrant file to spin up multiple machines and OS'
-# Maintainer Michael Vilain [202103.18]
+# Maintainer Michael Vilain [202104.22]
 
 Vagrant.configure("2") do |config|
   # config.vm.network 'forwarded_port', guest: 80, host: 8080
@@ -19,7 +19,6 @@ Vagrant.configure("2") do |config|
   # provision on all machines to allow ssh w/o checking
   #
   config.vm.provision "shell", inline: <<-SHELLALL
-#     cat /vagrant/etc-hosts >> /etc/hosts
     echo "...disabling CheckHostIP..."
     sed -i.orig -e "s/#   CheckHostIP yes/CheckHostIP no/" /etc/ssh/ssh_config
   SHELLALL
@@ -100,7 +99,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
-# deprecated notice for gitlab on Ubuntu 16 4/15/2021
+# deprecated notice for gitlab 14 on Ubuntu 16 4/15/2021
   config.vm.define "gitlab16" do |gitlab16|
     gitlab16.vm.box = "ubuntu/xenial64"
     gitlab16.vm.network 'private_network', ip: '192.168.10.116'
