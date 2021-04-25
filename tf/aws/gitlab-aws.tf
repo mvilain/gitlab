@@ -42,6 +42,10 @@ variable "linode_region" {
   description = "region where linode is running"
   type        = string
 }
+variable "linode_domain" {
+  description = "DNS domain where linode is running"
+  type        = string
+}
 variable "linode_token" {
   description = "Linode access token"
   type        = string

@@ -42,6 +42,10 @@ variable "linode_region" {
   description = "region where linode is running"
   type        = string
 }
+variable "linode_domain" {
+  description = "DNS domain where linode is running"
+  type        = string
+}
 variable "linode_token" {
   description = "Linode access token"
   type        = string
@@ -67,13 +71,48 @@ terraform {
 
 # use environment variables for access and secret key
 provider "linode" {
-  token = "$LINODE_TOKEN"
+#  token = "$LINODE_TOKEN"
 }
 
-data "linode_region" "region" {
-  id = "us-east"
-}
-
-// ================================================== NETWORK + SUBNETS
+#data "linode_region" "region" {
+#  id = "us-east"
+#}
+# outputs
+#   data.linode_region.region.country
 
 //================================================== INSTANCES
+# https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest
+#  image  - Linode Image type to use   - string   [default: "linode/ubuntu18.04"]
+#  region - The Linode region to use   - string   [default: "us-west"]
+#  type   - The image size type to use - string   [default: "g6-nanode-1"]
+#  lable  - The label used to create the instance [default: "example"]
+#   requires environment variable LINODE_TOKEN="xxxxx"
+module "lin_instance" {
+  source      = "./modules/terraform-linode-instance"
+
+#inputs:
+  image  = "linode/centos7"
+#  region = "us-east"
+#  type   = "g6-standard-1"
+  label  = "gitlab7"
+
+#outputs:
+#  id
+#  password
+#  ssh
+#  ip_address
+}
+
+resource "linode_domain" "lin-vilain" {
+  type      = "master"
+  domain    = "lin-vilain.com"
+  soa_email = "encrypt@vilain.com"
+}
+# returns linode_domain.lin-vilain.id
+
+resource "linode_domain_record" "gitlab7" {
+  domain_id   = linode_domain.lin-vilain.id
+  name        = "gitlab7"
+  record_type = "A"
+  target      = module.lin_instance.ip_address
+}
