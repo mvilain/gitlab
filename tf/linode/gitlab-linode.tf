@@ -71,14 +71,7 @@ terraform {
 
 # use environment variables for access and secret key
 provider "linode" {
-#  token = "$LINODE_TOKEN"
 }
-
-#data "linode_region" "region" {
-#  id = "us-east"
-#}
-# outputs
-#   data.linode_region.region.country
 
 //================================================== INSTANCES
 # https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest
@@ -103,15 +96,28 @@ module "lin_instance" {
 #  ip_address
 }
 
-resource "linode_domain" "lin-vilain" {
-  type      = "master"
+# domain already created and won't be managed
+data "linode_domain" "lin-vilain" {
   domain    = "lin-vilain.com"
-  soa_email = "encrypt@vilain.com"
 }
-# returns linode_domain.lin-vilain.id
+# output
+#  id - The unique ID of this Domain.
+#  domain - The domain this Domain represents. These must be unique in our system; you cannot have two Domains representing the same domain
+#  type - If this Domain represents the authoritative source of information for the domain it describes, or if it is a read-only copy of a master (also called a slave)
+#  group - The group this Domain belongs to.
+#  status - Used to control whether this Domain is currently being rendered.
+#  description - A description for this Domain.
+#  master_ips - The IP addresses representing the master DNS for this Domain.
+#  axfr_ips - The list of IPs that may perform a zone transfer for this Domain.
+#  ttl_sec - 'Time to Live'-the amount of time in seconds that this Domain's records may be cached by resolvers or other domain servers.
+#  retry_sec - The interval, in seconds, at which a failed refresh should be retried.
+#  expire_sec - The amount of time in seconds that may pass before this Domain is no longer authoritative.
+#  refresh_sec - The amount of time in seconds before this Domain should be refreshed.
+#  soa_email - Start of Authority email address.
+#  tags - An array of tags applied to this object.
 
 resource "linode_domain_record" "gitlab7" {
-  domain_id   = linode_domain.lin-vilain.id
+  domain_id   = data.linode_domain.lin-vilain.id
   name        = "gitlab7"
   record_type = "A"
   target      = module.lin_instance.ip_address
