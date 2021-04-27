@@ -42,7 +42,8 @@ won't respond to ping?  It's OK if node is up but http doesn't respond to heartb
 ### adding submodule to git
 
 - cd ~/gitlab/tf/linode/modules
-- git submodule add https://github.com/mvilain/terraform-linode-instance.git
+- git submodule add git@github.com:mvilain/terraform-linode-instance.git
+- git submodule update --init --recursive
 
 ### removing submodules from git
 

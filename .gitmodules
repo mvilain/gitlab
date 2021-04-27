@@ -1,0 +1,3 @@
+[submodule "tf/linode/modules/terraform-linode-instance"]
+	path = tf/linode/modules/terraform-linode-instance
+	url = git@github.com:mvilain/terraform-linode-instance.git
