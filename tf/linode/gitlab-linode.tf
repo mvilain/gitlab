@@ -50,21 +50,25 @@ variable "linode_token" {
   description = "Linode access token"
   type        = string
 }
-variable "linode_root_pass" {
-  description = "root password for linode"
-  type        = string
-}
-variable "linode_ssh_key" {
-  description = "ssh key for accessing linode"
-  type    = list(string)
-}
 
 ######################################################################
 terraform {
   required_providers {
     linode = {
-      source = "linode/linode"
-      version = "1.16.0"
+      source  = "linode/linode"
+      version = ">= 1.16.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "2.0.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "3.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.0.0"
     }
   }
 }
@@ -73,21 +77,57 @@ terraform {
 provider "linode" {
 }
 
+//================================================== GENERATE KEYS AND SAVE
+
+resource "tls_private_key" "linode_ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = "4096"
+}
+
+resource "local_file" "linode_pub_ssh_key" {
+  content         = tls_private_key.linode_ssh_key.public_key_openssh
+  filename        = "id_rsa.pub"
+  file_permission = "0600"
+}
+
+resource "local_file" "linode_priv_ssh_key" {
+  content         = tls_private_key.linode_ssh_key.private_key_pem
+  filename        = "id_rsa"
+  file_permission = "0600"
+}
+
+# there's really no need to know this password if using ssh -i private_key
+resource "random_password" "linode_root_pass" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
+resource "local_file" "root_passwd" {
+  content         = random_password.linode_root_pass.result
+  filename        = "root-passwd"
+  file_permission = "0600"
+}
+
 //================================================== INSTANCES
-# https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest
-#  image  - Linode Image type to use   - string   [default: "linode/ubuntu18.04"]
-#  region - The Linode region to use   - string   [default: "us-west"]
-#  type   - The image size type to use - string   [default: "g6-nanode-1"]
-#  lable  - The label used to create the instance [default: "example"]
-#   requires environment variable LINODE_TOKEN="xxxxx"
+# forked from https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest
+#  password - Linode root password
+#  ssh_key  - Linode public ssh key for setting authorize_hosts
+#  image    - Linode Image type to use                  [default: "linode/ubuntu18.04"]
+#  region   - The Linode region to use                  [default: "us-west"]
+#  type     - The image size type to use                [default: "g6-nanode-1"]
+#  label    - The label used to create the instance     [default: "example"]
+
 module "lin_instance" {
-  source      = "./modules/terraform-linode-instance"
+  source   = "./modules/terraform-linode-instance"
 
 #inputs:
-  image  = "linode/centos7"
-#  region = "us-east"
-#  type   = "g6-standard-1"
-  label  = "gitlab7"
+  password = random_password.linode_root_pass.result
+  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  image    = "linode/centos7"
+#  region  = "us-east"
+#  type    = "g6-standard-1"
+  label    = "gitlab7"
 
 #outputs:
 #  id
