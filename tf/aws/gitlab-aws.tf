@@ -50,15 +50,6 @@ variable "linode_token" {
   description = "Linode access token"
   type        = string
 }
-variable "linode_root_pass" {
-  description = "root password for linode"
-  type        = string
-}
-variable "linode_ssh_key" {
-  description = "ssh key for accessing linode"
-  type    = list(string)
-}
-
 ######################################################################
 # Configure the AWS Provider
 terraform {
