@@ -45,11 +45,11 @@ This creates a HEADless snapshot of the submodule in the main repo.
 
     cd ~/gitlab/tf/linode/modules
     git submodule add git@github.com:mvilain/terraform-linode-instance.git
-    git submodule update --init --recursive
 
 When you update the submodule and push it, the snapshot must be refreshed with the changes.
 
     git submodule update --remote
+    git submodule update
 
 ### removing submodules from git
 

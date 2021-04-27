@@ -121,6 +121,7 @@ module "lin_instance" {
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   image    = "linode/centos7"
+  script   = "centos7.sh"  # config/ is implied
 #  region  = "us-east"
 #  type    = "g6-standard-1"
   label    = "gitlab7"
