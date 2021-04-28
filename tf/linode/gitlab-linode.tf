@@ -1,4 +1,4 @@
-// linode-gitlab.tf -- define the gitlab aws instances
+// gitlab-linode.tf -- spin up the gitlab linode instances and define in DNS
 //================================================== VARIABLES (in terraform.tfvars)
 variable "aws_region" {
   description = "default region to setup all resources"
