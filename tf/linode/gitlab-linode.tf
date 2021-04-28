@@ -105,27 +105,55 @@ resource "local_file" "root_passwd" {
   file_permission = "0600"
 }
 
+# manage ansible's inventory file because it will have different IPs each run
+resource "local_file" "inventory" {
+  content = <<-EOT
+  # this is overridden with every terraform run
+  [all:vars]
+  ansible_ssh_user=root
+  ansible_ssh_private_key_file=./id_rsa
+  ansible_python_interpreter=/usr/libexec/platform-python
+  
+  [all]
+  EOT
+  filename        = "inventory"
+  file_permission = "0644"
+}
+
+resource "local_file" "inventory_py3" {
+  content = <<-EOT
+  # this is overridden with every terraform run
+  [all:vars]
+  ansible_ssh_user=root
+  ansible_ssh_private_key_file=./id_rsa
+  ansible_python_interpreter=/usr/bin/python3
+
+  [all]
+  EOT
+  filename        = "inventory_py3"
+  file_permission = "0644"
+}
+
 //================================================== INSTANCES
 # inputs:
-#  password - Linode root password                              [default: NONE ]
-#  ssh_key  - Linode public ssh key for setting authorize_hosts [default: NONE ]
-#  image    - Linode Image type used to create instance         [default: "linode/ubuntu18.04"]
-#  region   - Linode region where instance will run             [default: "us-west"]
-#  type     - Linode image size to use                          [default: "g6-nanode-1"]
-#  label    - label used to create the instance and hostname    [default: "example"]
-#  domain   - Linode-managed DNS domain used to assign host IP  [default: "example.com"]
-module "lin_instance" {
+#  password  - Linode root password                              [default: NONE ]
+#  ssh_key   - Linode public ssh key for setting authorize_hosts [default: NONE ]
+#  image     - Linode Image type used to create instance         [default: "linode/ubuntu18.04"]
+#  region    - Linode region where instance will run             [default: "us-west"]
+#  type      - Linode image size to use                          [default: "g6-nanode-1"]
+#  label     - label used to create the instance and hostname    [default: "example"]
+#  domain    - Linode-managed DNS domain used to assign host IP  [default: "example.com"]
+#  inventory - ansible inventory file to append host             [default: inventory]
+module "lin_gitlab7" {
   source   = "./modules/terraform-linode-instance"
-
-#inputs:
+  #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  image    = "linode/centos7"
-  script   = "centos7.sh"  # config/ is implied
-#  region  = "us-east"
-#  type    = "g6-standard-1"
-  label    = "gitlab7"
   domain   = var.linode_domain
+  image    = "linode/centos7"
+  script   = "centos7.sh"       # config/ is implied
+  label    = "gitlab7"
+  inventory = "inventory"
 }
 # outputs:
 #  id
@@ -135,3 +163,74 @@ module "lin_instance" {
 #  ipv6
 #  ipv4
 #  backups (enabled, schedule, day, window)
+
+
+module "lin_gitlab8" {
+  source   = "./modules/terraform-linode-instance"
+  #
+  password = random_password.linode_root_pass.result
+  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain   = var.linode_domain
+  image    = "linode/centos8"
+  script   = "centos8.sh"
+  label    = "gitlab8"
+  inventory = "inventory"
+}
+
+module "lin_gitlab9" {
+  source   = "./modules/terraform-linode-instance"
+  #
+  password = random_password.linode_root_pass.result
+  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain   = var.linode_domain
+  image    = "linode/debian9"
+  script   = "debian.sh"
+  label    = "gitlab9"
+  inventory = "inventory_py3"
+}
+
+module "lin_gitlab10" {
+  source   = "./modules/terraform-linode-instance"
+  #
+  password = random_password.linode_root_pass.result
+  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain   = var.linode_domain
+  image    = "linode/debian10"
+  script   = "debian.sh"
+  label    = "gitlab10"
+  inventory = "inventory_py3"
+}
+
+module "lin_gitlab16" {
+  source   = "./modules/terraform-linode-instance"
+  #
+  password = random_password.linode_root_pass.result
+  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain   = var.linode_domain
+  image    = "linode/ubuntu16.04lts"
+  script   = "ubuntu.sh"
+  label    = "gitlab16"
+  inventory = "inventory_py3"
+}
+module "lin_gitlab18" {
+  source   = "./modules/terraform-linode-instance"
+  #
+  password = random_password.linode_root_pass.result
+  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain   = var.linode_domain
+  image    = "linode/ubuntu18.04"
+  script   = "ubuntu.sh"
+  label    = "gitlab18"
+  inventory = "inventory_py3"
+}
+module "lin_gitlab20" {
+  source   = "./modules/terraform-linode-instance"
+  #
+  password = random_password.linode_root_pass.result
+  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain   = var.linode_domain
+  image    = "linode/ubuntu20.04"
+  script   = "ubuntu.sh"
+  label    = "gitlab20"
+  inventory = "inventory_py3"
+}

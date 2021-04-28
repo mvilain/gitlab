@@ -49,7 +49,7 @@ This creates a HEADless snapshot of the submodule in the main repo.
 When you update the submodule and push it, the snapshot must be refreshed with the changes.
 
     git submodule update --remote
-    git submodule update
+    git commit -a -m "submodule update"
 
 ### removing submodules from git
 
