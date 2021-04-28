@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 # gitlab demo Vagrant file to spin up multiple machines and OS'
-# Maintainer Michael Vilain [202104.22]
+# Maintainer Michael Vilain [202104.28]
 
 Vagrant.configure("2") do |config|
   # config.vm.network 'forwarded_port', guest: 80, host: 8080
@@ -24,25 +24,27 @@ Vagrant.configure("2") do |config|
   SHELLALL
 
 
+# vagrant box has python2.7 installed with /usr/libexec/platform-python
   config.vm.define "gitlab7" do |gitlab7|
     gitlab7.vm.box = "centos/7"
     gitlab7.ssh.insert_key = false
     gitlab7.vm.network 'private_network', ip: '192.168.10.107'
     gitlab7.vm.hostname = 'gitlab7'
-    gitlab7.vm.provision "shell", inline: <<-SHELL
+#     gitlab7.vm.provision "shell", inline: <<-SHELL
 #      yum install -y epel-release
 #       yum install -y python3 libselinux-python3 #python36-rpm
-    SHELL
+#     SHELL
     # still uses python2 for ansible
     gitlab7.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory"
+      ansible.inventory_path = "./inventory-vagrant"
     end
   end
-  
+
   # https://bugzilla.redhat.com/show_bug.cgi?id=1820925
   # use AlmaLinux CentOS fork 202104.03
+  # # vagrant box has python3.6 installed with /usr/libexec/platform-python
   config.vm.define "gitlab8" do |gitlab8|
 #     gitlab8.vm.box = "centos/8"
     gitlab8.vm.box = "almalinux/8"
@@ -59,7 +61,7 @@ Vagrant.configure("2") do |config|
     gitlab8.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory"
+      ansible.inventory_path = "./inventory-vagrant"
     end
   end
 
@@ -71,13 +73,13 @@ Vagrant.configure("2") do |config|
     gitlab9.vm.network 'private_network', ip: '192.168.10.109'
     gitlab9.vm.hostname = 'gitlab9'
     gitlab9.vm.provision "shell", inline: <<-SHELL
-      apt-get update
+      apt-get update --allow-releaseinfo-change -y
       apt-get install -y apt-transport-https python-apt
     SHELL
     gitlab9.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory"
+      ansible.inventory_path = "./inventory-vagrant"
     end
   end
 
@@ -90,12 +92,12 @@ Vagrant.configure("2") do |config|
     gitlab10.vm.hostname = 'gitlab10'
     gitlab10.vm.provision "shell", inline: <<-SHELL
       apt-get update --allow-releaseinfo-change -y
-      apt-get install -y apt-transport-https
+      apt-get install -y apt-transport-https python-apt
     SHELL
     gitlab10.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory"
+      ansible.inventory_path = "./inventory-vagrant"
     end
   end
 
@@ -110,7 +112,7 @@ Vagrant.configure("2") do |config|
     gitlab16.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory"
+      ansible.inventory_path = "./inventory-vagrant"
     end
   end
 
@@ -125,7 +127,7 @@ Vagrant.configure("2") do |config|
     gitlab18.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory"
+      ansible.inventory_path = "./inventory-vagrant"
     end
   end
 
@@ -143,7 +145,7 @@ Vagrant.configure("2") do |config|
     gitlab20.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory"
+      ansible.inventory_path = "./inventory-vagrant"
     end
   end
 
