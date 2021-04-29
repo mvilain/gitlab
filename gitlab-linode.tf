@@ -145,13 +145,13 @@ resource "local_file" "inventory_py3" {
 #  domain    - Linode-managed DNS domain used to assign host IP  [default: "example.com"]
 #  inventory - ansible inventory file to append host             [default: inventory]
 module "lin_gitlab7" {
-  source   = "./modules/terraform-linode-instance"
+  source   = "./terraform-modules/terraform-linode-instance"
   #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
   image    = "linode/centos7"
-  script   = "centos7.sh"       # config/ is implied
+  script   = "centos7.sh"       # gitlab-config/ is implied
   label    = "gitlab7"
   inventory = "inventory"
 }
@@ -166,7 +166,7 @@ module "lin_gitlab7" {
 
 
 module "lin_gitlab8" {
-  source   = "./modules/terraform-linode-instance"
+  source   = "./terraform-modules/terraform-linode-instance"
   #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
@@ -178,7 +178,7 @@ module "lin_gitlab8" {
 }
 
 module "lin_gitlab9" {
-  source   = "./modules/terraform-linode-instance"
+  source   = "./terraform-modules/terraform-linode-instance"
   #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
@@ -190,7 +190,7 @@ module "lin_gitlab9" {
 }
 
 module "lin_gitlab10" {
-  source   = "./modules/terraform-linode-instance"
+  source   = "./terraform-modules/terraform-linode-instance"
   #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
@@ -202,7 +202,7 @@ module "lin_gitlab10" {
 }
 
 module "lin_gitlab16" {
-  source   = "./modules/terraform-linode-instance"
+  source   = "./terraform-modules/terraform-linode-instance"
   #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
@@ -213,7 +213,7 @@ module "lin_gitlab16" {
   inventory = "inventory_py3"
 }
 module "lin_gitlab18" {
-  source   = "./modules/terraform-linode-instance"
+  source   = "./terraform-modules/terraform-linode-instance"
   #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
@@ -224,7 +224,7 @@ module "lin_gitlab18" {
   inventory = "inventory_py3"
 }
 module "lin_gitlab20" {
-  source   = "./modules/terraform-linode-instance"
+  source   = "./terraform-modules/terraform-linode-instance"
   #
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
