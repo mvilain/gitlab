@@ -14,7 +14,6 @@ Also, the haproxy process doesn't agregate logs in a separate file.
 
 Instead of using this managed role as is, I combine it's features with my own module.
 
-
 - (https://github.com/geerlingguy/ansible-role-gitlab)[ansible-role-gitlab] was created in 2014 and is a bit old
 
 it doesn't use the gitlab installation repos in
@@ -37,12 +36,15 @@ which didn't work right off due to version incompatibilities. Once I reported an
 
 It now runs a pre-install script to configure nodes so they'll run ansible and adds the nodes to a pre-existing Linode-managed DNS domain.
 
-## to do
+If you define a DNS domain and assign it a SOA email address in linode's DNS service, update the the play-linode.yml playbook accordingly.  After terraform has created the nodes and inserted them into DNS domain, you can run the ansible playbook for the CentOS systems using the `inventory` file and the Debian/Ubuntu systems using the `inventory_py3` file.  These will correctly create the gitlab service on these hosts with https enabled.
+
+## TODO
 
 - haproxy round-robin will not cycle if a host in the proxy list is down
 
 won't respond to ping?  It's OK if node is up but http doesn't respond to heartbeat
 
+- setup gitlab instances to point to a single postgresql server and use haproxy to load balance between them.
 
 
 ## Appendix A
