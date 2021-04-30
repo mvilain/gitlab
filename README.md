@@ -31,7 +31,11 @@ To work around this problem, instead of using Vagrant to run the project, use a 
 
 - terraform-linode-instance module
 
+From https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest 
 
+which didn't work right off due to version incompatibilities. Once I reported an issue, the author fixed that problem. But I discovered I wanted to enhance the features of the module, so I forked it.
+
+It now runs a pre-install script to configure nodes so they'll run ansible and adds the nodes to a pre-existing Linode-managed DNS domain.
 
 ## to do
 

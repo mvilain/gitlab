@@ -162,10 +162,11 @@
 #
 - include_tasks: "{{ ansible_distribution }}_tasks.yml"
 
+# copy as textlog so system clean up doesn't delete it
 - name: fetch install log
   fetch:
     src: "{{ gitlab_install_log }}"
-    dest: "{{ ansible_hostname }}_gitlab-ce-install.log"
+    dest: "{{ ansible_hostname }}_gitlab-ce-install.textlog"
     flat: yes
   register: copy_log
 - debug: var=copy_log
@@ -182,10 +183,11 @@
     var: gitlab_reconfig.stderr_lines
   when: gitlab_reconfig|selectattr("stderr_lines", "defined")|list|length >0
 
+# copy as textlog so system clean up doesn't delete it
 - name: fetch reconfig log
   fetch:
     src: "{{ gitlab_reconfig_log }}"
-    dest: "{{ ansible_hostname }}_gitlab-ce-reconfig.log"
+    dest: "{{ ansible_hostname }}_gitlab-ce-reconfig.textlog"
     flat: yes
   register: gitlab_reconfig
 - debug: var=gitlab_reconfig

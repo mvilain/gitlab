@@ -4,5 +4,5 @@
 
 {% for item in groups['all'] %}
 {% set short_name = item.split('.') %}
-{{ hostvars[item]['ansible_host'] }}  {{ item }} {{ short_name[0] }}
+{{ hostvars[item]['ansible_host'] }}  {{ item }}.{{ gitlab_domain }} {{ short_name[0] }}
 {% endfor %}
