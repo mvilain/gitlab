@@ -1,11 +1,11 @@
-# playbook for gitlab server hosts
+# playbook for configuring gitlab server hosts on linode servers
 # this will install both roles, then run the handlers for both roles
 # ansible should pull variables from group_vars/gitlab anyway
 ---
-- hosts: gitlab gitlab_py3
+- hosts: all
   vars:
-    gitlab_domain: "{{ ansible_hostname}}.aws-vilain.com"
-    gitlab_external_url: "http://{{ gitlab_domain }}/"
+    gitlab_domain: "{{ ansible_hostname}}.lin-vilain.com"
+    gitlab_external_url: "https://{{ gitlab_domain }}/"
   vars_files:
     - group_vars/gitlab
   become: true
