@@ -1,65 +1,6 @@
 // aws-gitlab.tf -- define the gitlab aws instances
-//================================================== VARIABLES (in terraform.tfvars)
-variable "aws_region" {
-  description = "default region to setup all resources"
-  type        = string
-}
-variable "aws_alma8_name" {
-  description = "us-west-2 # ami-01a87a7d55032db2e"
-  type        = list(string)
-}
-variable "aws_centos7_name" {
-  description = "us-west-2 # ami-01e36b7901e884a10"
-  type        = list(string)
-}
-variable "aws_centos8_name" {
-  description = "us-west-2 # ami-082a036ec7c372e4c"
-  type        = list(string)
-}
-variable "aws_debian9_name" {
-  description = "us-west-2 # ami-0c18820215678d337"
-  type        = list(string)
-}
-variable "aws_debian10_name" {
-  description = "us-west-2 # ami-0a449b766e034390d"
-  type        = list(string)
-}
-variable "aws_ubuntu16_name" {
-  description = "us-west-2 # ami-0a65caa9c575c1c0c"
-  type        = list(string)
-}
-variable "aws_ubuntu18_name" {
-  description = "us-west-2 # ami-00833850c832e03a2"
-  type        = list(string)
-}
-variable "aws_ubuntu20_name" {
-  description = "us-west-2 # ami-06b3455df6cbbf3a2"
-  type        = list(string)
-}
-
-
-variable "linode_region" {
-  description = "region where linode is running"
-  type        = string
-}
-variable "linode_domain" {
-  description = "DNS domain where linode is running"
-  type        = string
-}
-variable "linode_token" {
-  description = "Linode access token"
-  type        = string
-}
-######################################################################
-# Configure the AWS Provider
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
+//================================================== VARIABLES (in gitlab-vars.tf)
+//================================================== PROVIDERS (in gitlab-providers.tf)
 
 # use environment variables for access and secret key
 provider "aws" {
@@ -70,6 +11,9 @@ data "aws_region" "current" {}
 # data.aws_region.name - The name of the selected region.
 # data.aws_region.endpoint - The EC2 endpoint for the selected region.
 # data.aws_region.description - region's description in this format: "Location (Region name)".
+
+//================================================== GENERATE KEYS AND SAVE
+
 
 //================================================== S3 ENCRYPTED BACKEND+LOCKS
 resource "aws_s3_bucket" "tf-backend" {
