@@ -36,7 +36,15 @@ It now runs a pre-install script to configure nodes so they'll run ansible and a
 
 If you define a DNS domain and assign it a SOA email address in linode's DNS service, update the the play-linode.yml playbook accordingly.  After terraform has created the nodes and inserted them into DNS domain, you can run the ansible playbook for the CentOS systems using the `inventory` file and the Debian/Ubuntu systems using the `inventory_py3` file.  These will correctly create the gitlab service on these hosts with https enabled.
 
+- aws-list-gold-ami tool
 
+The shell version of this tool exists as a testbed before coding the python version, which uses the AWS boto3 python library to access AWS services.
+
+```
+python3 -m venv venv
+. venv/bin/activate
+python3 -m pip install -r requirements.txt
+```
 
 ## TODO
 
@@ -45,6 +53,7 @@ If you define a DNS domain and assign it a SOA email address in linode's DNS ser
 won't respond to ping?  It's OK if node is up but http doesn't respond to heartbeat
 
 - setup gitlab instances to point to a single postgresql server and use haproxy to load balance between them.
+- `aws-list-gold-ami.sh`needs to be ported to python3.
 
 
 
