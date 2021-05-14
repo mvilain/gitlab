@@ -1,4 +1,4 @@
-# gitlab -- install and configure gitlab with load balancers
+# gitlab -- install and configure gitlab
 
 This project uses Vagrant to create three GitLab servers, a database server, and
 a haproxy load balancer to cycle between the three servers.  All three servers
@@ -14,13 +14,13 @@ Also, the haproxy process doesn't agregate logs in a separate file.
 
 Instead of using this managed role as is, I combine it's features with my own module.
 
-- (https://github.com/geerlingguy/ansible-role-gitlab)[ansible-role-gitlab] was created in 2014 and is a bit old
+- [ansible-role-gitlab](https://github.com/geerlingguy/ansible-role-gitlab) was created in 2014 and is a bit old
 
 it doesn't use the gitlab installation repos in
 
 https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.{rpm|deb}.sh
 
-from (https://about.gitlab.com/install)[Installing Gitlab] which depends on the OS being installed.
+from [Installing Gitlab](https://about.gitlab.com/install) which depends on the OS being installed.
 
 The code from Guy's role has been enhanced and updated to run using CentOS (both 7 and AlamaLinux which is a straight port of CentOS 8), Debian 9 and 10, and Ubuntu 16.04 (deprecated in Gitlab 14), 18.04, and 20.04.
 
@@ -28,15 +28,15 @@ All the versions of the gitlab VM run setup and run the stand-alone http version
 
 To work around this problem, instead of using Vagrant to run the project, use a Terraform model to deploy machines in AWS and the ansible playbook to deploy gitlab to the AWS machines.
 
-- terraform-linode-instance module
+- [terraform-linode-instance module](https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest)
 
-From https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest 
-
-which didn't work right off due to version incompatibilities. Once I reported an issue, the author fixed that problem. But I discovered I wanted to enhance the features of the module, so I forked it.
+Initially, the module didn't work due to version incompatibilities.  I reported the issue and the author fixed it. Then I discovered I wanted to enhance the features of the module, so I forked it.
 
 It now runs a pre-install script to configure nodes so they'll run ansible and adds the nodes to a pre-existing Linode-managed DNS domain.
 
 If you define a DNS domain and assign it a SOA email address in linode's DNS service, update the the play-linode.yml playbook accordingly.  After terraform has created the nodes and inserted them into DNS domain, you can run the ansible playbook for the CentOS systems using the `inventory` file and the Debian/Ubuntu systems using the `inventory_py3` file.  These will correctly create the gitlab service on these hosts with https enabled.
+
+
 
 ## TODO
 
@@ -47,7 +47,15 @@ won't respond to ping?  It's OK if node is up but http doesn't respond to heartb
 - setup gitlab instances to point to a single postgresql server and use haproxy to load balance between them.
 
 
+
 ## Appendix A
+
+### Repo has submodules
+
+Since this repo has submodules, you'll need to clone it and populate the submodules:
+
+    git clone --recurse-submodules https://github.com/mvilain/gitlab.git
+
 
 ### adding submodule to git
 
@@ -63,14 +71,12 @@ When you update the submodule and push it, the snapshot must be refreshed with t
 
 ### removing submodules from git
 
-Here's how to remove submodules:
+Here's how to remove submodules (from [How to delete a submodule](https://gist.github.com/myusuf3/7f645819ded92bda6677))
 
 - Delete the relevant section from the .gitmodules file.
 - Stage the .gitmodules changes git add .gitmodules
 - Delete the relevant section from .git/config.
-- Run git rm --cached path_to_submodule (no trailing slash).
-- Run rm -rf .git/modules/path_to_submodule (no trailing slash).
-- Commit git commit -m "Removed submodule "
-- Delete the now untracked submodule files rm -rf path_to_submodule
-
-from [https://gist.github.com/myusuf3/7f645819ded92bda6677](How to delete a submodule)
+- Run `git rm --cached path_to_submodule` (no trailing slash).
+- Run `rm -rf .git/modules/path_to_submodule` (no trailing slash).
+- Commit `git commit -m "Removed submodule"`
+- Delete the now untracked submodule files `rm -rf path_to_submodule`
