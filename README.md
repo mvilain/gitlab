@@ -44,7 +44,25 @@ The shell version of this tool exists as a testbed before coding the python vers
 python3 -m venv venv
 . venv/bin/activate
 python3 -m pip install -r requirements.txt
+
+Collecting boto3
+  Downloading boto3-1.17.73-py2.py3-none-any.whl (131 kB)
+     |████████████████████████████████| 131 kB 2.9 MB/s
+Collecting s3transfer<0.5.0,>=0.4.0
+  Using cached s3transfer-0.4.2-py2.py3-none-any.whl (79 kB)
+Collecting jmespath<1.0.0,>=0.7.1
+  Using cached jmespath-0.10.0-py2.py3-none-any.whl (24 kB)
+Collecting botocore<1.21.0,>=1.20.73
+  Using cached botocore-1.20.73-py2.py3-none-any.whl (7.5 MB)
+Collecting urllib3<1.27,>=1.25.4
+  Using cached urllib3-1.26.4-py2.py3-none-any.whl (153 kB)
+Requirement already satisfied: python-dateutil<3.0.0,>=2.1 in /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages (from botocore<1.21.0,>=1.20.73->boto3) (2.8.1)
+Requirement already satisfied: six>=1.5 in /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages (from python-dateutil<3.0.0,>=2.1->botocore<1.21.0,>=1.20.73->boto3) (1.16.0)
+Installing collected packages: urllib3, jmespath, botocore, s3transfer, boto3
+Successfully installed boto3-1.17.73 botocore-1.20.73 jmespath-0.10.0 s3transfer-0.4.2 urllib3-1.26.4
 ```
+
+
 
 ## TODO
 
