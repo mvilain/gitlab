@@ -21,14 +21,14 @@ PROG = os.path.basename( sys.argv[0] )
 
 # distro and ProductCode for Gitlab-supported distros
 DISTROS = dict(
-    alma8    =  '2pag55a9fkn96t01w4zg0hjzx',
-    centos7  =  'aw0evgkw8e5c1q413zgy5pjce',
-    centos8  =  'ef6kit54bxdxm5ec5h7921duf',
-    debian9  =  'wa59nhjens2s3nbfqlcjxiyy',
-    debian10 =  'a8to8juz0snuukwdxuz7x3ol8',
-    ubuntu16 =  'a77pfe5qy4y0x0ovr82l3q0jt',
-    ubuntu18 =  '3iplms73etrdhxdepv72l6ywj',
-    ubuntu20 =  '9rxhntdy981dz5t3gbzpdd60w'
+    alma83     =  '2pag55a9fkn96t01w4zg0hjzx',
+    centos79   =  'aw0evgkw8e5c1q413zgy5pjce',
+    centos83   =  'ef6kit54bxdxm5ec5h7921duf',
+    debian913  =  'wa59nhjens2s3nbfqlcjxiyy',
+    debian107  =  'a8to8juz0snuukwdxuz7x3ol8',
+    ubuntu1604 =  'a77pfe5qy4y0x0ovr82l3q0jt',
+    ubuntu1804 =  '3iplms73etrdhxdepv72l6ywj',
+    ubuntu2004 =  '9rxhntdy981dz5t3gbzpdd60w'
 )
 
 def parse_arguments(default_region):
@@ -121,11 +121,12 @@ def region_config(valid_region):
     :return: a configuration object specifying the region
     """
 
-def desc_images(RegionConfig,ProductCode):
+def desc_images(ProductCode,RegionConfig):
     """
     get all the Golden Image AMIs for a specific ProductCode
-    :param RegionConfig: Config object which defines the region to query
+
     :param ProductCode: string of the ProductCode for a vendor's images
+    :param RegionConfig: Config object which defines the region to query
     :return: json object describing the AMIs and their attributes
     """
     client = boto3.client( 'ec2', config=RegionConfig )
@@ -180,7 +181,7 @@ def main():
             regions_print()
             return 1
 
-        print('REGION={}'.format(args.REGION))
+        # print('REGION={}'.format(args.REGION))
         # create a Config object defining region to use with a boto3 client
         region_config = Config(
             region_name = args.REGION,
@@ -192,36 +193,47 @@ def main():
         )
 
         # scan region for Gold AMIs
-        for distro,prod in DISTROS.items():
-            print('{} {}'.format(40*'>',distro))
-            images = desc_images(region_config,prod)
-            pprint.pprint(images['Images'])
-            print('{} {} end\n'.format(40*'<',distro))
+        gold_ami = {}
+        for distro,prodcode in DISTROS.items():
+            print ('{}'.format(distro),end='...', flush=True)
+            # this returns dict with Images,Metadata keys
+            # Images is a list of dicts containing each images info
+            images = desc_images(prodcode,region_config)    # describe_images for region
 
+            # loop through each image dict and save stuff in dict gold_ami
+            # key = distro-CreationDate
+            # value = ImageID|Description|Name
+            for im in images['Images']:
+            #     im.pop('Architecture', None)
+            #     im.pop('BlockDeviceMappings', None)
+            #   CreationDate form: YYYY-MM-DDThh:mm:ss.000Z
+            #   Description
+            #     im.pop('EnaSupport', None)
+            #     im.pop('Hypervisor', None)
+            #   ImageId
+            #   ImageLocation
+            #     im.pop('ImageOwnerAlias', None)
+            #     im.pop('ImageType', None)
+            #   Name
+            #     im.pop('OwnerId', None)
+            #     im.pop('PlatformDetails', None)
+            #     im.pop('ProductCodes', None)
+            #     im.pop('Public', None)
+            #     im.pop('RootDeviceName', None)
+            #     im.pop('RootDeviceType', None)
+            #     im.pop('SriovNetSupport', None)
+            #     im.pop('State', None)
+            #     im.pop('UsageOperation', None)
+            #     im.pop('VirtualizationType', None)
+            #     print('{} {}'.format(60*'>',i['CreationDate']))
+            #     pprint.pprint(im)
+            #     print('{} {} end\n'.format(40*'-',distro))
+                gold_ami[args.REGION + '|' + distro + '|' + im['CreationDate'] ] = \
+                    im['ImageId'] + '|' + im['Description'] + '|' + im['Name']
+        print ('[done]',flush=True)
+        size = os.get_terminal_size()
+        pprint.pprint(gold_ami,width=size.columns)
         return 0
 
 
 if __name__ == '__main__': sys.exit(main())
-
-#///////////
-
-# for distro in $(cat <<-PRODCODES | awk '{print $2}'
-#     almalinux   2pag55a9fkn96t01w4zg0hjzx
-#     centos7.9   aw0evgkw8e5c1q413zgy5pjce
-#     centos8.3   ef6kit54bxdxm5ec5h7921duf
-#     debian9.13  wa59nhjens2s3nbfqlcjxiyy
-#     debian10.7  a8to8juz0snuukwdxuz7x3ol8
-#     ubuntu16.04 a77pfe5qy4y0x0ovr82l3q0jt
-#     ubuntu18.04 3iplms73etrdhxdepv72l6ywj
-#     ubuntu20.04 9rxhntdy981dz5t3gbzpdd60w
-# PRODCODES
-# ); do
-#   # for some reason awscli won't pipe but it will redirect ouput
-#   aws ec2 describe-images --owners 'aws-marketplace' \
-#     --filters "Name=product-code,Values=$distro" \
-#     --output 'json' --no-cli-pager --region $REGION > $TMPFILE
-#   jq -r ".Images[] | .CreationDate, .ImageId, .ImageLocation" $TMPFILE
-#   echo ""
-# done
-# rm $TMPFILE
-# exit
