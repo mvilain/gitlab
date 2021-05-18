@@ -9,7 +9,7 @@
 # uses region defined in awscli's credentials if not specified in REGION
 # credentials file must be present with the region and keys environment variables
 
-import sys, os, re, argparse
+import sys, os, re, argparse, datetime
 import boto3, json, pprint, jmespath
 from botocore.config import Config
 # from jmespath import exceptions
@@ -19,7 +19,7 @@ CRED = os.path.expanduser( '~/.aws/credentials' )
 CONFIG = os.path.expanduser( '~/.aws/config' )
 PROG = os.path.basename( sys.argv[0] )
 
-# distro and ProductCode for Gitlab-supported distros
+# distro and ProductCode for each Gitlab-supported distros
 DISTROS = dict(
     alma83     =  '2pag55a9fkn96t01w4zg0hjzx',
     centos79   =  'aw0evgkw8e5c1q413zgy5pjce',
@@ -114,12 +114,15 @@ def valid_region(region):
     else:
         return False
 
-def region_config(valid_region):
+def date_convert(aws_date):
     """
+    converts the aws CreationDate string (YYYY-MM-DDThh:mm:ss.000Z)
+        into a datetime object
+    :param aws_date: string in the form YYYY-MM-DDThh:mm:ss.000Z for AWS' CreationDate
+    :return: a datetime object
+    """
+    return datetime.datetime.strptime(aws_date, '%Y-%m-%dT%H:%M:%S.000Z')
 
-    :param valid_region: string of a valid AWS region where to access resources
-    :return: a configuration object specifying the region
-    """
 
 def desc_images(ProductCode,RegionConfig):
     """
@@ -167,9 +170,8 @@ def main():
     args = parse_arguments(default_region)
 
     # display regions
-    if args.list:  # 6 at a time fits width=80
+    if args.list:  # 6 (default) at a time fits width=80
         print('{} -- valid regions:'.format(PROG))
-        # pprint.pprint(' '.join(regions_list()),width=72)
         regions_print()
         return 0
 
@@ -181,7 +183,6 @@ def main():
             regions_print()
             return 1
 
-        # print('REGION={}'.format(args.REGION))
         # create a Config object defining region to use with a boto3 client
         region_config = Config(
             region_name = args.REGION,
@@ -192,17 +193,17 @@ def main():
             }
         )
 
-        # scan region for Gold AMIs
         gold_ami = {}
+        # scan region for Gold AMIs
         for distro,prodcode in DISTROS.items():
             print ('{}'.format(distro),end='...', flush=True)
             # this returns dict with Images,Metadata keys
             # Images is a list of dicts containing each images info
             images = desc_images(prodcode,region_config)    # describe_images for region
 
-            # loop through each image dict and save stuff in dict gold_ami
-            # key = distro-CreationDate
-            # value = ImageID|Description|Name
+            # loop through each image dict which can have multiple entries
+            # store entries in a list for each distro so it can be sorted
+            distro_list = []
             for im in images['Images']:
             #     im.pop('Architecture', None)
             #     im.pop('BlockDeviceMappings', None)
@@ -228,11 +229,29 @@ def main():
             #     print('{} {}'.format(60*'>',i['CreationDate']))
             #     pprint.pprint(im)
             #     print('{} {} end\n'.format(40*'-',distro))
-                gold_ami[args.REGION + '|' + distro + '|' + im['CreationDate'] ] = \
-                    im['ImageId'] + '|' + im['Description'] + '|' + im['Name']
+                distro_list.append(
+                    im['CreationDate'] + '|' + im['ImageId'] + '|' + im['Description']
+                )
+            # reverse sort and select newest version
+            #   rather than using datetime objects
+            # distro|CreationDate|ImageID|Description
+            first = sorted( distro_list, reverse=True )[0]
+            # split into fields
+            newest = first.split('|')
+
+            gold_ami[ distro ]  = \
+                dict(
+                    CreationDate = newest[0],
+                    ImageID      = newest[1],
+                    Description  = newest[2],
+                    region       = args.REGION
+                )
+
         print ('[done]',flush=True)
+        # test for template...if true, process the template otherwise print
         size = os.get_terminal_size()
         pprint.pprint(gold_ami,width=size.columns)
+
         return 0
 
 
