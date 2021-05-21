@@ -60,6 +60,11 @@ def parse_arguments(default_region):
                         help=('JINJA2 template file to fill in with AMI info'),
                         required=False
                         )
+    parser.add_argument('-v', '--verbose',
+                        action="store_true",
+                        help=('show all the AMI image info'),
+                        required=False
+                        )
     args = parser.parse_args()
 
     if args.template:   # passed a template filename?
@@ -220,11 +225,15 @@ def main():
         for distro,prodcode in DISTROS.items():
             print ('{}'.format(distro),end='...', flush=True)
 
-            distro_list = []  # store entries in a list for each distro so it can be sorted
+            distro_list = []  # store distro entries in list so it can be sorted
             for im in desc_images(prodcode,region_config):
                 distro_list.append(
                     im['CreationDate'] + '|' + im['ImageId'] + '|' + im['Description']
                 )
+                if args.verbose:
+                    pprint.pprint(im)
+
+            # use sorted list with CreationDate as key rather than datetime module
             first = sorted( distro_list, reverse=True )[0] # rev sort...select newest
             newest = first.split('|')
             gold_ami[ distro ]  = \
@@ -237,7 +246,7 @@ def main():
 
         print ('[done]',flush=True)
 
-        # processed the region's AMIs, so either fill in a template or print them out
+        # processed the region's AMIs, so fill in a template or print them out
         if args.template:
             env = Environment(
                 loader=PackageLoader( PROG ),
@@ -245,11 +254,10 @@ def main():
             )
 
         else:
-            # test for template...if true, process the template otherwise print
             try:
                 size = os.get_terminal_size()
                 pprint.pprint(gold_ami,width=size.columns)
-            except OSError:     # most likely can't get terminal info
+            except OSError:     # likely can't get terminal info in debugging session
                 pprint.pprint(gold_ami,width=132)
 
         return 0
