@@ -1,4 +1,4 @@
-// gitlab-vars.tf -- spin up the gitlab aws and linode instances and define in DNS
+// gitlab-aws-vars.tf -- spin up the gitlab aws instances and define in DNS
 //================================================== VARIABLES (in terraform.tfvars)
 variable "aws_region" {
   description = "default region to setup all resources"
@@ -50,16 +50,4 @@ variable "aws_ubuntu20_name" {
   description = "us-west-2 # ami-06b3455df6cbbf3a2"
   type        = list(string)
   default     = [ "SupportedImages ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*" ]
-}
-
-
-variable "linode_region" {
-  description = "region where linode is running"
-  type        = string
-  default     =  "us-west"
-}
-variable "linode_domain" {
-  description = "DNS domain where linodes are running"
-  type        = string
-  default     = "lin-vilain.com"
 }
