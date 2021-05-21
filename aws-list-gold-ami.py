@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-# 202105.16MeV
+# 202105.20MeV
 # uses aws boto3 to crawl through AWS' marketplace and list instances for
 # - centos7 almalinux (centos8 replacement)
 # - debian9 debian10
@@ -7,12 +7,14 @@
 #
 # python3 and the boto3 library are required to run this tool
 # uses region defined in awscli's credentials if not specified in REGION
-# credentials file must be present with the region and keys environment variables
+# credentials file must be present with the region
+# allows for jinja2 templating with -t <TEMPLATE> option
+# You don't need AWS_ACCESS_KEY or AWS_SECRET_KEY environment variables to run this tool
 
-import sys, os, re, argparse, datetime
-import boto3, json, pprint, jmespath
+import sys, os, re, argparse
+import boto3, pprint
 from botocore.config import Config
-# from jmespath import exceptions
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 # shell expands '~' but you need to do it explicitly in python
 CRED = os.path.expanduser( '~/.aws/credentials' )
@@ -40,21 +42,32 @@ def parse_arguments(default_region):
         a namespace with the arguments passed and their values
     """
     parser = argparse.ArgumentParser(
-            description='display the AMI strings for Gitlab-supported virtual machines')
+             description='display the AMI strings for Gitlab-supported virtual machines')
     parser.add_argument('REGION',
-                        help='region to use for AMI images [default: {}]'.format(default_region),
+                        action="store",
                         default=default_region,
-                        # choices=regions_list(), # don't use this...don't like the error output
+                        help='region to use for AMI images [default: {}]'.format(default_region),
+                        # choices=regions_list(),   # don't use...don't like error output
                         nargs="?",
                         )
     parser.add_argument('-l', '--list',
+                        action="store_true",
                         help=('List the valid AWS regions'),
-                        required=False,
-                        action="store_true"
+                        required=False
+                        )
+    parser.add_argument('-t', '--template',
+                        action="store",
+                        help=('JINJA2 template file to fill in with AMI info'),
+                        required=False
                         )
     args = parser.parse_args()
-    return args
 
+    if args.template:   # passed a template filename?
+        if not os.path.exists( args.template ):
+            print('{} -- template file {} not found'.format(PROG, args.template))
+            exit(1)
+    #else:
+    return args
 
 def regions_list():
     """
@@ -75,7 +88,6 @@ def regions_list():
         valid_regions.append(r['RegionName'])
     return sorted(valid_regions)
 
-
 def regions_print(incr=5,tab='    '):
     """
     print the regions as a list of sort strings INCR number per line
@@ -92,7 +104,6 @@ def regions_print(incr=5,tab='    '):
         start = stop
         stop = stop + 5
     return None
-
 
 def valid_region(region):
     """
@@ -114,16 +125,6 @@ def valid_region(region):
     else:
         return False
 
-def date_convert(aws_date):
-    """
-    converts the aws CreationDate string (YYYY-MM-DDThh:mm:ss.000Z)
-        into a datetime object
-    :param aws_date: string in the form YYYY-MM-DDThh:mm:ss.000Z for AWS' CreationDate
-    :return: a datetime object
-    """
-    return datetime.datetime.strptime(aws_date, '%Y-%m-%dT%H:%M:%S.000Z')
-
-
 def desc_images(ProductCode,RegionConfig):
     """
     get all the Golden Image AMIs for a specific ProductCode
@@ -132,7 +133,11 @@ def desc_images(ProductCode,RegionConfig):
     :param RegionConfig: Config object which defines the region to query
     :return: json object describing the AMIs and their attributes
     """
+
     client = boto3.client( 'ec2', config=RegionConfig )
+
+    # this returns dict with Images,Metadata keys
+    # Images is a list of dicts containing each image's info
     response = client.describe_images(
         Filters=[
             { 'Name': 'product-code', 'Values': [ ProductCode ] },
@@ -141,17 +146,36 @@ def desc_images(ProductCode,RegionConfig):
         Owners=[ 'aws-marketplace' ]
         # DryRun=True|False
     ) # dict{Images(list of images)}
-    return response
+
+#     for image in response['Images']:
+#         image.pop('Architecture', None)
+#         image.pop('BlockDeviceMappings', None)
+#         # image.pop('CreationDate', None)   # form: YYYY-MM-DDThh:mm:ss.000Z
+#         # image.pop('Description', None)
+#         image.pop('EnaSupport', None)
+#         image.pop('Hypervisor', None)
+#         # image.pop('ImageId', None) 
+#         image.pop('ImageLocation', None)
+#         image.pop('ImageOwnerAlias', None)
+#         image.pop('ImageType', None)
+#         # image.pop('Name', None) 
+#         image.pop('OwnerId', None)
+#         image.pop('PlatformDetails', None)
+#         image.pop('ProductCodes', None)
+#         image.pop('Public', None)
+#         image.pop('RootDeviceName', None)
+#         image.pop('RootDeviceType', None)
+#         image.pop('SriovNetSupport', None)
+#         image.pop('State', None)
+#         image.pop('UsageOperation', None)
+#         image.pop('VirtualizationType', None)
+    return response['Images'] # don't bother with Metadata key
 
 
 def main():
     # abort if no credentials to access AWS
     if not os.path.exists( CRED ):
         print('{} -- credentials file {} not found'.format(PROG, CRED))
-        exit(1)
-    if not os.getenv("AWS_ACCESS_KEY", default=None) or \
-            not os.getenv("AWS_SECRET_KEY", default=None):
-        print('{} -- AWS ACCESS KEY or AWS_SECRET_KEY not defined'.format(PROG))
         exit(1)
 
     # if config not found, exit with error
@@ -160,27 +184,26 @@ def main():
         exit(1)
 
     # search config for "^region = XXXXXX" and extract XXXX as default
-    with open(CONFIG,'r') as config:    # don't bother with close() b/c used with
+    with open(CONFIG,'r') as config:
         config_lines = config.readlines()
-        for l in config_lines:
+        for line in config_lines:
             # extract region from config file...assumes region is a valid region
-            if re.search(r'^region = ', l):
-                default_region = re.sub(r'^region = ', '', l, flags=re.IGNORECASE).rstrip()
+            if re.search(r'^region = ', line):
+                default_region = re.sub(r'^region = ', '', line, flags=re.IGNORECASE).rstrip()
 
     args = parse_arguments(default_region)
 
     # display regions
-    if args.list:  # 6 (default) at a time fits width=80
+    if args.list:
         print('{} -- valid regions:'.format(PROG))
-        regions_print()
+        regions_print(incr=5)
         return 0
 
     if args.REGION:
         # validate region (done here b/c don't like output of add_argument choices
         if not valid_region(args.REGION):
-            print('{} -- "{}" REGION invalid...valid regions:'.
-                  format(PROG,args.REGION))
-            regions_print()
+            print('{} -- "{}" REGION invalid...valid regions:'.format(PROG,args.REGION))
+            regions_print(incr=5)
             return 1
 
         # create a Config object defining region to use with a boto3 client
@@ -189,56 +212,21 @@ def main():
             signature_version = 'v4',
             retries = {
                 'max_attempts': 10,
-                'mode': 'standard'
+                'mode'        : 'standard'
             }
         )
 
-        gold_ami = {}
-        # scan region for Gold AMIs
+        gold_ami = {}  # start scan region for Gold AMIs
         for distro,prodcode in DISTROS.items():
             print ('{}'.format(distro),end='...', flush=True)
-            # this returns dict with Images,Metadata keys
-            # Images is a list of dicts containing each images info
-            images = desc_images(prodcode,region_config)    # describe_images for region
 
-            # loop through each image dict which can have multiple entries
-            # store entries in a list for each distro so it can be sorted
-            distro_list = []
-            for im in images['Images']:
-            #     im.pop('Architecture', None)
-            #     im.pop('BlockDeviceMappings', None)
-            #   CreationDate form: YYYY-MM-DDThh:mm:ss.000Z
-            #   Description
-            #     im.pop('EnaSupport', None)
-            #     im.pop('Hypervisor', None)
-            #   ImageId
-            #   ImageLocation
-            #     im.pop('ImageOwnerAlias', None)
-            #     im.pop('ImageType', None)
-            #   Name
-            #     im.pop('OwnerId', None)
-            #     im.pop('PlatformDetails', None)
-            #     im.pop('ProductCodes', None)
-            #     im.pop('Public', None)
-            #     im.pop('RootDeviceName', None)
-            #     im.pop('RootDeviceType', None)
-            #     im.pop('SriovNetSupport', None)
-            #     im.pop('State', None)
-            #     im.pop('UsageOperation', None)
-            #     im.pop('VirtualizationType', None)
-            #     print('{} {}'.format(60*'>',i['CreationDate']))
-            #     pprint.pprint(im)
-            #     print('{} {} end\n'.format(40*'-',distro))
+            distro_list = []  # store entries in a list for each distro so it can be sorted
+            for im in desc_images(prodcode,region_config):
                 distro_list.append(
                     im['CreationDate'] + '|' + im['ImageId'] + '|' + im['Description']
                 )
-            # reverse sort and select newest version
-            #   rather than using datetime objects
-            # distro|CreationDate|ImageID|Description
-            first = sorted( distro_list, reverse=True )[0]
-            # split into fields
+            first = sorted( distro_list, reverse=True )[0] # rev sort...select newest
             newest = first.split('|')
-
             gold_ami[ distro ]  = \
                 dict(
                     CreationDate = newest[0],
@@ -248,9 +236,21 @@ def main():
                 )
 
         print ('[done]',flush=True)
-        # test for template...if true, process the template otherwise print
-        size = os.get_terminal_size()
-        pprint.pprint(gold_ami,width=size.columns)
+
+        # processed the region's AMIs, so either fill in a template or print them out
+        if args.template:
+            env = Environment(
+                loader=PackageLoader( PROG ),
+                autoescape=select_autoescape()
+            )
+
+        else:
+            # test for template...if true, process the template otherwise print
+            try:
+                size = os.get_terminal_size()
+                pprint.pprint(gold_ami,width=size.columns)
+            except OSError:     # most likely can't get terminal info
+                pprint.pprint(gold_ami,width=132)
 
         return 0
 

@@ -1,4 +1,4 @@
 boto3
 botocore
-s3transfer
+jinja2
 jmespath
