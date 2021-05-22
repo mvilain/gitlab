@@ -1,5 +1,4 @@
-// gitlab-aws-s3-backend.tf -- define the gitlab aws backend in s3
-
+//================================================== S3 BACKEND
 resource "aws_s3_bucket" "tf-backend" {
   bucket = "mvilain-prod-tfstate-backend"
   acl    = "private"

@@ -1,6 +1,5 @@
-// aws-gitlab.tf -- define the gitlab aws instances
-//================================================== VARIABLES (in gitlab-vars.tf)
-######################################################################
+// gitlab-providers.tf -- define the gitlab providers
+//================================================== PROVIDERS
 # Configure the AWS Provider
 terraform {
   required_providers {

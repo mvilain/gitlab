@@ -2,7 +2,7 @@
 //================================================== VARIABLES (in gitlab-vars.tf)
 //================================================== PROVIDERS (in gitlab-providers.tf)
 //================================================== S3 BACKEND (in gitlab-aws-s3-backend.tf)
-// ================================================== NETWORK+SUBNETS (in gitlab-aws-vpc.tf)
+// ================================================= NETWORK+SUBNETS (in gitlab-aws-vpc.tf)
 # data "aws_vpc" "default" {
 #   default    = true
 # }
@@ -18,6 +18,6 @@
 # data.aws_availability_zones.available.zone_ids is lists region's availability zone ids
 
 # Create a VPC
-# resource "aws_vpc" "example" {
+# resource "aws_vpc" "gitlab_vpc" {
 #   cidr_block  = "192.168.10.0/24"
 # }

@@ -1,5 +1,5 @@
 // gitlab-aws-vars.tf -- spin up the gitlab aws instances and define in DNS
-//================================================== VARIABLES (in terraform.tfvars)
+//================================================== VARIABLES
 variable "aws_region" {
   description = "default region to setup all resources"
   type        = string

@@ -13,14 +13,65 @@ data "aws_region" "current" {}
 # data.aws_region.description - region's description in this format: "Location (Region name)"
 
 //================================================== S3 BACKEND (in gitlab-aws-s3-backend.tf)
-
 //================================================== GENERATE KEYS AND SAVE
+resource "tls_private_key" "aws_ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = "2048"
+}
 
-// ================================================== NETWORK + SUBNETS (in gitlab-aws-vpc.tf)
+resource "local_file" "aws_pub_ssh_key" {
+  content         = tls_private_key.aws_ssh_key.public_key_openssh
+  filename        = "id_rsa.pub"
+  file_permission = "0600"
+}
 
+resource "local_file" "aws_priv_ssh_key" {
+  content         = tls_private_key.aws_ssh_key.private_key_pem
+  filename        = "id_rsa"
+  file_permission = "0600"
+}
+
+resource "aws_key_pair" "aws_gitlab_key" {
+  key_name   = "aws_gitlab_key"
+  public_key = tls_private_key.aws_ssh_key.public_key_openssh
+}
+
+# manage ansible's inventory file because it will have different IPs each run
+# also each instance has their own default AWS user
+# (e.g. almalinux=ec2-user, centos=centos, debian=admin, ubuntu=ubuntu)
+resource "local_file" "inventory" {
+  content = <<-EOT
+  # this is overridden with every terraform run
+  [all:vars]
+  ansible_ssh_user=root
+  ansible_ssh_private_key_file=./id_rsa
+  ansible_python_interpreter=/usr/libexec/platform-python
+
+  [all]
+  EOT
+  filename        = "inventory"
+  file_permission = "0644"
+}
+
+resource "local_file" "inventory_py3" {
+  content = <<-EOT
+  # this is overridden with every terraform run
+  [all:vars]
+  ansible_ssh_user=root
+  ansible_ssh_private_key_file=./id_rsa
+  ansible_python_interpreter=/usr/bin/python3
+
+  [all]
+  EOT
+  filename        = "inventory_py3"
+  file_permission = "0644"
+}
+
+//================================================== NETWORK + SUBNETS (in gitlab-aws-vpc.tf)
 //================================================== INSTANCES
-## run aws-list-gold-ami.py -t gitlab-aws-vars.j2 > gitlab-aws-vars.tf
+## aws-list-gold-ami.py -t gitlab-aws-vars.j2 > gitlab-aws-vars.tf
 # to generate vars below
+
 # AlmaLinux 8.3 AMI
 data "aws_ami" "alma8" {
   most_recent = true
