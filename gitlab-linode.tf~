@@ -1,28 +1,27 @@
 // gitlab-linode.tf -- spin up the gitlab linode instances and define in DNS
 //================================================== VARIABLES (in gitlab-vars.tf)
 //================================================== PROVIDERS (in gitlab-providers.tf)
-
-# use environment variables for access and secret key
 provider "linode" {
 }
 
 //================================================== GENERATE KEYS AND SAVE
-
 resource "tls_private_key" "linode_ssh_key" {
   algorithm = "RSA"
-  rsa_bits  = "4096"
+  rsa_bits  = "2048"
 }
 
 resource "local_file" "linode_pub_ssh_key" {
-  content         = tls_private_key.linode_ssh_key.public_key_openssh
-  filename        = "id_rsa.pub"
-  file_permission = "0600"
+  content              = tls_private_key.linode_ssh_key.public_key_openssh
+  filename             = "id_rsa.pub"
+  directory_permission = "0755"
+  file_permission      = "0600"
 }
 
 resource "local_file" "linode_priv_ssh_key" {
-  content         = tls_private_key.linode_ssh_key.private_key_pem
-  filename        = "id_rsa"
-  file_permission = "0600"
+  content              = tls_private_key.linode_ssh_key.private_key_pem
+  filename             = "id_rsa"
+  directory_permission = "0755"
+  file_permission      = "0600"
 }
 
 # there's really no need to know this password if using ssh -i private_key
@@ -33,9 +32,10 @@ resource "random_password" "linode_root_pass" {
 }
 
 resource "local_file" "root_passwd" {
-  content         = random_password.linode_root_pass.result
-  filename        = "root-passwd"
-  file_permission = "0600"
+  content              = random_password.linode_root_pass.result
+  filename             = "root-passwd"
+  directory_permission = "0755"
+  file_permission      = "0600"
 }
 
 # manage ansible's inventory file because it will have different IPs each run
@@ -49,8 +49,9 @@ resource "local_file" "inventory" {
   
   [all]
   EOT
-  filename        = "inventory"
-  file_permission = "0644"
+  filename             = "inventory"
+  directory_permission = "0755"
+  file_permission      = "0644"
 }
 
 resource "local_file" "inventory_py3" {
@@ -63,8 +64,9 @@ resource "local_file" "inventory_py3" {
 
   [all]
   EOT
-  filename        = "inventory_py3"
-  file_permission = "0644"
+  filename             = "inventory_py3"
+  directory_permission = "0755"
+  file_permission      = "0644"
 }
 
 //================================================== INSTANCES
