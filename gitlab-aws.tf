@@ -20,15 +20,17 @@ resource "tls_private_key" "aws_ssh_key" {
 }
 
 resource "local_file" "aws_pub_ssh_key" {
-  content         = tls_private_key.aws_ssh_key.public_key_openssh
-  filename        = "id_rsa.pub"
-  file_permission = "0600"
+  content              = tls_private_key.aws_ssh_key.public_key_openssh
+  filename             = "id_rsa.pub"
+  directory_permission = "0755"
+  file_permission      = "0600"
 }
 
 resource "local_file" "aws_priv_ssh_key" {
-  content         = tls_private_key.aws_ssh_key.private_key_pem
-  filename        = "id_rsa"
-  file_permission = "0600"
+  content              = tls_private_key.aws_ssh_key.private_key_pem
+  filename             = "id_rsa"
+  directory_permission = "0755"
+  file_permission      = "0600"
 }
 
 resource "aws_key_pair" "aws_gitlab_key" {
@@ -49,8 +51,9 @@ resource "local_file" "inventory" {
 
   [all]
   EOT
-  filename        = "inventory"
-  file_permission = "0644"
+  filename             = "inventory"
+  directory_permission = "0755"
+  file_permission      = "0644"
 }
 
 resource "local_file" "inventory_py3" {
@@ -63,8 +66,9 @@ resource "local_file" "inventory_py3" {
 
   [all]
   EOT
-  filename        = "inventory_py3"
-  file_permission = "0644"
+  filename             = "inventory_py3"
+  directory_permission = "0755"
+  file_permission      = "0644"
 }
 
 //================================================== NETWORK + SUBNETS (in gitlab-aws-vpc.tf)
