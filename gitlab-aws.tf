@@ -19,10 +19,9 @@ data "aws_region" "current" {}
 // ================================================== NETWORK + SUBNETS (in gitlab-aws-vpc.tf)
 
 //================================================== INSTANCES
+## run aws-list-gold-ami.py -t gitlab-aws-vars.j2 > gitlab-aws-vars.tf
+# to generate vars below
 # AlmaLinux 8.3 AMI
-#aws ec2 describe-images --owners 'aws-marketplace'  \
-#  --filters 'Name=product-code,Values=2pag55a9fkn96t01w4zg0hjzx' \
-#  --output 'json'
 data "aws_ami" "alma8" {
   most_recent = true
   filter {
@@ -41,9 +40,6 @@ resource "aws_instance" "helloworlda8" {
 
 
 # centos 7 AMI
-# aws ec2 describe-images --owners 'aws-marketplace'  \
-#   --filters 'Name=product-code,Values=aw0evgkw8e5c1q413zgy5pjce' \
-#   --output 'json'
 data "aws_ami" "centos7" {
   most_recent = true
   filter {
@@ -61,9 +57,6 @@ resource "aws_instance" "helloworld7" {
 }
 
 # centos 8.3 AMI
-# aws ec2 describe-images --owners 'aws-marketplace'  \
-#   --filters 'Name=product-code,Values=ef6kit54bxdxm5ec5h7921duf' \
-#   --output 'json'
 data "aws_ami" "centos8" {
   most_recent = true
   filter {
@@ -83,9 +76,6 @@ resource "aws_instance" "helloworldc8" {
 
 
 # Debian 9 AMI
-# aws ec2 describe-images --owners 'aws-marketplace'  \
-#   --filters 'Name=product-code,Values=wa59nhjens2s3nbfqlcjxiyy' \
-#   --output 'json'
 data "aws_ami" "debian9" {
   most_recent = true
   filter {
@@ -101,11 +91,7 @@ resource "aws_instance" "helloworld9" {
     Name = "HelloWorld-d9"
   }
 }
-
 # Debian 10 AMI
-# aws ec2 describe-images --owners 'aws-marketplace'  \
-#   --filters 'Name=product-code,Values=a8to8juz0snuukwdxuz7x3ol8' \
-#   --output 'json'
 data "aws_ami" "debian10" {
   most_recent = true
   filter {
@@ -125,10 +111,6 @@ resource "aws_instance" "helloworld10" {
 
 
 # Ubuntu 16 AMI
-# aws ec2 describe-images --owners 'aws-marketplace'  \
-#   --filters 'Name=product-code,Values=a77pfe5qy4y0x0ovr82l3q0jt' \
-#   --output 'json'
-#
 data "aws_ami" "ubuntu16" {
   most_recent = true
   filter {
@@ -144,12 +126,7 @@ resource "aws_instance" "helloworld16" {
     Name = "HelloWorld-u16"
   }
 }
-
 # Ubuntu 18 AMI
-# aws ec2 describe-images --owners 'aws-marketplace'  \
-#   --filters 'Name=product-code,Values=3iplms73etrdhxdepv72l6ywj' \
-#   --output 'json'
-#
 data "aws_ami" "ubuntu18" {
   most_recent = true
   filter {
@@ -165,12 +142,7 @@ resource "aws_instance" "helloworld18" {
     Name = "HelloWorld-u18"
   }
 }
-
 # Ubuntu 20 AMI
-# aws ec2 describe-images --owners 'aws-marketplace'  \
-#   --filters 'Name=product-code,Values=9rxhntdy981dz5t3gbzpdd60w' \
-#   --output 'json'
-#
 data "aws_ami" "ubuntu20" {
   most_recent = true
   filter {
