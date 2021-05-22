@@ -12,9 +12,8 @@
 # You don't need AWS_ACCESS_KEY or AWS_SECRET_KEY environment variables to run this tool
 
 import sys, os, re, argparse
-import boto3, pprint
+import boto3, pprint, jinja2
 from botocore.config import Config
-from jinja2 import Environment, PackageLoader, select_autoescape
 
 # shell expands '~' but you need to do it explicitly in python
 CRED = os.path.expanduser( '~/.aws/credentials' )
@@ -221,44 +220,59 @@ def main():
             }
         )
 
-        gold_ami = {}  # start scan region for Gold AMIs
+        gold_ami = []
         for distro,prodcode in DISTROS.items():
-            print ('{}'.format(distro),end='...', flush=True)
+            if args.verbose:
+                print('{} {}'.format(60*'>',distro))
+            elif args.template:
+                print('#{}'.format(distro),end='...', flush=True)
+            else:
+                print('{}'.format(distro),end='...', flush=True)
 
             distro_list = []  # store distro entries in list so it can be sorted
             for im in desc_images(prodcode,region_config):
+
                 distro_list.append(
                     im['CreationDate'] + '|' + im['ImageId'] + '|' + im['Description']
                 )
                 if args.verbose:
+                    print('{} {}'.format(60*'=',im['CreationDate']))
                     pprint.pprint(im)
 
             # use sorted list with CreationDate as key rather than datetime module
             first = sorted( distro_list, reverse=True )[0] # rev sort...select newest
             newest = first.split('|')
-            gold_ami[ distro ]  = \
+            gold_ami.append(
                 dict(
+                    distro       = distro,
                     CreationDate = newest[0],
                     ImageID      = newest[1],
                     Description  = newest[2],
                     region       = args.REGION
                 )
-
-        print ('[done]',flush=True)
-
-        # processed the region's AMIs, so fill in a template or print them out
-        if args.template:
-            env = Environment(
-                loader=PackageLoader( PROG ),
-                autoescape=select_autoescape()
             )
 
+        if args.verbose:
+            print('{} {}'.format(60*'<',distro))
         else:
-            try:
-                size = os.get_terminal_size()
-                pprint.pprint(gold_ami,width=size.columns)
-            except OSError:     # likely can't get terminal info in debugging session
-                pprint.pprint(gold_ami,width=132)
+            print ('[done]',flush=True)
+
+        # processed the region's AMIs, so fill in Jinja2 template
+        if args.template:
+            file_loader = jinja2.FileSystemLoader('.')
+            env = jinja2.Environment(loader=file_loader)
+            template = env.get_template(args.template)
+            output = template.render(images=gold_ami, region=args.REGION)
+            print(output)
+
+        # or print them out
+        else:
+            if not args.verbose:
+                try:
+                    size = os.get_terminal_size()
+                    pprint.pprint(gold_ami,width=size.columns)
+                except OSError:     # likely can't get terminal info in debugging session
+                    pprint.pprint(gold_ami,width=132)
 
         return 0
 

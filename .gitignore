@@ -12,9 +12,10 @@ venv/*
 # Local .terraform directories
 **/.terraform/*
 
-# .tfstate files
+# .tfstate files and python cache files
 *.tfstate
 *.tfstate.*
+__pycache__/
 !global/init/terraform.tfstate
 !global/init/terraform.tfstate.backup
 
