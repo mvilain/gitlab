@@ -221,11 +221,12 @@ def main():
         )
 
         gold_ami = []
+        if args.template:
+            print('#',end='', flush=True)
+
         for distro,prodcode in DISTROS.items():
             if args.verbose:
                 print('{} {}'.format(60*'>',distro))
-            elif args.template:
-                print('#{}'.format(distro),end='...', flush=True)
             else:
                 print('{}'.format(distro),end='...', flush=True)
 
