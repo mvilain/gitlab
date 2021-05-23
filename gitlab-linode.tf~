@@ -81,7 +81,7 @@ resource "local_file" "inventory_py3" {
 #  inventory - ansible inventory file to append host             [default: inventory]
 module "lin_gitlab7" {
   source   = "./terraform-modules/terraform-linode-instance"
-  #
+
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
@@ -103,7 +103,7 @@ module "lin_gitlab7" {
 
 module "lin_gitlab8" {
   source   = "./terraform-modules/terraform-linode-instance"
-  #
+
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
@@ -118,7 +118,7 @@ module "lin_gitlab8" {
 # nanodes are to small...worked OK in the 2GB linode
 module "lin_gitlab9" {
   source   = "./terraform-modules/terraform-linode-instance"
-  #
+
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
@@ -131,7 +131,7 @@ module "lin_gitlab9" {
 
 module "lin_gitlab10" {
   source   = "./terraform-modules/terraform-linode-instance"
-  #
+
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
@@ -144,7 +144,7 @@ module "lin_gitlab10" {
 
 module "lin_gitlab16" {
   source   = "./terraform-modules/terraform-linode-instance"
-  #
+
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
@@ -156,7 +156,7 @@ module "lin_gitlab16" {
 }
 module "lin_gitlab18" {
   source   = "./terraform-modules/terraform-linode-instance"
-  #
+
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
@@ -168,7 +168,7 @@ module "lin_gitlab18" {
 }
 module "lin_gitlab20" {
   source   = "./terraform-modules/terraform-linode-instance"
-  #
+
   password = random_password.linode_root_pass.result
   ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain   = var.linode_domain
