@@ -375,10 +375,10 @@ def main():
                 try:
                     size = os.get_terminal_size()
                     pprint.pprint(gold_ami,width=size.columns)
-                    pprint.pprint(vpc_list,width=size.columns)
+                    pprint.pprint(avzs_list,width=size.columns)
                 except OSError:     # likely can't get terminal info in debugging session
                     pprint.pprint(gold_ami,width=132)
-                    pprint.pprint(vpc_list,width=132)
+                    pprint.pprint(avzs_list,width=132)
 
         return 0
 

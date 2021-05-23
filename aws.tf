@@ -41,7 +41,7 @@ resource "aws_key_pair" "aws_gitlab_key" {
 # manage ansible's inventory file because it will have different IPs each run
 # also each instance has their own default AWS user
 # (e.g. almalinux=ec2-user, centos=centos, debian=admin, ubuntu=ubuntu)
-resource "local_file" "inventory_centos" {
+resource "local_file" "inventory_aws_centos" {
   content = <<-EOT
   # this is overridden with every terraform run
   [all:vars]
@@ -56,7 +56,7 @@ resource "local_file" "inventory_centos" {
   file_permission      = "0644"
 }
 
-resource "local_file" "inventory_py3" {
+resource "local_file" "inventory_aws_py3" {
   content = <<-EOT
   # this is overridden with every terraform run
   [all:vars]
