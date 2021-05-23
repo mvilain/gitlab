@@ -129,6 +129,51 @@ def valid_region(region):
     else:
         return False
 
+
+def desc_avz(RegionConfig):
+    """
+    get all the region's default availability zones
+
+    :param RegionConfig: Config object which defines the region to query
+    :return: json object describing the AZs and their attributes
+    """
+
+    # this returns dict with AvailabilityZones,Metadata keys
+    # Images is a list of dicts containing each image's info
+    client = boto3.client( 'ec2', config=RegionConfig )
+    response = client.describe_availability_zones(
+        Filters=[
+            {
+            'Name': 'state',
+            'Values': [ 'available' ]
+            },
+        ],
+        # DryRun=True|False
+    ) # dict{AvailabilityZones[list of default azs]}
+
+# {
+#     'AvailabilityZones': [
+#         {
+#             'State': 'available'|'information'|'impaired'|'unavailable',
+#             'OptInStatus': 'opt-in-not-required'|'opted-in'|'not-opted-in',
+#             'Messages': [
+#                 {
+#                     'Message': 'string'
+#                 },
+#             ],
+#             'RegionName': 'string',
+#             'ZoneName': 'string',
+#             'ZoneId': 'string',
+#             'GroupName': 'string',
+#             'NetworkBorderGroup': 'string',
+#             'ZoneType': 'string',
+#             'ParentZoneName': 'string',
+#             'ParentZoneId': 'string'
+#         },
+#     ]
+# }
+    return response['AvailabilityZones']
+
 def desc_images(ProductCode,RegionConfig):
     """
     get all the Golden Image AMIs for a specific ProductCode
@@ -138,10 +183,9 @@ def desc_images(ProductCode,RegionConfig):
     :return: json object describing the AMIs and their attributes
     """
 
-    client = boto3.client( 'ec2', config=RegionConfig )
-
     # this returns dict with Images,Metadata keys
     # Images is a list of dicts containing each image's info
+    client = boto3.client( 'ec2', config=RegionConfig )
     response = client.describe_images(
         Filters=[
             { 'Name': 'product-code', 'Values': [ ProductCode ] },
@@ -151,28 +195,69 @@ def desc_images(ProductCode,RegionConfig):
         # DryRun=True|False
     ) # dict{Images(list of images)}
 
-#     for image in response['Images']:
-#         image.pop('Architecture', None)
-#         image.pop('BlockDeviceMappings', None)
-#         # image.pop('CreationDate', None)   # form: YYYY-MM-DDThh:mm:ss.000Z
-#         # image.pop('Description', None)
-#         image.pop('EnaSupport', None)
-#         image.pop('Hypervisor', None)
-#         # image.pop('ImageId', None) 
-#         image.pop('ImageLocation', None)
-#         image.pop('ImageOwnerAlias', None)
-#         image.pop('ImageType', None)
-#         # image.pop('Name', None) 
-#         image.pop('OwnerId', None)
-#         image.pop('PlatformDetails', None)
-#         image.pop('ProductCodes', None)
-#         image.pop('Public', None)
-#         image.pop('RootDeviceName', None)
-#         image.pop('RootDeviceType', None)
-#         image.pop('SriovNetSupport', None)
-#         image.pop('State', None)
-#         image.pop('UsageOperation', None)
-#         image.pop('VirtualizationType', None)
+# {
+#     'Images': [
+#         {
+#             'Architecture': 'i386'|'x86_64'|'arm64',
+#             'CreationDate': 'string',   # form: YYYY-MM-DDThh:mm:ss.000Z
+#             'ImageId': 'string',
+#             'ImageLocation': 'string',
+#             'ImageType': 'machine'|'kernel'|'ramdisk',
+#             'Public': True|False,
+#             'KernelId': 'string',
+#             'OwnerId': 'string',
+#             'Platform': 'Windows',
+#             'PlatformDetails': 'string',
+#             'UsageOperation': 'string',
+#             'ProductCodes': [
+#                 {
+#                     'ProductCodeId': 'string',
+#                     'ProductCodeType': 'devpay'|'marketplace'
+#                 },
+#             ],
+#             'RamdiskId': 'string',
+#             'State': 'pending'|'available'|'invalid'|'deregistered'|'transient'|'failed'|'error',
+#             'BlockDeviceMappings': [
+#                 {
+#                     'DeviceName': 'string',
+#                     'VirtualName': 'string',
+#                     'Ebs': {
+#                         'DeleteOnTermination': True|False,
+#                         'Iops': 123,
+#                         'SnapshotId': 'string',
+#                         'VolumeSize': 123,
+#                         'VolumeType': 'standard'|'io1'|'io2'|'gp2'|'sc1'|'st1'|'gp3',
+#                         'KmsKeyId': 'string',
+#                         'Throughput': 123,
+#                         'OutpostArn': 'string',
+#                         'Encrypted': True|False
+#                     },
+#                     'NoDevice': 'string'
+#                 },
+#             ],
+#             'Description': 'string',
+#             'EnaSupport': True|False,
+#             'Hypervisor': 'ovm'|'xen',
+#             'ImageOwnerAlias': 'string',
+#             'Name': 'string',
+#             'RootDeviceName': 'string',
+#             'RootDeviceType': 'ebs'|'instance-store',
+#             'SriovNetSupport': 'string',
+#             'StateReason': {
+#                 'Code': 'string',
+#                 'Message': 'string'
+#             },
+#             'Tags': [
+#                 {
+#                     'Key': 'string',
+#                     'Value': 'string'
+#                 },
+#             ],
+#             'VirtualizationType': 'hvm'|'paravirtual',
+#             'BootMode': 'legacy-bios'|'uefi'
+#         },
+#     ]
+# }
     return response['Images'] # don't bother with Metadata key
 
 
@@ -203,6 +288,9 @@ def main():
         regions_print(incr=5)
         return 0
 
+    # this will always contain a string with either the validated region provided
+    # on the command line or the default region specified in the config file
+    # which is why the config file must exist and contain a default region
     if args.REGION:
         # validate region (done here b/c don't like output of add_argument choices
         if not valid_region(args.REGION):
@@ -253,17 +341,32 @@ def main():
                 )
             )
 
+        avzs_list = []   # store region's availability zones
+        for az in desc_avz(region_config):
+            avzs_list.append(
+                dict(
+                    ZoneName     = az['ZoneName'],
+                    ZoneId       = az['ZoneId']
+                )
+            )
+
+            if args.verbose:
+                print('{} {}'.format(60*'=',avzs_list['ZoneName']))
+                pprint.pprint(avzs_list)
+
         if args.verbose:
             print('{} {}'.format(60*'<',distro))
         else:
             print ('[done]',flush=True)
+
 
         # processed the region's AMIs, so fill in Jinja2 template
         if args.template:
             file_loader = jinja2.FileSystemLoader('.')
             env = jinja2.Environment(loader=file_loader)
             template = env.get_template(args.template)
-            output = template.render(images=gold_ami, region=args.REGION)
+            output = template.render(images=gold_ami, region=args.REGION, avzs=avzs_list)
+            # if args.output: print to output file else print to stout
             print(output)
 
         # or print them out
@@ -272,8 +375,10 @@ def main():
                 try:
                     size = os.get_terminal_size()
                     pprint.pprint(gold_ami,width=size.columns)
+                    pprint.pprint(vpc_list,width=size.columns)
                 except OSError:     # likely can't get terminal info in debugging session
                     pprint.pprint(gold_ami,width=132)
+                    pprint.pprint(vpc_list,width=132)
 
         return 0
 

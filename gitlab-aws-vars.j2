@@ -12,6 +12,14 @@ variable "aws_domain" {
   default     = "aws-vilain.com"
 }
 
+#========================================== AVAILABILTY ZONES
+variable "aws_avz" {
+  description = "{{ region }}-zones"
+  type        = list(string)
+  default     = [ 
+  {%- for avz in avzs -%}"{{- avz.ZoneName }}{{ '", ' if not loop.last else '"' }}{% endfor -%} ]
+}
+
 {% for image in images -%}
 #========================================== {{ image.distro }} {{ image.CreationDate }}
 variable "aws_{{ image.distro }}_ami" {
