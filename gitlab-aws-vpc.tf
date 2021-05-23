@@ -11,8 +11,8 @@
 ## data "aws_availability_zones" "available" {
 ##   state    = "available"
 ## }
-### data.aws_availability_zones.available.names is lists region's availability zones
-### data.aws_availability_zones.available.zone_ids is lists region's availability zone ids
+### data.aws_availability_zones.available.names is list region's availability zones
+### data.aws_availability_zones.available.zone_ids is list region's availability zone ids
 
 # resource "aws_vpc" "gitlab_vpc" {
 #   cidr_block           = "192.168.0.0/16"
