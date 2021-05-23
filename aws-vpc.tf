@@ -1,4 +1,4 @@
-// aws-gitlab-vpc.tf -- define the gitlab aws vpc
+// aws-vpc.tf -- define the gitlab aws vpc
 // ================================================= NETWORK+SUBNETS
 ## data "aws_vpc" "default" {
 ##   default    = true

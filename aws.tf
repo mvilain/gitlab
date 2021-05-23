@@ -1,6 +1,6 @@
 // aws-gitlab.tf -- define the gitlab aws instances
-//================================================== VARIABLES (in gitlab-vars.tf)
-//================================================== PROVIDERS (in gitlab-providers.tf)
+//================================================== VARIABLES (in aws-vars.tf)
+//================================================== PROVIDERS (in aws-providers.tf)
 
 # use environment variables for access and secret key
 provider "aws" {
@@ -12,7 +12,7 @@ data "aws_region" "current" {}
 # data.aws_region.endpoint - The EC2 endpoint for the selected region.
 # data.aws_region.description - region's description in this format: "Location (Region name)"
 
-//================================================== S3 BACKEND (in gitlab-aws-s3-backend.tf)
+//================================================== S3 BACKEND (in aws-s3-backend.tf)
 //================================================== GENERATE KEYS AND SAVE
 resource "tls_private_key" "aws_ssh_key" {
   algorithm = "RSA"
@@ -71,9 +71,9 @@ resource "local_file" "inventory_aws_py3" {
   file_permission      = "0644"
 }
 
-//================================================== NETWORK + SUBNETS (in gitlab-aws-vpc.tf)
+//================================================== NETWORK + SUBNETS (in aws-vpc.tf)
 //================================================== INSTANCES
-## aws-list-gold-ami.py -t gitlab-aws-vars.j2 > gitlab-aws-vars.tf
+## aws-list-gold-ami.py -t aws-vars.j2 > aws-vars.tf
 # to generate vars below
 
 # AlmaLinux 8.3 AMI

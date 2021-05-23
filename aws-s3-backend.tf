@@ -1,4 +1,4 @@
-// gitlab-aws-s3-backend.tf -- define the s3 backend for terraform state
+// aws-s3-backend.tf -- define the s3 backend for terraform state
 //================================================== S3 BACKEND
 #resource "aws_s3_bucket" "tf-backend" {
 #  bucket = "mvilain-prod-tfstate-backend"

@@ -1,6 +1,6 @@
-// gitlab-linode.tf -- spin up the gitlab linode instances and define in DNS
-//================================================== VARIABLES (in gitlab-vars.tf)
-//================================================== PROVIDERS (in gitlab-providers.tf)
+// linode.tf -- spin up the gitlab linode instances and define in DNS
+//================================================== VARIABLES (in linode-vars.tf)
+//================================================== PROVIDERS (in providers.tf)
 provider "linode" {
 }
 

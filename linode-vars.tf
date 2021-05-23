@@ -1,4 +1,4 @@
-// gitlab-linode-vars.tf -- spin up the gitlab linode instances and define in DNS
+// linode-vars.tf -- spin up the gitlab linode instances and define in DNS
 //================================================== VARIABLES (in terraform.tfvars)
 variable "linode_region" {
   description = "region where linode is running"
