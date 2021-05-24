@@ -137,8 +137,31 @@ It now runs a pre-install script to configure nodes so they'll run ansible and a
 
 If you define a DNS domain and assign it a SOA email address in linode's DNS service, update the the play-linode.yml playbook accordingly.  After terraform has created the nodes and inserted them into DNS domain, you can run the ansible playbook for the CentOS systems using the `inventory` file and the Debian/Ubuntu systems using the `inventory_py3` file.  These will correctly create the gitlab service on these hosts with https enabled.
 
+Inputs:
+
+- password - string - root password used to create the instance
+- ssh_key - string - description = "The ssh public key used in instance's authorized_hosts
+- image - string - Linode Image type to use
+- script - string - script to execute after Linode is running
+- region - string - The Linode region to use
+- type - string - The image size type to use
+- label - string - The label used to create the instance and hostname
+- domain - string - pre-existing Linode-managed DNS domain to assign public IP of created instance
+- inventory - string - pre-existing inventory file used for ansible to append instance info into
+
+Outputs:
+
+- id - string - `linode_instance.this.id`
+- ip_address - string - `linode_instance.this.ip_address`
+- private_ip_address - string - `linode_instance.this.private_ip_address`
+- ipv6 - string - `linode_instance.this.ipv6`
+- ipv4 - string - `linode_instance.this.ipv4`
+- backups - string - `linode_instance.this.backups`
+
 
 - [ec2-instance](https://github.com/terraform-aws-modules/terraform-aws-ec2-instance)
+
+I had to fork this repository to add the provisioner commands and augment the inputs. Now this will append to the inventory file and rather than using scripts, the `user_data` input to `aws_instance` will be passed a text string.
 
 ```
 module "ec2_cluster" {
@@ -154,6 +177,16 @@ module "ec2_cluster" {
   monitoring             = true
   vpc_security_group_ids = ["sg-12345678"]
   subnet_id              = "subnet-eddcdzz4"
+  user_data = <<EOF
+    #!/bin/bash
+    # configure CentOS 8 to use ansible
+
+    dnf install -y epel-release
+    dnf config-manager --set-enabled powertools
+    dnf makecache
+    dnf install -y ansible
+    alternatives --set python /usr/bin/python3
+  EOF
 
   tags = {
     Terraform   = "true"
@@ -162,45 +195,55 @@ module "ec2_cluster" {
 }
 ```
 
+Inputs:
+
+Name  |  Description  |  Type  |  Default  |  Required
+|-----|---------------|--------|-----------|------------
+`ami`                     |  ID of AMI to use for the instance                        |  string  |  n/a  |  yes
+`associate_public_ip_address`  |  If true, the EC2 instance will have associated public IP address  |  bool  |  null  |  no
+`cpu_credits`             |  The credit option for CPU usage (unlimited or standard)  |  string  |  "standard"  |  no
+`disable_api_termination` |  If true, enables EC2 Instance Termination Protection     |  bool  |  false  |  no
+`ebs_block_device`        |  Additional EBS block devices to attach to the instance   |  list(map(string))  |  []  |  no
+`ebs_optimized`           |  If true, the launched EC2 instance will be EBS-optimized  |  bool  |  false  |  no
+`enable_volume_tags`      |  Whether to enable volume tags (if enabled it conflicts with `root_block_device` tags)  |  bool  |  true  |  no
+`ephemeral_block_device`  |  Customize Ephemeral (also known as Instance Store) volumes on the instance  |  list(map(string))  |  []  |  no
+`get_password_data`       |  If true, wait for password data to become available and retrieve it.  |  bool  |  false  |  no
+`iam_instance_profile`    |  The IAM Instance Profile to launch the instance with. Specified as the name of the Instance Profile.  |  string  |  ""  |  no
+`instance_count`          |  Number of instances to launch                             |  number  |  1  |  no
+`instance_initiated_shutdown_behavior`  |  Shutdown behavior for the instance          |  string  |  ""  |  no
+`instance_type`           |  The type of instance to start                             |  string  |  n/a  |  yes
+`ipv6_address_count`      |  A number of IPv6 addresses to associate with the primary network interface. Amazon EC2 chooses the IPv6 addresses from the range of your subnet.  |  number  |  null  |  no
+`ipv6_addresses`          |  Specify one or more IPv6 addresses from the range of the subnet to associate with the primary network interface  |  list(string)  |  null  |  no
+`key_name`                |  The key name to use for the instance                      |  string  |  ""  |  no
+`metadata_options`        |  Customize the metadata options of the instance            |  map(string)  |  {}  |  no
+`monitoring`              |  If true, the launched EC2 instance will have detailed monitoring enabled  |  bool  |  false  |  no
+`name`                    |  Name to be used on all resources as prefix                |  string  |  n/a  |  yes
+`network_interface`       |  Customize network interfaces to be attached at instance boot time  |  list(map(string))  |  []  |  no
+`num_suffix_format`       |  Numerical suffix format used as the volume and EC2 instance name suffix  |  string  |  "-%d"  |  no
+`placement_group`         |  The Placement Group to start the instance in              |  string  |  ""  |  no
+`private_ip`              |  Private IP address to associate with the instance in a VPC  |  string  |  null  |  no
+`private_ips`             |  A list of private IP address to associate with the instance in a VPC. Should match the number of instances.  |  list(string)  |  []  |  no
+`root_block_device`       |  Customize details about the root block device of the instance. See Block Devices below for details  |  list(any)  |  []  |  no
+`source_dest_check`       |  Controls if traffic is routed to the instance when the destination address does not match the instance. Used for NAT or VPNs.  |  bool  |  true  |  no
+`subnet_id`               |  The VPC Subnet ID to launch in                              |  string  |  ""  |  no
+`subnet_ids`              |  A list of VPC Subnet IDs to launch in                       |  list(string)  |  []  |  no
+`tags`                    |  A mapping of tags to assign to the resource                 |  map(string)  |  {}  |  no
+`tenancy`                 |  The tenancy of the instance (if the instance is running in a VPC). Available values: default, dedicated, host.  |  string  |  "default"  |  no
+`use_num_suffix`          |  Always append numerical suffix to instance name, even if `instance_count` is 1  |  bool  |  false  |  no
+`user_data`               |  The user data to provide when launching the instance. Do not pass gzip-compressed data via this argument; see `user_data_base64` instead.  |  string  |  null  |  no
+`user_data_base64`        |  Can be used instead of `user_data` to pass base64-encoded binary data directly. Use this instead of `user_data` whenever the value is not a valid UTF-8 string. For example, gzip-encoded user data must be base64-encoded and passed via this argument to avoid corruption.  |  string  |  null  |  no
+`volume_tags`             |  A mapping of tags to assign to the devices created by the instance at launch time  |  map(string)  |  {}  |  no
+`vpc_security_group_ids`  |  A list of security group IDs to associate with              |  list(string)  |  null
+
+
+Outputs:
+
+
+
 - [vpc](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 
-```
-module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+This module is way overkill used to create subnets for public, private, database, elastic cache, and other services.  Also, it outputs things that you can't just plug into other modules as their types are incompatible. Since this is a demo project rather than something that will be run in production, the `aws-vpc.tf` file will create a simple vpc with a publicly accessible subnet, gateway, routes, and security group to access it.
 
-  name = "my-vpc"
-  cidr = "10.0.0.0/16"
-
-  azs             = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-
-  enable_nat_gateway = true
-  enable_vpn_gateway = true
-
-  tags = {
-    Terraform = "true"
-    Environment = "dev"
-  }
-}
-```
-
-- [security-group](https://github.com/terraform-aws-modules/terraform-aws-security-group)
-
-```
-module "security_group" {
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
-
-  name        = "example"
-  description = "Security group for example usage with EC2 instance"
-  vpc_id      = data.aws_vpc.default.id
-
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["http-80-tcp", "all-icmp"]
-  egress_rules        = ["all-all"]
-}
-```
 
 
 ## TODO
