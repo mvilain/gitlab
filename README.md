@@ -197,43 +197,43 @@ module "ec2_cluster" {
 
 Inputs:
 
-Name  |  Description  |  Type  |  Default  |  Required
-|-----|---------------|--------|-----------|------------
-`ami`                     |  ID of AMI to use for the instance                        |  string  |  n/a  |  yes
-`associate_public_ip_address`  |  If true, the EC2 instance will have associated public IP address  |  bool  |  null  |  no
-`cpu_credits`             |  The credit option for CPU usage (unlimited or standard)  |  string  |  "standard"  |  no
-`disable_api_termination` |  If true, enables EC2 Instance Termination Protection     |  bool  |  false  |  no
-`ebs_block_device`        |  Additional EBS block devices to attach to the instance   |  list(map(string))  |  []  |  no
-`ebs_optimized`           |  If true, the launched EC2 instance will be EBS-optimized  |  bool  |  false  |  no
-`enable_volume_tags`      |  Whether to enable volume tags (if enabled it conflicts with `root_block_device` tags)  |  bool  |  true  |  no
-`ephemeral_block_device`  |  Customize Ephemeral (also known as Instance Store) volumes on the instance  |  list(map(string))  |  []  |  no
-`get_password_data`       |  If true, wait for password data to become available and retrieve it.  |  bool  |  false  |  no
-`iam_instance_profile`    |  The IAM Instance Profile to launch the instance with. Specified as the name of the Instance Profile.  |  string  |  ""  |  no
-`instance_count`          |  Number of instances to launch                             |  number  |  1  |  no
-`instance_initiated_shutdown_behavior`  |  Shutdown behavior for the instance          |  string  |  ""  |  no
-`instance_type`           |  The type of instance to start                             |  string  |  n/a  |  yes
-`ipv6_address_count`      |  A number of IPv6 addresses to associate with the primary network interface. Amazon EC2 chooses the IPv6 addresses from the range of your subnet.  |  number  |  null  |  no
-`ipv6_addresses`          |  Specify one or more IPv6 addresses from the range of the subnet to associate with the primary network interface  |  list(string)  |  null  |  no
-`key_name`                |  The key name to use for the instance                      |  string  |  ""  |  no
-`metadata_options`        |  Customize the metadata options of the instance            |  map(string)  |  {}  |  no
-`monitoring`              |  If true, the launched EC2 instance will have detailed monitoring enabled  |  bool  |  false  |  no
-`name`                    |  Name to be used on all resources as prefix                |  string  |  n/a  |  yes
-`network_interface`       |  Customize network interfaces to be attached at instance boot time  |  list(map(string))  |  []  |  no
-`num_suffix_format`       |  Numerical suffix format used as the volume and EC2 instance name suffix  |  string  |  "-%d"  |  no
-`placement_group`         |  The Placement Group to start the instance in              |  string  |  ""  |  no
-`private_ip`              |  Private IP address to associate with the instance in a VPC  |  string  |  null  |  no
-`private_ips`             |  A list of private IP address to associate with the instance in a VPC. Should match the number of instances.  |  list(string)  |  []  |  no
-`root_block_device`       |  Customize details about the root block device of the instance. See Block Devices below for details  |  list(any)  |  []  |  no
-`source_dest_check`       |  Controls if traffic is routed to the instance when the destination address does not match the instance. Used for NAT or VPNs.  |  bool  |  true  |  no
-`subnet_id`               |  The VPC Subnet ID to launch in                              |  string  |  ""  |  no
-`subnet_ids`              |  A list of VPC Subnet IDs to launch in                       |  list(string)  |  []  |  no
-`tags`                    |  A mapping of tags to assign to the resource                 |  map(string)  |  {}  |  no
-`tenancy`                 |  The tenancy of the instance (if the instance is running in a VPC). Available values: default, dedicated, host.  |  string  |  "default"  |  no
-`use_num_suffix`          |  Always append numerical suffix to instance name, even if `instance_count` is 1  |  bool  |  false  |  no
-`user_data`               |  The user data to provide when launching the instance. Do not pass gzip-compressed data via this argument; see `user_data_base64` instead.  |  string  |  null  |  no
-`user_data_base64`        |  Can be used instead of `user_data` to pass base64-encoded binary data directly. Use this instead of `user_data` whenever the value is not a valid UTF-8 string. For example, gzip-encoded user data must be base64-encoded and passed via this argument to avoid corruption.  |  string  |  null  |  no
-`volume_tags`             |  A mapping of tags to assign to the devices created by the instance at launch time  |  map(string)  |  {}  |  no
-`vpc_security_group_ids`  |  A list of security group IDs to associate with              |  list(string)  |  null
+Name | Type | Default | Required | Description
+-----|------|---------|----------|-------------
+ami | string | n/a | yes | ID of AMI to use for the instance
+instance\_type | string | n/a | yes | The type of instance to start
+name | string | n/a | yes | Name to be used on all resources as prefix
+associate\_public\_ip\_address | bool | null | no | If true the EC2 instance will have associated public IP address"
+cpu\_credits | string | standard | no | The credit option for CPU usage (unlimited or standard)
+disable\_api\_termination | bool | FALSE | no | If true enables EC2 Instance Termination Protection"
+ebs\_block\_device | list(map(string)) | [] | no | Additional EBS block devices to attach to the instance
+ebs\_optimized | bool | FALSE | no | If true the launched EC2 instance will be EBS-optimized"
+enable\_volume\_tags | bool | TRUE | no | Whether to enable volume tags (if enabled it conflicts with root\_block\_device tags)
+ephemeral\_block\_device | list(map(string)) | [] | no | Customize Ephemeral (also known as Instance Store) volumes on the instance
+get\_password\_data | bool | FALSE | no | If true wait for password data to become available and retrieve it."
+iam\_instance\_profile | string | "" | no | The IAM Instance Profile to launch the instance with. Specified as the name of the Instance Profile.
+instance\_count | number | 1 | no | Number of instances to launch
+instance\_initiated\_shutdown\_behavior | string | "" | no | Shutdown behavior for the instance
+ipv6\_address\_count | number | null | no | A number of IPv6 addresses to associate with the primary network interface. Amazon EC2 chooses the IPv6 addresses from the range of your subnet.
+ipv6\_addresses | list(string) | null | no | Specify one or more IPv6 addresses from the range of the subnet to associate with the primary network interface
+key\_name | string | "" | no | The key name to use for the instance
+metadata\_options | map(string) | {} | no | Customize the metadata options of the instance
+monitoring | bool | FALSE | no | If true the launched EC2 instance will have detailed monitoring enabled"
+network\_interface | list(map(string)) | [] | no | Customize network interfaces to be attached at instance boot time
+num\_suffix\_format | string | "-%d" | no | Numerical suffix format used as the volume and EC2 instance name suffix
+placement\_group | string | "" | no | The Placement Group to start the instance in
+private\_ip | string | null | no | Private IP address to associate with the instance in a VPC
+private\_ips | list(string) | [] | no | A list of private IP address to associate with the instance in a VPC. Should match the number of instances.
+root\_block\_device | list(any) | [] | no | Customize details about the root block device of the instance. See Block Devices below for details
+source\_dest\_check | bool | TRUE | no | Controls if traffic is routed to the instance when the destination address does not match the instance. Used for NAT or VPNs.
+subnet\_id | string | "" | no | The VPC Subnet ID to launch in
+subnet\_ids | list(string) | [] | no | A list of VPC Subnet IDs to launch in
+tags | map(string) | {} | no | A mapping of tags to assign to the resource
+tenancy | string | "default" | no | The tenancy of the instance (if the instance is running in a VPC). Available values: default |  dedicated |  host."
+use\_num\_suffix | bool | FALSE | no | Always append numerical suffix to instance name |  even if instance\_count is 1"
+user\_data | string | null | no | The user data to provide when launching the instance. Do not pass gzip-compressed data via this argument; see user\_data\_base64 instead.
+user\_data\_base64 | string | null | no | Can be used instead of user\_data to pass base64-encoded binary data directly. Use this instead of user\_data whenever the value is not a valid UTF-8 string. For example |  gzip-encoded user data must be base64-encoded and passed via this argument to avoid corruption."
+volume\_tags | map(string) | {} | no | A mapping of tags to assign to the devices created by the instance at launch time
+vpc\_security\_group\_ids | list(string) | null | no | A list of security group IDs to associate with
 
 
 Outputs:
