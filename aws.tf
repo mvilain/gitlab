@@ -50,18 +50,14 @@ resource "aws_key_pair" "gitlab_key" {
 resource "local_file" "inventory_aws_centos" {
   content = <<-EOT
   # this is overridden with every terraform run
-  [alma:vars]
-  ansible_ssh_user=ec2-user
-  ansible_ssh_private_key_file=./id_rsa
-  ansible_python_interpreter=/usr/libexec/platform-python
-
-  [centos:vars]
+  [all:vars]
   ansible_ssh_user=centos
   ansible_ssh_private_key_file=./id_rsa
   ansible_python_interpreter=/usr/libexec/platform-python
 
+  [all]
   EOT
-  filename             = "inventory-centos"
+  filename             = "inventory_centos"
   directory_permission = "0755"
   file_permission      = "0644"
 }
@@ -69,18 +65,16 @@ resource "local_file" "inventory_aws_centos" {
 resource "local_file" "inventory_aws_py3" {
   content = <<-EOT
   # this is overridden with every terraform run
-  [debian:vars]
-  ansible_ssh_user=admin
-  ansible_ssh_private_key_file=./id_rsa
-  ansible_python_interpreter=/usr/bin/python3
-
-  [ubuntu:vars]
+  [all:vars]
   ansible_ssh_user=ubuntu
   ansible_ssh_private_key_file=./id_rsa
   ansible_python_interpreter=/usr/bin/python3
 
+  #ansible_ssh_user=admin
+
+  [all]
   EOT
-  filename             = "inventory-py3"
+  filename             = "inventory_py3"
   directory_permission = "0755"
   file_permission      = "0644"
 }
@@ -91,11 +85,13 @@ resource "local_file" "inventory_aws_py3" {
 # to generate vars below
 
 module "gitlab_alma83" {
-  source                 = "terraform-aws-modules/ec2-instance/aws"
-  version                = "~> 2.0"
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
 
-  name                   = var.aws_alma83_name
-  ami                    = var.aws_alma83_ami
+  name                   = var.aws_alma83_name  # defined in aws-vars.tf
+  ami                    = var.aws_alma83_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain       # defined in aws-vars.tf
+  inventory              = "inventory_centos"
+  user                   = "ec2-user"
 
   instance_type          = "t2.micro"
   instance_count         = 1
@@ -103,15 +99,13 @@ module "gitlab_alma83" {
   monitoring             = true
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
   subnet_id              = aws_subnet.gitlab_subnet.id
-
   tags = {
     Terraform   = "true"
     Environment = "gitlab"
   }
-  user_data = <<EOF
+  user_data = <<-EOF
     #!/bin/bash
     # configure CentOS 8 to use ansible
-
     dnf install -y epel-release
     dnf config-manager --set-enabled powertools
     dnf makecache
@@ -119,30 +113,8 @@ module "gitlab_alma83" {
     alternatives --set python /usr/bin/python3
   EOF
 }
-provisioner "local-exec" {
-  command = "echo [alma83] >> ${ local_file.inventory_aws_centos.filename }"
-}
-provisioner "local-exec" {
-  command = "echo alma83 ansible_host=${ module.gitlab_alma83.public_ip } >> ${ local_file.inventory_aws_centos.filename }"
-}
 
 
-#data "aws_ami" "alma8" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_alma8_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworlda8" {
-#  ami           = data.aws_ami.alma8.id # ami-01a87a7d55032db2e
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-a8"
-#  }
-#}
-#
 #data "aws_ami" "centos7" {
 #  most_recent = true
 #  filter {
