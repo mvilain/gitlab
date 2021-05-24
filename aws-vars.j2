@@ -24,18 +24,18 @@ variable "aws_avz" {
 #========================================== {{ image.distro }} {{ image.CreationDate }}
 variable "aws_{{ image.distro }}_ami" {
   description = "{{ image.region }}--{{ image.Description }}"
-  type        = list(string)
-  default     = [ "{{ image.ImageID }}" ]
+  type        = string
+  default     = "{{ image.ImageID }}"
 }
 variable "aws_{{ image.distro }}_name" {
   description = "name for {{ image.distro }} instance"
-  type        = list(string)
-  default     = [ "gitlab_{{ image.distro }}" ]
+  type        = string
+  default     = "gitlab_{{ image.distro }}"
 }
 variable "aws_{{ image.distro }}_tag" {
   description = "tag for {{ image.distro }} instance"
-  type        = list(string)
-  default     = [ "gitlab {{ image.distro }}" ]
+  type        = string
+  default     = "gitlab {{ image.distro }}"
 }
 
 {% endfor %}
