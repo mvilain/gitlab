@@ -111,7 +111,7 @@ letsencrypt['enable'] = "true"                      # GitLab 10.5 and 10.6 requi
 letsencrypt['contact_emails'] = ['encrypt@vilain.com'] # Optional
 {% else %}
 letsencrypt['enable'] = "false"                      # GitLab 10.5 and 10.6 require this option
-#letsencrypt['contact_emails'] = ['gitlab@{{ gitlab_domain }}'] # Optional
+letsencrypt['contact_emails'] = ['gitlab@{{ gitlab_domain }}'] # Optional
 {% endif %}
 
 
