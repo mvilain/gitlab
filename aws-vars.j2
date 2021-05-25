@@ -30,7 +30,7 @@ variable "aws_{{ image.distro }}_ami" {
 variable "aws_{{ image.distro }}_name" {
   description = "name for {{ image.distro }} instance"
   type        = string
-  default     = "gitlab_{{ image.distro }}"
+  default     = "gitlab-{{ image.distro }}"
 }
 variable "aws_{{ image.distro }}_tag" {
   description = "tag for {{ image.distro }} instance"
