@@ -70,6 +70,8 @@ The `gitlab.rb.j2` template packaged with this role is meant to be very generic 
     gitlab_ssl_certificate: "/etc/gitlab/ssl/{{ gitlab_domain }}.crt"
     gitlab_ssl_certificate_key: "/etc/gitlab/ssl/{{ gitlab_domain }}.key"
 
+aws' instances successfully install with Let's Encrypt but Chrome says the self-signed certificate used above is not valid. I removed the code generating the cert and will let the installer package use the Let's Encrypt certificate instead. It's based on the protocol used for the `gitlab_external_url`. If it's set to 'https', the Let's Encrypt certificat is generated.
+
 GitLab SSL configuration; tells GitLab to redirect normal http requests to https, and the path to the certificate and key (the default values will work for automatic self-signed certificate creation, if set to `true` in the variable below).
 
     # SSL Self-signed Certificate Configuration.
