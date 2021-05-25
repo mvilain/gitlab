@@ -252,8 +252,6 @@ See the [README](https://github.com/terraform-aws-modules/terraform-aws-vpc) on 
 won't respond to ping?  It's OK if node is up but http doesn't respond to heartbeat
 
 - setup gitlab instances to point to a single postgresql server and use haproxy to load balance between them.
-- `aws-list-gold-ami.sh`needs to be ported to python3.
-
 
 
 ## Appendix A
