@@ -1,6 +1,8 @@
 # playbook for configuring gitlab server hosts on linode servers
 # this will install both roles, then run the handlers for both roles
 # ansible should pull variables from group_vars/gitlab anyway
+
+# https://docs.gitlab.com/ee/administration/environment_variables.html
 ---
 - hosts: all
   vars:
