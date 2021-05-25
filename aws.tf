@@ -57,7 +57,7 @@ resource "local_file" "inventory_aws_centos" {
 
   [all]
   EOT
-  filename             = "inventory_centos"
+  filename             = "inventory-centos"
   directory_permission = "0755"
   file_permission      = "0644"
 }
@@ -74,26 +74,31 @@ resource "local_file" "inventory_aws_py3" {
 
   [all]
   EOT
-  filename             = "inventory_py3"
+  filename             = "inventory-py3"
   directory_permission = "0755"
   file_permission      = "0644"
 }
 
-//================================================== NETWORK + SUBNETS (in aws-vpc.tf)
+//================================================== NETWORK+SUBNETS+ACLs (aws-vpc.tf)
+//================================================== SECURITY GROUPS (in aws-vpc-sg.tf)
 //================================================== INSTANCES
 ## ./aws-list-gold-ami.py -t aws-vars.j2 > aws-vars.tf
 # to generate vars below
 
+# AWS uses hostnames in the form ip-xxx-xxx-xxx-xxx.REGION.compute.internal
+# with cloud-init setup to disallow setting the hostname
+# https://forums.aws.amazon.com/thread.jspa?threadID=165077
+# https://aws.amazon.com/premiumsupport/knowledge-center/linux-static-hostname-rhel7-centos7/
 module "gitlab_alma83" {
   source                 = "./terraform-modules/terraform-aws-ec2-instance"
 
   name                   = var.aws_alma83_name  # defined in aws-vars.tf
   ami                    = var.aws_alma83_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain       # defined in aws-vars.tf
-  inventory              = "inventory_centos"
+  inventory              = "inventory-centos"
   user                   = "ec2-user"
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -105,7 +110,8 @@ module "gitlab_alma83" {
   }
   user_data = <<-EOF
     #!/bin/bash
-    # configure CentOS 8 to use ansible
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
     dnf install -y epel-release
     dnf config-manager --set-enabled powertools
     dnf makecache
