@@ -72,8 +72,8 @@ optional arguments:
 
 This tool queries the AWS Marketplace for the latest gold AMIs for 
 
-- centos 7
-- CentOS 8
+- CentOS 7
+- CentOS 8 + AlmaLinux 8.3
 - Debian 9
 - Debian 10
 - Ubuntu 16.04 (deprecated in Gitlab 14+)
@@ -140,7 +140,7 @@ If you define a DNS domain and assign it a SOA email address in linode's DNS ser
 Inputs:
 
 - password - string - root password used to create the instance
-- ssh_key - string - description = "The ssh public key used in instance's authorized_hosts
+- ssh\_key - string - description = "The ssh public key used in instance's authorized_hosts
 - image - string - Linode Image type to use
 - script - string - script to execute after Linode is running
 - region - string - The Linode region to use
@@ -151,12 +151,12 @@ Inputs:
 
 Outputs:
 
-- id - string - `linode_instance.this.id`
-- ip_address - string - `linode_instance.this.ip_address`
-- private_ip_address - string - `linode_instance.this.private_ip_address`
-- ipv6 - string - `linode_instance.this.ipv6`
-- ipv4 - string - `linode_instance.this.ipv4`
-- backups - string - `linode_instance.this.backups`
+- id - string - linode\_instance.this.id
+- ip\_address - string - linode\_instance.this.ip\_address
+- private\_ip\_address - string - linode\_instance.this.private\_ip\_address`
+- ipv6 - string - linode\_instance.this.ipv6
+- ipv4 - string - linode\_instance.this.ipv4
+- backups - string - linode\_instance.this.backups
 
 
 - [ec2-instance](https://github.com/terraform-aws-modules/terraform-aws-ec2-instance)
@@ -166,7 +166,6 @@ I had to fork this repository to add the provisioner commands and augment the in
 ```
 module "ec2_cluster" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
-  version                = "~> 2.0"
 
   name                   = "my-cluster"
   instance_count         = 5
@@ -177,7 +176,7 @@ module "ec2_cluster" {
   monitoring             = true
   vpc_security_group_ids = ["sg-12345678"]
   subnet_id              = "subnet-eddcdzz4"
-  user_data = <<EOF
+  user_data = <<-EOF
     #!/bin/bash
     # configure CentOS 8 to use ansible
 
@@ -195,55 +194,55 @@ module "ec2_cluster" {
 }
 ```
 
-Inputs:
+Inputs and Outputs
 
-Name | Type | Default | Required | Description
------|------|---------|----------|-------------
-ami | string | n/a | yes | ID of AMI to use for the instance
-instance\_type | string | n/a | yes | The type of instance to start
-name | string | n/a | yes | Name to be used on all resources as prefix
-associate\_public\_ip\_address | bool | null | no | If true the EC2 instance will have associated public IP address"
-cpu\_credits | string | standard | no | The credit option for CPU usage (unlimited or standard)
-disable\_api\_termination | bool | FALSE | no | If true enables EC2 Instance Termination Protection"
-ebs\_block\_device | list(map(string)) | [] | no | Additional EBS block devices to attach to the instance
-ebs\_optimized | bool | FALSE | no | If true the launched EC2 instance will be EBS-optimized"
-enable\_volume\_tags | bool | TRUE | no | Whether to enable volume tags (if enabled it conflicts with root\_block\_device tags)
-ephemeral\_block\_device | list(map(string)) | [] | no | Customize Ephemeral (also known as Instance Store) volumes on the instance
-get\_password\_data | bool | FALSE | no | If true wait for password data to become available and retrieve it."
-iam\_instance\_profile | string | "" | no | The IAM Instance Profile to launch the instance with. Specified as the name of the Instance Profile.
-instance\_count | number | 1 | no | Number of instances to launch
-instance\_initiated\_shutdown\_behavior | string | "" | no | Shutdown behavior for the instance
-ipv6\_address\_count | number | null | no | A number of IPv6 addresses to associate with the primary network interface. Amazon EC2 chooses the IPv6 addresses from the range of your subnet.
-ipv6\_addresses | list(string) | null | no | Specify one or more IPv6 addresses from the range of the subnet to associate with the primary network interface
-key\_name | string | "" | no | The key name to use for the instance
-metadata\_options | map(string) | {} | no | Customize the metadata options of the instance
-monitoring | bool | FALSE | no | If true the launched EC2 instance will have detailed monitoring enabled"
-network\_interface | list(map(string)) | [] | no | Customize network interfaces to be attached at instance boot time
-num\_suffix\_format | string | "-%d" | no | Numerical suffix format used as the volume and EC2 instance name suffix
-placement\_group | string | "" | no | The Placement Group to start the instance in
-private\_ip | string | null | no | Private IP address to associate with the instance in a VPC
-private\_ips | list(string) | [] | no | A list of private IP address to associate with the instance in a VPC. Should match the number of instances.
-root\_block\_device | list(any) | [] | no | Customize details about the root block device of the instance. See Block Devices below for details
-source\_dest\_check | bool | TRUE | no | Controls if traffic is routed to the instance when the destination address does not match the instance. Used for NAT or VPNs.
-subnet\_id | string | "" | no | The VPC Subnet ID to launch in
-subnet\_ids | list(string) | [] | no | A list of VPC Subnet IDs to launch in
-tags | map(string) | {} | no | A mapping of tags to assign to the resource
-tenancy | string | "default" | no | The tenancy of the instance (if the instance is running in a VPC). Available values: default |  dedicated |  host."
-use\_num\_suffix | bool | FALSE | no | Always append numerical suffix to instance name |  even if instance\_count is 1"
-user\_data | string | null | no | The user data to provide when launching the instance. Do not pass gzip-compressed data via this argument; see user\_data\_base64 instead.
-user\_data\_base64 | string | null | no | Can be used instead of user\_data to pass base64-encoded binary data directly. Use this instead of user\_data whenever the value is not a valid UTF-8 string. For example |  gzip-encoded user data must be base64-encoded and passed via this argument to avoid corruption."
-volume\_tags | map(string) | {} | no | A mapping of tags to assign to the devices created by the instance at launch time
-vpc\_security\_group\_ids | list(string) | null | no | A list of security group IDs to associate with
-
-
-Outputs:
-
+see the module [README](https://github.com/mvilain/terraform-aws-ec2-instance/blob/master/README.md)
 
 
 - [vpc](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 
 This module is way overkill used to create subnets for public, private, database, elastic cache, and other services.  Also, it outputs things that you can't just plug into other modules as their types are incompatible. Since this is a demo project rather than something that will be run in production, the `aws-vpc.tf` file will create a simple vpc with a publicly accessible subnet, gateway, routes, and security group to access it.
 
+```
+provider "aws" {
+  region = local.region
+}
+
+locals {
+  region = "us-east-2"
+}
+
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+
+  name = "github-example"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+
+  enable_ipv6 = true
+
+  enable_nat_gateway = true
+  single_nat_gateway = true
+
+  public_subnet_tags = {
+    Name = "gitlab-subnet"
+  }
+
+  tags = {
+    Owner       = "user"
+    Environment = "gitlab"
+  }
+
+  vpc_tags = {
+    Name = "gitlab-vpc"
+  }
+}
+```
+
+See the [README](https://github.com/terraform-aws-modules/terraform-aws-vpc) on github for a full list of all 159 inputs (18 required) and 108 outputs.
 
 
 ## TODO
@@ -275,6 +274,7 @@ This creates a HEADless snapshot of the submodule in the main repo.
 
 When you update the submodule and push it, the snapshot must be refreshed with the changes.
 
+    git submodule update
     git submodule update --remote
     git commit -a -m "submodule update"
 

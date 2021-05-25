@@ -4,8 +4,8 @@
 ---
 - hosts: all
   vars:
-    gitlab_domain: "{{ ansible_hostname}}.aws-vilain.com"
-    gitlab_external_url: "http://{{ gitlab_domain }}/"
+    gitlab_domain: "aws-vilain.com"
+    gitlab_external_url: "http://{{ inventory_hostname}}.{{ gitlab_domain }}/"
   vars_files:
     - group_vars/gitlab
   become: true

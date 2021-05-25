@@ -69,20 +69,36 @@
   register: reload
 #- debug: var=reload
 
+# specifically because AWS sets the hostname to ip-xxx-xxx-xxx-xxx.REGION.compute.internal
+- name: setting hostname with hostnamectl
+  command: hostnamectl set-hostname "{{ inventory_hostname }}"
+  args:
+    warn: no
+  register: hostname
 
 # don't use EXTERNAL_URL environment variable because the ssl certs will be wrong
 # set gitlab_domain variable in playbook instead
+#- name: Install GitLab (this will take a while)
+#  shell: >
+#    yum install -y "{{ gitlab_package_name | default(gitlab_edition) }}" > \
+#    "{{ gitlab_install_log }}"
+#  args:
+#    warn: false
+##    creates: "{{ gitlab_install_log }}"
+#  when: not gitlab_file.stat.exists
+#  ignore_errors: True
+#  register: gitlab_install
+##  check_mode: yes
+#- debug: 
+#    var: gitlab_install.stderr_lines
+#  when: gitlab_install|selectattr("stderr_lines", "defined")|list|length >0
+
 - name: Install GitLab (this will take a while)
-  shell: >
-    yum install -y "{{ gitlab_package_name | default(gitlab_edition) }}" > \
-    "{{ gitlab_install_log }}"
-  args:
-    warn: false
-#    creates: "{{ gitlab_install_log }}"
+  package: 
+  name: "{{ gitlab_package_name | default(gitlab_edition) }}"
   when: not gitlab_file.stat.exists
   ignore_errors: True
   register: gitlab_install
-#  check_mode: yes
 - debug: 
-    var: gitlab_install.stderr_lines
-  when: gitlab_install|selectattr("stderr_lines", "defined")|list|length >0
+    var: gitlab_install
+#  when: gitlab_install|selectattr("stderr_lines", "defined")|list|length >0
