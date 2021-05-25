@@ -43,6 +43,7 @@
 #  - ansible_distribution_major_version
 #  - ansible_distribution_release
 #  - ansible_distribution_version
+#  - inventory_hostname
 
 # first_found function is broken in 2.8+ https://github.com/ansible/ansible/issues/70772
 # can't use this to look for a version of vars files that's specific to version
@@ -52,6 +53,16 @@
 #    - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
 #    - "{{ ansible_os_family }}.yml"
 #    - "main.yml"
+
+- name: set hostname on AWS
+  lineinfile:
+    path: /etc/hostname
+    regexp: 'ip.*.compute.internal'
+    line: "{{ inventory_hostname }}"
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
 
 # https://gist.github.com/rothgar/8793800
 # https://stackoverflow.com/questions/36328907/ansible-get-all-the-ip-addresses-of-a-group
