@@ -154,18 +154,19 @@
 
 # uses domain variable defaults/main.yml or vars in playbook
 # gitlab_create_self_signed_cert in defaults/main.yml (default: false)
-- name: Create self-signed certificate.
-  command: >
-    openssl req -new -nodes -x509 
-    -subj "{{ gitlab_self_signed_cert_subj }}" 
-    -days 3650 -keyout {{ gitlab_ssl_certificate_key }} 
-    -out {{ gitlab_ssl_certificate }} -extensions v3_ca
-  args:
-    warn: false
-    creates: "{{ gitlab_ssl_certificate }}"
-  when: gitlab_create_self_signed_cert | bool
-  register: gitlab_cert
-- debug: var=gitlab_cert.stderr_lines
+# # THIS SELF-SIGNED CERTIFICATE IS NOT TRUSTED...disabled # # 5/25/2021
+#- name: Create self-signed certificate.
+#  command: >
+#    openssl req -new -nodes -x509
+#     -subj "{{ gitlab_self_signed_cert_subj }}"
+#     -days 3650 -keyout {{ gitlab_ssl_certificate_key }}
+#     -out {{ gitlab_ssl_certificate }} -extensions v3_ca
+#  args:
+#    warn: false
+#    creates: "{{ gitlab_ssl_certificate }}"
+#  when: gitlab_create_self_signed_cert | bool
+#  register: gitlab_cert
+#- debug: var=gitlab_cert.stderr_lines
 
 
 # NOTE: gitlab package is installed in here because it generates a LOT of output
