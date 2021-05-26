@@ -147,9 +147,9 @@ resource "aws_security_group_rule" "gitlab_sgr_https" {
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_home" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_att" {
   type              = "ingress"
-  description       = "gitlab ssh home"
+  description       = "gitlab ssh att"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
@@ -157,27 +157,40 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_home" {
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_leaseweb80" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord5324" {
   type              = "ingress"
-  description       = "gitlab ssh leaseweb80"
+  description       = "gitlab ssh nord5324"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "66.114.176.0/20" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
+
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord80" {
+  type              = "ingress"
+  description       = "gitlab ssh nord80"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = [ "23.80.0.0/15" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
-resource "aws_security_group_rule" "gitlab_sgr_ssh_leaseweb82" {
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord82" {
   type              = "ingress"
-  description       = "gitlab ssh leaseweb80"
+  description       = "gitlab ssh nord82"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = [ "23.82.0.0/16" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
-resource "aws_security_group_rule" "gitlab_sgr_ssh_leaseweb83" {
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord83" {
   type              = "ingress"
-  description       = "gitlab ssh leaseweb80"
+  description       = "gitlab ssh nord80"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
@@ -185,3 +198,42 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_leaseweb83" {
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord6929" {
+  type              = "ingress"
+  description       = "gitlab ssh nord6929"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "107.181.160.0/19" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord145" {
+  type              = "ingress"
+  description       = "gitlab ssh nord145"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "192.145.118.0/24" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord6067" {
+  type              = "ingress"
+  description       = "gitlab ssh nord6067"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "198.8.80.0/20" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord58" {
+  type              = "ingress"
+  description       = "gitlab ssh nord58"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "209.58.128.0/20" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
