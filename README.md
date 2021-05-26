@@ -127,7 +127,7 @@ variable "aws_{{ image.distro }}_name" {
 
 ### Terraform Modules
 
-- [forked terraform-linode-instance module](https://github.com/mvilain/terraform-linode-instance)
+#### [forked terraform-linode-instance module](https://github.com/mvilain/terraform-linode-instance)
 
 formed from https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest
 
@@ -139,27 +139,27 @@ If you define a DNS domain and assign it a SOA email address in linode's DNS ser
 
 Inputs:
 
-- password - string - root password used to create the instance
-- ssh\_key - string - description = "The ssh public key used in instance's authorized_hosts
-- image - string - Linode Image type to use
-- script - string - script to execute after Linode is running
-- region - string - The Linode region to use
-- type - string - The image size type to use
-- label - string - The label used to create the instance and hostname
-- domain - string - pre-existing Linode-managed DNS domain to assign public IP of created instance
-- inventory - string - pre-existing inventory file used for ansible to append instance info into
+  - password - string - root password used to create the instance
+  - ssh\_key - string - description = "The ssh public key used in instance's authorized_hosts
+  - image - string - Linode Image type to use
+  - script - string - script to execute after Linode is running
+  - region - string - The Linode region to use
+  - type - string - The image size type to use
+  - label - string - The label used to create the instance and hostname
+  - domain - string - pre-existing Linode-managed DNS domain to assign public IP of created instance
+  - inventory - string - pre-existing inventory file used for ansible to append instance info into
 
 Outputs:
 
-- id - string - linode\_instance.this.id
-- ip\_address - string - linode\_instance.this.ip\_address
-- private\_ip\_address - string - linode\_instance.this.private\_ip\_address`
-- ipv6 - string - linode\_instance.this.ipv6
-- ipv4 - string - linode\_instance.this.ipv4
-- backups - string - linode\_instance.this.backups
+  - id - string - linode\_instance.this.id
+  - ip\_address - string - linode\_instance.this.ip\_address
+  - private\_ip\_address - string - linode\_instance.this.private\_ip\_address`
+  - ipv6 - string - linode\_instance.this.ipv6
+  - ipv4 - string - linode\_instance.this.ipv4
+  - backups - string - linode\_instance.this.backups
 
 
-- [ec2-instance](https://github.com/terraform-aws-modules/terraform-aws-ec2-instance)
+#### [ec2-instance](https://github.com/terraform-aws-modules/terraform-aws-ec2-instance)
 
 I had to fork this repository to add the provisioner commands and augment the inputs. Now this will append to the inventory file and rather than using scripts, the `user_data` input to `aws_instance` will be passed a text string.
 
@@ -199,7 +199,7 @@ Inputs and Outputs
 see the module [README](https://github.com/mvilain/terraform-aws-ec2-instance/blob/master/README.md)
 
 
-- [vpc](https://github.com/terraform-aws-modules/terraform-aws-vpc)
+#### [vpc](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 
 This module is way overkill used to create subnets for public, private, database, elastic cache, and other services.  Also, it outputs things that you can't just plug into other modules as their types are incompatible. Since this is a demo project rather than something that will be run in production, the `aws-vpc.tf` file will create a simple vpc with a publicly accessible subnet, gateway, routes, and security group to access it.
 
