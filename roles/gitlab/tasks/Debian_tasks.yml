@@ -40,6 +40,16 @@
       register: locale_gen
 - debug: var=locale_gen.stdout_lines
 
+- name: set hostname on AWS
+  lineinfile:
+    path: /etc/hosts
+    regexp: 'ip.*.compute.internal'
+    line: "127.0.1.1 {{ inventory_hostname }}"
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: is_aws_environment
 
 # don't use EXTERNAL_URL environment variable because the ssl certs will be wrong
 # set gitlab_domain variable in playbook instead

@@ -64,24 +64,6 @@
   register: hostname
 #- debug: var=hostname
 
-# don't use EXTERNAL_URL environment variable because the ssl certs will be wrong
-# set gitlab_domain variable in playbook instead
-# this works OK on linode and vagrant boxes but doesn't work well on AWS
-#- name: Install GitLab (this will take a while)
-#  shell: >
-#    dnf install -y "{{ gitlab_package_name | default(gitlab_edition) }}" > \
-#    "{{ gitlab_install_log }}"
-#  args:
-#    warn: false
-##    creates: "{{ gitlab_install_log }}"
-#  when: not gitlab_file.stat.exists
-#  ignore_errors: True
-#  register: gitlab_install
-##  check_mode: yes
-#- debug: 
-#    var: gitlab_install.stderr_lines
-#  when: gitlab_install|selectattr("stderr_lines", "defined")|list|length >0
-
 - name: Install GitLab (this will take a while)
   package:
     name: "{{ gitlab_package_name | default(gitlab_edition) }}"
@@ -93,5 +75,3 @@
 - debug: 
     var: gitlab_install
 #  when: gitlab_install|selectattr("stdout_lines", "defined")|list|length >0
-
-

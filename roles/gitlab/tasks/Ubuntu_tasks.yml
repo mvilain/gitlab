@@ -20,6 +20,18 @@
     - postfix
     - sshd
 
+# specifically because AWS sets the hostname to ip-xxx-xxx-xxx-xxx.REGION.compute.internal
+- name: set hostname on AWS
+  lineinfile:
+    path: /etc/hostname
+    regexp: 'ip.*.compute.internal'
+    line: "{{ inventory_hostname }}"
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: is_aws_environment
+
 # don't use EXTERNAL_URL environment variable because the ssl certs will be wrong
 # set gitlab_domain variable in playbook instead
 - name: Install GitLab (this will take a while)

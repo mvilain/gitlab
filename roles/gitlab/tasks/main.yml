@@ -54,15 +54,24 @@
 #    - "{{ ansible_os_family }}.yml"
 #    - "main.yml"
 
-- name: set hostname on AWS
-  lineinfile:
-    path: /etc/hostname
-    regexp: 'ip.*.compute.internal'
-    line: "{{ inventory_hostname }}"
-    backup: yes
-    owner: root
-    group: root
-    mode: 0644
+
+- name: Check if inside AWS
+  uri:
+    url: http://169.254.169.254/latest/meta-data
+    timeout: 2
+  register: aws_uri_check
+  failed_when: False
+#- debug: var=aws_uri_check
+
+- set_fact:
+    is_aws_environment: "{{ aws_uri_check.status == 200 }}"
+
+- name: setting hostname with hostnamectl
+  command: hostnamectl set-hostname "{{ inventory_hostname }}"
+  args:
+    warn: no
+  register: hostname
+  when: is_aws_environment
 
 # https://gist.github.com/rothgar/8793800
 # https://stackoverflow.com/questions/36328907/ansible-get-all-the-ip-addresses-of-a-group
