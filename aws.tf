@@ -89,12 +89,13 @@ resource "local_file" "inventory_aws_py3" {
 # with cloud-init setup to disallow setting the hostname
 # https://forums.aws.amazon.com/thread.jspa?threadID=165077
 # https://aws.amazon.com/premiumsupport/knowledge-center/linux-static-hostname-rhel7-centos7/
-module "gitlab_alma83" {
+
+module "gitlab_alma8" {
   source                 = "./terraform-modules/terraform-aws-ec2-instance"
 
-  name                   = var.aws_alma83_name  # defined in aws-vars.tf
-  ami                    = var.aws_alma83_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain       # defined in aws-vars.tf
+  name                   = var.aws_alma8_name  # defined in aws-vars.tf
+  ami                    = var.aws_alma8_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain      # defined in aws-vars.tf
   inventory              = "inventory-centos"
   user                   = "ec2-user"
 
@@ -120,114 +121,207 @@ module "gitlab_alma83" {
   EOF
 }
 
+module "gitlab_centos7" {
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
 
-#data "aws_ami" "centos7" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_centos7_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworld7" {
-#  ami           = data.aws_ami.centos7.id # ami-01e36b7901e884a10
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-c7"
-#  }
-#}
-#
-#data "aws_ami" "centos8" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_centos8_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworldc8" {
-#  ami           = data.aws_ami.centos8.id # ami-082a036ec7c372e4c
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-c8"
-#  }
-#}
-#
-#
-#data "aws_ami" "debian9" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_debian9_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworld9" {
-#  ami           = data.aws_ami.debian9.id # ami-0c18820215678d337
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-d9"
-#  }
-#}
-#data "aws_ami" "debian10" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_debian10_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworld10" {
-#  ami           = data.aws_ami.debian10.id # ami-0a449b766e034390d
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-d10"
-#  }
-#}
-#
-#
-#data "aws_ami" "ubuntu16" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_ubuntu16_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworld16" {
-#  ami           = data.aws_ami.ubuntu16.id # ami-0a65caa9c575c1c0c
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-u16"
-#  }
-#}
-#data "aws_ami" "ubuntu18" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_ubuntu18_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworld18" {
-#  ami           = data.aws_ami.ubuntu18.id # ami-00833850c832e03a2
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-u18"
-#  }
-#}
-#data "aws_ami" "ubuntu20" {
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = var.aws_ubuntu20_name
-#  }
-#  owners = ["679593333241"]
-#}
-#resource "aws_instance" "helloworld20" {
-#  ami           = data.aws_ami.ubuntu20.id # ami-06b3455df6cbbf3a2
-#  instance_type = "t2.micro"
-#  tags = {
-#    Name = "HelloWorld-u20"
-#  }
-#}
+  name                   = var.aws_centos7_name  # defined in aws-vars.tf
+  ami                    = var.aws_centos7_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain        # defined in aws-vars.tf
+  inventory              = "inventory-centos"
+  user                   = "centos"
+
+  instance_type          = "t2.medium"
+  instance_count         = 1
+  key_name               = aws_key_pair.gitlab_key.key_name
+  monitoring             = true
+  vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
+  subnet_id              = aws_subnet.gitlab_subnet.id
+  tags = {
+    Terraform   = "true"
+    Environment = "gitlab"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
+    yum install -y epel-release
+    yum install -y ansible
+#    yum install -y python3 libselinux-python3 git
+    alternatives --set python /usr/bin/python
+  EOF
+}
+
+module "gitlab_centos8" {
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
+
+  name                   = var.aws_centos8_name  # defined in aws-vars.tf
+  ami                    = var.aws_centos8_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain        # defined in aws-vars.tf
+  inventory              = "inventory-centos"
+  user                   = "centos"
+
+  instance_type          = "t2.medium"
+  instance_count         = 1
+  key_name               = aws_key_pair.gitlab_key.key_name
+  monitoring             = true
+  vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
+  subnet_id              = aws_subnet.gitlab_subnet.id
+  tags = {
+    Terraform   = "true"
+    Environment = "gitlab"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
+    dnf install -y epel-release
+    dnf config-manager --set-enabled powertools
+    dnf makecache
+    dnf install -y ansible
+    alternatives --set python /usr/bin/python3
+  EOF
+}
+
+
+
+module "gitlab_debian9" {
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
+
+  name                   = var.aws_debian9_name  # defined in aws-vars.tf
+  ami                    = var.aws_debian9_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain          # defined in aws-vars.tf
+  inventory              = "inventory-py3"
+  user                   = "admin"
+
+  instance_type          = "t2.medium"
+  instance_count         = 1
+  key_name               = aws_key_pair.gitlab_key.key_name
+  monitoring             = true
+  vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
+  subnet_id              = aws_subnet.gitlab_subnet.id
+  tags = {
+    Terraform   = "true"
+    Environment = "gitlab"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
+    apt-get update -y
+    apt-get install -y apt-transport-https python-apt
+  EOF
+}
+
+module "gitlab_debian10" {
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
+
+  name                   = var.aws_debian10_name  # defined in aws-vars.tf
+  ami                    = var.aws_debian10_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
+  inventory              = "inventory-py3"
+  user                   = "admin"
+
+  instance_type          = "t2.medium"
+  instance_count         = 1
+  key_name               = aws_key_pair.gitlab_key.key_name
+  monitoring             = true
+  vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
+  subnet_id              = aws_subnet.gitlab_subnet.id
+  tags = {
+    Terraform   = "true"
+    Environment = "gitlab"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
+    apt-get update -y
+    apt-get install -y apt-transport-https python-apt
+  EOF
+}
+
+
+
+module "gitlab_ubuntu16" {
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
+
+  name                   = var.aws_ubuntu16_name  # defined in aws-vars.tf
+  ami                    = var.aws_ubuntu16_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
+  inventory              = "inventory-py3"
+  user                   = "ubuntu"
+
+  instance_type          = "t2.medium"
+  instance_count         = 1
+  key_name               = aws_key_pair.gitlab_key.key_name
+  monitoring             = true
+  vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
+  subnet_id              = aws_subnet.gitlab_subnet.id
+  tags = {
+    Terraform   = "true"
+    Environment = "gitlab"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
+    apt-get update -y
+    apt-get install -y apt-transport-https python-apt
+  EOF
+}
+
+module "gitlab_ubuntu18" {
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
+
+  name                   = var.aws_ubuntu18_name  # defined in aws-vars.tf
+  ami                    = var.aws_ubuntu18_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
+  inventory              = "inventory-py3"
+  user                   = "ubuntu"
+
+  instance_type          = "t2.medium"
+  instance_count         = 1
+  key_name               = aws_key_pair.gitlab_key.key_name
+  monitoring             = true
+  vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
+  subnet_id              = aws_subnet.gitlab_subnet.id
+  tags = {
+    Terraform   = "true"
+    Environment = "gitlab"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
+    apt-get update -y
+    apt-get install -y apt-transport-https python-apt
+  EOF
+}
+
+module "gitlab_ubuntu20" {
+  source                 = "./terraform-modules/terraform-aws-ec2-instance"
+
+  name                   = var.aws_ubuntu20_name  # defined in aws-vars.tf
+  ami                    = var.aws_ubuntu20_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
+  inventory              = "inventory-py3"
+  user                   = "ubuntu"
+
+  instance_type          = "t2.medium"
+  instance_count         = 1
+  key_name               = aws_key_pair.gitlab_key.key_name
+  monitoring             = true
+  vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
+  subnet_id              = aws_subnet.gitlab_subnet.id
+  tags = {
+    Terraform   = "true"
+    Environment = "gitlab"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "preserve_hostname: false" >> /etc/cloud/cloud.cfg
+
+    apt-get update -y
+    apt-get install -y apt-transport-https python-apt
+  EOF
+}
