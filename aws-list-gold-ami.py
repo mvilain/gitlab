@@ -22,14 +22,14 @@ PROG = os.path.basename( sys.argv[0] )
 
 # distro and ProductCode for each Gitlab-supported distros
 DISTROS = dict(
-    alma83     =  '2pag55a9fkn96t01w4zg0hjzx',
-    centos79   =  'aw0evgkw8e5c1q413zgy5pjce',
-    centos83   =  'ef6kit54bxdxm5ec5h7921duf',
-    debian913  =  'wa59nhjens2s3nbfqlcjxiyy',
-    debian107  =  'a8to8juz0snuukwdxuz7x3ol8',
-    ubuntu1604 =  'a77pfe5qy4y0x0ovr82l3q0jt',
-    ubuntu1804 =  '3iplms73etrdhxdepv72l6ywj',
-    ubuntu2004 =  '9rxhntdy981dz5t3gbzpdd60w'
+    alma8    =  '2pag55a9fkn96t01w4zg0hjzx',
+    centos7  =  'aw0evgkw8e5c1q413zgy5pjce',
+    centos8  =  'ef6kit54bxdxm5ec5h7921duf',
+    debian9  =  'wa59nhjens2s3nbfqlcjxiyy',
+    debian10 =  'a8to8juz0snuukwdxuz7x3ol8',
+    ubuntu16 =  'a77pfe5qy4y0x0ovr82l3q0jt',
+    ubuntu18 =  '3iplms73etrdhxdepv72l6ywj',
+    ubuntu20 =  '9rxhntdy981dz5t3gbzpdd60w'
 )
 
 def parse_arguments(default_region):
