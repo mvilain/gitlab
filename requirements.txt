@@ -2,3 +2,12 @@ boto3
 botocore
 jinja2
 jmespath
+
+ansible==2.9
+PyYAML>=5.4
+cffi>=1.14
+cryptography>=3.4
+pycparser>=2.2
+
+boto
+ec2

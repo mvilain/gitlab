@@ -253,6 +253,34 @@ won't respond to ping?  It's OK if node is up but http doesn't respond to heartb
 
 - setup gitlab instances to point to a single postgresql server and use haproxy to load balance between them.
 
+- dynamically detected AWS inventory generation
+
+The [AWS-blessed scripts](https://aws.amazon.com/blogs/apn/getting-started-with-ansible-and-dynamic-amazon-ec2-inventory-management/) are no longer valid.
+
+
+The [ansible plugin](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py) and it's [corresponding ini file](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini) are the maintained code.
+
+A [forked version](https://raw.githubusercontent.com/vshn/ansible-dynamic-inventory-ec2/master/ec2.py) of this script allows for a sorted list of the instances. That's the version included in this repo.
+
+To use this scripts, install the required python modules either under a virtual environment or directly onto your system.  Then define the following along with the AWS authentication keys:
+
+```bash
+python3 -m venv venv
+. venv/bin/activate
+python3 -m pip install -r requirements.txt
+
+export ANSIBLE_HOSTS=./ec2.py
+export EC2\_INI\_PATH=./ec2.ini
+
+export AWS_ACCESS_KEY_ID='YOUR_AWS_API_KEY'
+export AWS_SECRET_ACCESS_KEY='YOUR_AWS_API_SECRET_KEY'
+```
+
+
+- refactor the linode inventory build design to use
+
+  - https://github.com/ansible-collections/community.general/blob/main/scripts/inventory/linode.ini
+  - https://github.com/ansible-collections/community.general/blob/main/scripts/inventory/linode.py
 
 ## Appendix A
 
