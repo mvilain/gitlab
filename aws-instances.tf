@@ -47,37 +47,37 @@ resource "aws_key_pair" "gitlab_key" {
 # manage ansible's inventory file because it will have different IPs each run
 # also each instance has their own default AWS user
 # (e.g. almalinux=ec2-user, centos=centos, debian=admin, ubuntu=ubuntu)
-resource "local_file" "inventory_aws_centos" {
-  content = <<-EOT
-  # this is overridden with every terraform run
-  [all:vars]
-  ansible_ssh_user=centos
-  ansible_ssh_private_key_file=./id_rsa
-  ansible_python_interpreter=/usr/libexec/platform-python
-
-  [all]
-  EOT
-  filename             = "inventory-centos"
-  directory_permission = "0755"
-  file_permission      = "0644"
-}
-
-resource "local_file" "inventory_aws_py3" {
-  content = <<-EOT
-  # this is overridden with every terraform run
-  [all:vars]
-  ansible_ssh_user=ubuntu
-  ansible_ssh_private_key_file=./id_rsa
-  ansible_python_interpreter=/usr/bin/python3
-
-  #ansible_ssh_user=admin
-
-  [all]
-  EOT
-  filename             = "inventory-py3"
-  directory_permission = "0755"
-  file_permission      = "0644"
-}
+#resource "local_file" "inventory_aws_centos" {
+#  content = <<-EOT
+#  # this is overridden with every terraform run
+#  [all:vars]
+#  ansible_ssh_user=centos
+#  ansible_ssh_private_key_file=./id_rsa
+#  ansible_python_interpreter=/usr/libexec/platform-python
+#
+#  [all]
+#  EOT
+#  filename             = "inventory-centos"
+#  directory_permission = "0755"
+#  file_permission      = "0644"
+#}
+#
+#resource "local_file" "inventory_aws_py3" {
+#  content = <<-EOT
+#  # this is overridden with every terraform run
+#  [all:vars]
+#  ansible_ssh_user=ubuntu
+#  ansible_ssh_private_key_file=./id_rsa
+#  ansible_python_interpreter=/usr/bin/python3
+#
+#  #ansible_ssh_user=admin
+#
+#  [all]
+#  EOT
+#  filename             = "inventory-py3"
+#  directory_permission = "0755"
+#  file_permission      = "0644"
+#}
 
 //================================================== NETWORK+SUBNETS+ACLs (aws-vpc.tf)
 //================================================== SECURITY GROUPS (in aws-vpc-sg.tf)
