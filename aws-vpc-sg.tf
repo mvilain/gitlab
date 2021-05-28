@@ -168,9 +168,9 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_nord5324" {
 }
 
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord80" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8860-80" {
   type              = "ingress"
-  description       = "gitlab ssh nord80"
+  description       = "gitlab ssh nord8860-80"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
@@ -178,9 +178,9 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_nord80" {
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord82" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8860-82" {
   type              = "ingress"
-  description       = "gitlab ssh nord82"
+  description       = "gitlab ssh nord8860-82"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
@@ -188,9 +188,9 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_nord82" {
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord83" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8860-83" {
   type              = "ingress"
-  description       = "gitlab ssh nord80"
+  description       = "gitlab ssh nord8860-83"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
