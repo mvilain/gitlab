@@ -38,7 +38,7 @@ Vagrant.configure("2") do |config|
     gitlab7.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory-vagrant"
+      ansible.inventory_path = "./inventory_vagrant"
     end
   end
 
@@ -61,7 +61,7 @@ Vagrant.configure("2") do |config|
     gitlab8.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory-vagrant"
+      ansible.inventory_path = "./inventory_vagrant"
     end
   end
 
@@ -79,7 +79,7 @@ Vagrant.configure("2") do |config|
     gitlab9.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory-vagrant"
+      ansible.inventory_path = "./inventory_vagrant"
     end
   end
 
@@ -97,7 +97,7 @@ Vagrant.configure("2") do |config|
     gitlab10.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory-vagrant"
+      ansible.inventory_path = "./inventory_vagrant"
     end
   end
 
@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
     gitlab16.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory-vagrant"
+      ansible.inventory_path = "./inventory_vagrant"
     end
   end
 
@@ -127,7 +127,7 @@ Vagrant.configure("2") do |config|
     gitlab18.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory-vagrant"
+      ansible.inventory_path = "./inventory_vagrant"
     end
   end
 
@@ -145,7 +145,7 @@ Vagrant.configure("2") do |config|
     gitlab20.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
-      ansible.inventory_path = "./inventory-vagrant"
+      ansible.inventory_path = "./inventory_vagrant"
     end
   end
 
