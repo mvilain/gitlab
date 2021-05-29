@@ -1,0 +1,37 @@
+# gitlab demo inventory
+
+# ansible.cfg sets global default python_interpeter=/usr/libexec/platform-python
+[gitlab]
+gitlab7  ansible_host=192.168.10.107
+gitlab8  ansible_host=192.168.10.108
+
+[gitlab:vars]
+# look in group_vars/gitlab
+
+
+[gitlab_py3]
+gitlab9  ansible_host=192.168.10.109
+gitlab10 ansible_host=192.168.10.110
+gitlab16 ansible_host=192.168.10.116
+gitlab18 ansible_host=192.168.10.118
+gitlab20 ansible_host=192.168.10.120
+
+[gitlab_py3:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+
+[lbr]
+lbr1 ansible_host=192.168.10.100
+
+[lbr:vars]
+# look in group_vars/lbr
+
+# Group 'all' with all servers
+[all:children]
+gitlab 
+gitlab_py3
+lbr
+
+[all:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
