@@ -255,14 +255,11 @@ won't respond to ping?  It's OK if node is up but http doesn't respond to heartb
 
 - dynamically detected AWS inventory generation
 
-The [AWS-blessed scripts](https://aws.amazon.com/blogs/apn/getting-started-with-ansible-and-dynamic-amazon-ec2-inventory-management/) are no longer valid.
+The [AWS-blessed scripts](https://aws.amazon.com/blogs/apn/getting-started-with-ansible-and-dynamic-amazon-ec2-inventory-management/) are no longer valid.  The [ansible plugin](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py) and it's [corresponding ini file](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini) are the maintained code, but there's a [updated fork](https://raw.githubusercontent.com/vshn/ansible-dynamic-inventory-ec2/master/ec2.py) that allows for a sorted list of the instances. That's the version included in this repo. 
 
+Note: it requires Ansible 2.9, which is why it's recommended to install the required modules into a python virtual environement.
 
-The [ansible plugin](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py) and it's [corresponding ini file](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini) are the maintained code.
-
-A [forked version](https://raw.githubusercontent.com/vshn/ansible-dynamic-inventory-ec2/master/ec2.py) of this script allows for a sorted list of the instances. That's the version included in this repo.
-
-To use this scripts, install the required python modules either under a virtual environment or directly onto your system.  Then define the following along with the AWS authentication keys:
+To use this script, install the required python modules either under a virtual environment or directly onto your system.  Then define the following along with the AWS authentication keys:
 
 ```bash
 python3 -m venv venv
