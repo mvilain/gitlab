@@ -45,11 +45,6 @@
 ## ./aws-list-gold-ami.py -t aws-list-gold-template.j2 > aws-vars.tf
 # to generate vars below
 
-# AWS uses hostnames in the form ip-xxx-xxx-xxx-xxx.REGION.compute.internal
-# with cloud-init setup to disallow setting the hostname
-# https://forums.aws.amazon.com/thread.jspa?threadID=165077
-# https://aws.amazon.com/premiumsupport/knowledge-center/linux-static-hostname-rhel7-centos7/
-
 module "gitlab_debian9" {
   source                 = "./terraform-modules/terraform-aws-ec2-instance"
 
