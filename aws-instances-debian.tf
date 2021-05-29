@@ -57,7 +57,6 @@ module "gitlab_debian9" {
   ami                    = var.aws_debian9_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain          # defined in aws-vars.tf
   ansible_inventory      = "inventory-debian9"
-  template               = "./aws-inv-debian9.j2"
   user                   = "admin"
 
   instance_type          = "t2.medium"
@@ -86,7 +85,6 @@ module "gitlab_debian10" {
   ami                    = var.aws_debian10_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
   ansible_inventory      = "inventory-debian10"
-  template               = "./aws-inv-debian10.j2"
   user                   = "admin"
 
   instance_type          = "t2.medium"
@@ -117,7 +115,6 @@ module "gitlab_ubuntu16" {
   ami                    = var.aws_ubuntu16_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
   ansible_inventory      = "inventory-ubuntu16"
-  template               = "./aws-inv-ubuntu16.j2"
   user                   = "ubuntu"
 
   instance_type          = "t2.medium"
@@ -146,7 +143,6 @@ module "gitlab_ubuntu18" {
   ami                    = var.aws_ubuntu18_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
   ansible_inventory      = "inventory-ubuntu18"
-  template               = "./aws-inv-ubuntu18.j2"
   user                   = "ubuntu"
 
   instance_type          = "t2.medium"
@@ -175,7 +171,6 @@ module "gitlab_ubuntu20" {
   ami                    = var.aws_ubuntu20_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
   ansible_inventory      = "inventory-ubuntu20"
-  template               = "./aws-inv-ubuntu20.j2"
   user                   = "ubuntu"
 
   instance_type          = "t2.medium"

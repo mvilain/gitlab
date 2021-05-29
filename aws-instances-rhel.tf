@@ -57,7 +57,6 @@ module "gitlab_alma8" {
   ami                    = var.aws_alma8_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain      # defined in aws-vars.tf
   ansible_inventory      = "inventory-alma8"
-  template               = "./aws-inv-rhel.j2"
   user                   = "ec2-user"
 
   instance_type          = "t2.medium"
@@ -89,7 +88,6 @@ module "gitlab_centos7" {
   ami                    = var.aws_centos7_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain        # defined in aws-vars.tf
   ansible_inventory      = "inventory-centos7"
-  template               = "./aws-inv-rhel.j2"
   user                   = "centos"
 
   instance_type          = "t2.medium"
@@ -120,7 +118,6 @@ module "gitlab_centos8" {
   ami                    = var.aws_centos8_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain        # defined in aws-vars.tf
   ansible_inventory      = "inventory-centos8"
-  template               = "./aws-inv-rhel.j2"
   user                   = "centos"
 
   instance_type          = "t2.medium"
