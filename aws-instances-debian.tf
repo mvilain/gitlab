@@ -62,7 +62,8 @@ module "gitlab_debian9" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    Environment = "gitlab"
+    environment = "gitlab"
+    os          = "debian"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -90,7 +91,8 @@ module "gitlab_debian10" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    Environment = "gitlab"
+    environment = "gitlab"
+    os          = "debian"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -120,7 +122,8 @@ module "gitlab_ubuntu16" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    Environment = "gitlab"
+    environment = "gitlab"
+    os          = "ubuntu"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -148,7 +151,8 @@ module "gitlab_ubuntu18" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    Environment = "gitlab"
+    environment = "gitlab"
+    os          = "ubuntu"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -176,7 +180,8 @@ module "gitlab_ubuntu20" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    Environment = "gitlab"
+    environment = "gitlab"
+    os          = "ubuntu"
   }
   user_data = <<-EOF
     #!/bin/bash

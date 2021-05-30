@@ -60,14 +60,15 @@ module "gitlab_alma8" {
   user                   = "ec2-user"
 
   instance_type          = "t2.medium"
-  instance_count         = 1
+  instance_count         = 2
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
-    Terraform   = "true"
-    Environment = "gitlab"
+    terraform   = "true"
+    environment = "gitlab"
+    os          = "alma8"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -97,8 +98,9 @@ module "gitlab_centos7" {
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
-    Terraform   = "true"
-    Environment = "gitlab"
+    terraform   = "true"
+    environment = "gitlab"
+    os          = "centos"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -127,8 +129,9 @@ module "gitlab_centos8" {
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
-    Terraform   = "true"
-    Environment = "gitlab"
+    terraform   = "true"
+    environment = "gitlab"
+    os          = "centos"
   }
   user_data = <<-EOF
     #!/bin/bash
