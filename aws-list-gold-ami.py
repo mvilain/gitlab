@@ -150,7 +150,7 @@ def desc_avz(RegionConfig):
         ],
         # DryRun=True|False
     ) # dict{AvailabilityZones[list of default azs]}
-
+    return response['AvailabilityZones']
 # {
 #     'AvailabilityZones': [
 #         {
@@ -172,7 +172,7 @@ def desc_avz(RegionConfig):
 #         },
 #     ]
 # }
-    return response['AvailabilityZones']
+
 
 def desc_images(ProductCode,RegionConfig):
     """
@@ -194,7 +194,7 @@ def desc_images(ProductCode,RegionConfig):
         Owners=[ 'aws-marketplace' ]
         # DryRun=True|False
     ) # dict{Images(list of images)}
-
+    return response['Images'] # don't bother with Metadata key
 # {
 #     'Images': [
 #         {
@@ -258,7 +258,6 @@ def desc_images(ProductCode,RegionConfig):
 #         },
 #     ]
 # }
-    return response['Images'] # don't bother with Metadata key
 
 
 def main():
@@ -320,7 +319,6 @@ def main():
 
             distro_list = []  # store distro entries in list so it can be sorted
             for im in desc_images(prodcode,region_config):
-
                 distro_list.append(
                     im['CreationDate'] + '|' + im['ImageId'] + '|' + im['Description']
                 )
