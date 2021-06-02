@@ -3,45 +3,11 @@
 //================================================== PROVIDERS (in aws-providers.tf)
 //================================================== S3 BACKEND (in aws-s3-backend.tf)
 //================================================== GENERATE KEYS AND SAVE (in aws-keys.tf)
-
-# manage ansible's inventory file because it will have different IPs each run
-# also each instance has their own default AWS user
-# (e.g. almalinux=ec2-user, centos=centos, debian=admin, ubuntu=ubuntu)
-#resource "local_file" "inventory_aws_centos" {
-#  content = <<-EOT
-#  # this is overridden with every terraform run
-#  [all:vars]
-#  ansible_ssh_user=centos
-#  ansible_ssh_private_key_file=./id_rsa
-#  ansible_python_interpreter=/usr/libexec/platform-python
-#
-#  [all]
-#  EOT
-#  filename             = "inventory-centos"
-#  directory_permission = "0755"
-#  file_permission      = "0644"
-#}
-#
-#resource "local_file" "inventory_aws_py3" {
-#  content = <<-EOT
-#  # this is overridden with every terraform run
-#  [all:vars]
-#  ansible_ssh_user=ubuntu
-#  ansible_ssh_private_key_file=./id_rsa
-#  ansible_python_interpreter=/usr/bin/python3
-#
-#  #ansible_ssh_user=admin
-#
-#  [all]
-#  EOT
-#  filename             = "inventory-py3"
-#  directory_permission = "0755"
-#  file_permission      = "0644"
-#}
-
 //================================================== NETWORK+SUBNETS+ACLs (aws-vpc.tf)
 //================================================== SECURITY GROUPS (in aws-vpc-sg.tf)
 //================================================== INSTANCES
+# manage ansible's inventory file because it will have different IPs each run
+# also each instance has their own default AWS user
 ## ./aws-list-gold-ami.py -t aws-list-gold-template.j2 > aws-vars.tf
 # to generate vars below
 
@@ -55,19 +21,16 @@ module "gitlab_alma8" {
 
   name                   = var.aws_alma8_name  # defined in aws-vars.tf
   ami                    = var.aws_alma8_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain      # defined in aws-vars.tf
-  ansible_inventory      = "inventory-alma8"
-  user                   = "ec2-user"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 2
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
-    terraform   = "true"
-    environment = "gitlab"
+    Terraform   = "true"
+    Environment = "gitlab"
     os          = "alma8"
   }
   user_data = <<-EOF
@@ -87,20 +50,17 @@ module "gitlab_centos7" {
 
   name                   = var.aws_centos7_name  # defined in aws-vars.tf
   ami                    = var.aws_centos7_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain        # defined in aws-vars.tf
-  ansible_inventory      = "inventory-centos7"
-  user                   = "centos"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
-    terraform   = "true"
-    environment = "gitlab"
-    os          = "centos"
+    Terraform   = "true"
+    Environment = "gitlab"
+    os          = "centos7"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -118,20 +78,17 @@ module "gitlab_centos8" {
 
   name                   = var.aws_centos8_name  # defined in aws-vars.tf
   ami                    = var.aws_centos8_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain        # defined in aws-vars.tf
-  ansible_inventory      = "inventory-centos8"
-  user                   = "centos"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
-    terraform   = "true"
-    environment = "gitlab"
-    os          = "centos"
+    Terraform   = "true"
+    Environment = "gitlab"
+    os          = "centos8"
   }
   user_data = <<-EOF
     #!/bin/bash

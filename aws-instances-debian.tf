@@ -3,45 +3,13 @@
 //================================================== PROVIDERS (in aws-providers.tf)
 //================================================== S3 BACKEND (in aws-s3-backend.tf)
 //================================================== GENERATE KEYS AND SAVE (in aws-keys.tf)
-
-# manage ansible's inventory file because it will have different IPs each run
-# also each instance has their own default AWS user
-# (e.g. almalinux=ec2-user, centos=centos, debian=admin, ubuntu=ubuntu)
-#resource "local_file" "inventory_aws_centos" {
-#  content = <<-EOT
-#  # this is overridden with every terraform run
-#  [all:vars]
-#  ansible_ssh_user=centos
-#  ansible_ssh_private_key_file=./id_rsa
-#  ansible_python_interpreter=/usr/libexec/platform-python
-#
-#  [all]
-#  EOT
-#  filename             = "inventory-centos"
-#  directory_permission = "0755"
-#  file_permission      = "0644"
-#}
-#
-#resource "local_file" "inventory_aws_py3" {
-#  content = <<-EOT
-#  # this is overridden with every terraform run
-#  [all:vars]
-#  ansible_ssh_user=ubuntu
-#  ansible_ssh_private_key_file=./id_rsa
-#  ansible_python_interpreter=/usr/bin/python3
-#
-#  #ansible_ssh_user=admin
-#
-#  [all]
-#  EOT
-#  filename             = "inventory-py3"
-#  directory_permission = "0755"
-#  file_permission      = "0644"
-#}
-
 //================================================== NETWORK+SUBNETS+ACLs (aws-vpc.tf)
 //================================================== SECURITY GROUPS (in aws-vpc-sg.tf)
 //================================================== INSTANCES
+# manage ansible's inventory file because it will have different IPs each run
+# also each instance has their own default AWS user
+# (e.g. almalinux=ec2-user, centos=centos, debian=admin, ubuntu=ubuntu)
+
 ## ./aws-list-gold-ami.py -t aws-list-gold-template.j2 > aws-vars.tf
 # to generate vars below
 
@@ -50,11 +18,8 @@ module "gitlab_debian9" {
 
   name                   = var.aws_debian9_name  # defined in aws-vars.tf
   ami                    = var.aws_debian9_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain          # defined in aws-vars.tf
-  ansible_inventory      = "inventory-debian9"
-  user                   = "admin"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -62,8 +27,8 @@ module "gitlab_debian9" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    environment = "gitlab"
-    os          = "debian"
+    Environment = "gitlab"
+    os          = "debian9"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -79,11 +44,8 @@ module "gitlab_debian10" {
 
   name                   = var.aws_debian10_name  # defined in aws-vars.tf
   ami                    = var.aws_debian10_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain         # defined in aws-vars.tf
-  ansible_inventory      = "inventory-debian10"
-  user                   = "admin"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -91,8 +53,8 @@ module "gitlab_debian10" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    environment = "gitlab"
-    os          = "debian"
+    Environment = "gitlab"
+    os          = "debian10"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -110,11 +72,8 @@ module "gitlab_ubuntu16" {
 
   name                   = var.aws_ubuntu16_name  # defined in aws-vars.tf
   ami                    = var.aws_ubuntu16_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain         # defined in aws-vars.tf
-  ansible_inventory      = "inventory-ubuntu16"
-  user                   = "ubuntu"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -122,8 +81,8 @@ module "gitlab_ubuntu16" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    environment = "gitlab"
-    os          = "ubuntu"
+    Environment = "gitlab"
+    os          = "ubuntu16"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -139,11 +98,8 @@ module "gitlab_ubuntu18" {
 
   name                   = var.aws_ubuntu18_name  # defined in aws-vars.tf
   ami                    = var.aws_ubuntu18_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain         # defined in aws-vars.tf
-  ansible_inventory      = "inventory-ubuntu18"
-  user                   = "ubuntu"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -151,8 +107,8 @@ module "gitlab_ubuntu18" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    environment = "gitlab"
-    os          = "ubuntu"
+    Environment = "gitlab"
+    os          = "ubuntu18"
   }
   user_data = <<-EOF
     #!/bin/bash
@@ -168,11 +124,8 @@ module "gitlab_ubuntu20" {
 
   name                   = var.aws_ubuntu20_name  # defined in aws-vars.tf
   ami                    = var.aws_ubuntu20_ami   # defined in aws-vars.tf
-  domain                 = var.aws_domain         # defined in aws-vars.tf
-  ansible_inventory      = "inventory-ubuntu20"
-  user                   = "ubuntu"
 
-  instance_type          = "t2.medium"
+  instance_type          = "t2.micro"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -180,8 +133,8 @@ module "gitlab_ubuntu20" {
   subnet_id              = aws_subnet.gitlab_subnet.id
   tags = {
     Terraform   = "true"
-    environment = "gitlab"
-    os          = "ubuntu"
+    Environment = "gitlab"
+    os          = "ubuntu20"
   }
   user_data = <<-EOF
     #!/bin/bash
