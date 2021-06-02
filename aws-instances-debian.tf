@@ -18,6 +18,7 @@ module "gitlab_debian9" {
 
   name                   = var.aws_debian9_name  # defined in aws-vars.tf
   ami                    = var.aws_debian9_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain        # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 1
@@ -44,6 +45,7 @@ module "gitlab_debian10" {
 
   name                   = var.aws_debian10_name  # defined in aws-vars.tf
   ami                    = var.aws_debian10_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 1
@@ -72,6 +74,7 @@ module "gitlab_ubuntu16" {
 
   name                   = var.aws_ubuntu16_name  # defined in aws-vars.tf
   ami                    = var.aws_ubuntu16_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 1
@@ -98,6 +101,7 @@ module "gitlab_ubuntu18" {
 
   name                   = var.aws_ubuntu18_name  # defined in aws-vars.tf
   ami                    = var.aws_ubuntu18_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 1
@@ -124,6 +128,7 @@ module "gitlab_ubuntu20" {
 
   name                   = var.aws_ubuntu20_name  # defined in aws-vars.tf
   ami                    = var.aws_ubuntu20_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain         # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 1

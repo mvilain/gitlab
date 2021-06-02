@@ -21,6 +21,7 @@ module "gitlab_alma8" {
 
   name                   = var.aws_alma8_name  # defined in aws-vars.tf
   ami                    = var.aws_alma8_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain      # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 2
@@ -50,6 +51,7 @@ module "gitlab_centos7" {
 
   name                   = var.aws_centos7_name  # defined in aws-vars.tf
   ami                    = var.aws_centos7_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain      # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 1
@@ -78,6 +80,7 @@ module "gitlab_centos8" {
 
   name                   = var.aws_centos8_name  # defined in aws-vars.tf
   ami                    = var.aws_centos8_ami   # defined in aws-vars.tf
+  domain                 = var.aws_domain      # defined in aws-vars.tf
 
   instance_type          = "t2.micro"
   instance_count         = 1
