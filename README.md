@@ -125,6 +125,43 @@ variable "aws_{{ image.distro }}_name" {
 {% endfor %}
 ```
 
+### AWS inventory generation
+
+The [link to AWS version](https://aws.amazon.com/blogs/apn/getting-started-with-ansible-and-dynamic-amazon-ec2-inventory-management/) of this script is no longer valid.  The [ansible plugin](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py) and it's [corresponding ini file](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini) are maintained code. Ansible also has some [old documentation](https://web.archive.org/web/20170630221334/http://docs.ansible.com/ansible/intro_dynamic_inventory.html#example-aws-ec2-external-inventory-script) on how to setup the inventory file and playbooks using this script.
+
+The [updated fork](https://raw.githubusercontent.com/vshn/ansible-dynamic-inventory-ec2/master/ec2.py) that allows for a sorted list. But it has drawbacks:
+
+- able to collect info on running instances, but it's SLOW
+- requires ansible 2.9 and uses old boto library to connect to AWS
+- generates ansible hostvars and groupvars with "-" which are invalid
+- could not get it to work solely as an inventory source from command-line or playbook
+- can't differentiate between 4 different OS' and two different python interpeters
+
+This points to a custom pythons script that collects the running instance's info and populates a inventory file from a template, similar to the python script to scan for the GOLD AMIs.
+
+
+To use this script, install the required python modules either under a virtual environment or directly onto your system.  Then define the following along with the AWS authentication keys:
+
+```bash
+python3 -m venv venv
+. venv/bin/activate
+python3 -m pip install -r requirements.txt
+
+export ANSIBLE_HOSTS=./ec2.py
+export EC2\_INI\_PATH=./ec2.ini
+
+# export these variables with your keys
+export AWS_ACCESS_KEY_ID='YOUR_AWS_API_KEY'
+export AWS_SECRET_ACCESS_KEY='YOUR_AWS_API_SECRET_KEY'
+# OR
+aws configure
+#[answer the questions and supply the keys and default region]
+```
+
+When running EC2 instances exist, the ec2.py script will run the AWS `describe_instances` query for running instances are report back a variety of critera that can be used in the `inventory_aws` file.
+
+
+
 ### Terraform Modules
 
 #### [forked terraform-linode-instance module](https://github.com/mvilain/terraform-linode-instance)
@@ -252,26 +289,6 @@ See the [README](https://github.com/terraform-aws-modules/terraform-aws-vpc) on 
 won't respond to ping?  It's OK if node is up but http doesn't respond to heartbeat
 
 - setup gitlab instances to point to a single postgresql server and use haproxy to load balance between them.
-
-- dynamically detected AWS inventory generation
-
-The [AWS-blessed scripts](https://aws.amazon.com/blogs/apn/getting-started-with-ansible-and-dynamic-amazon-ec2-inventory-management/) are no longer valid.  The [ansible plugin](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py) and it's [corresponding ini file](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini) are the maintained code, but there's a [updated fork](https://raw.githubusercontent.com/vshn/ansible-dynamic-inventory-ec2/master/ec2.py) that allows for a sorted list of the instances. That's the version included in this repo. 
-
-Note: it requires Ansible 2.9, which is why it's recommended to install the required modules into a python virtual environement.
-
-To use this script, install the required python modules either under a virtual environment or directly onto your system.  Then define the following along with the AWS authentication keys:
-
-```bash
-python3 -m venv venv
-. venv/bin/activate
-python3 -m pip install -r requirements.txt
-
-export ANSIBLE_HOSTS=./ec2.py
-export EC2\_INI\_PATH=./ec2.ini
-
-export AWS_ACCESS_KEY_ID='YOUR_AWS_API_KEY'
-export AWS_SECRET_ACCESS_KEY='YOUR_AWS_API_SECRET_KEY'
-```
 
 
 - refactor the linode inventory build design to use
