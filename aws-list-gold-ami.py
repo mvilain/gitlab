@@ -1,19 +1,26 @@
 #! /usr/bin/env python3
-# 202105.20MeV
-# uses aws boto3 to crawl through AWS' marketplace and list instances for
-# - centos7 almalinux (centos8 replacement)
-# - debian9 debian10
-# - ubuntu16.04 ubuntu18.04 ubuntu20.04
-#
-# python3 and the boto3 library are required to run this tool
-# uses region defined in awscli's credentials if not specified in REGION
-# credentials file must be present with the region
-# allows for jinja2 templating with -t <TEMPLATE> option
-# You don't need AWS_ACCESS_KEY or AWS_SECRET_KEY environment variables to run this tool
+"""
+202105.20MeV
+uses aws boto3 to crawl through AWS' marketplace and list instances for
+- centos7 almalinux (centos8 replacement)
+- debian9 debian10
+- ubuntu16.04 ubuntu18.04 ubuntu20.04
 
-import sys, os, re, argparse
-import boto3, pprint, jinja2
+python3 and the boto3 library are required to run this tool
+uses region defined in awscli's credentials if not specified in REGION
+credentials file must be present with the region
+allows for jinja2 templating with -t <TEMPLATE> option
+You don't need AWS_ACCESS_KEY or AWS_SECRET_KEY environment variables to run this tool
+"""
+
+import argparse
+import re
+import os
+import sys
+import boto3
 from botocore.config import Config
+import jinja2
+import pprint
 
 # shell expands '~' but you need to do it explicitly in python
 CRED = os.path.expanduser( '~/.aws/credentials' )
@@ -51,17 +58,17 @@ def parse_arguments(default_region):
                         )
     parser.add_argument('-l', '--list',
                         action="store_true",
-                        help=('List the valid AWS regions'),
+                        help='List the valid AWS regions',
                         required=False
                         )
     parser.add_argument('-t', '--template',
                         action="store",
-                        help=('JINJA2 template file to fill in with AMI info'),
+                        help='JINJA2 template file to fill in with AMI info',
                         required=False
                         )
     parser.add_argument('-v', '--verbose',
                         action="store_true",
-                        help=('show all the AMI image info'),
+                        help='show all the AMI image info',
                         required=False
                         )
     args = parser.parse_args()
@@ -77,7 +84,7 @@ def regions_list():
     """
     list all the valid AWS regions as strings
 
-    :param none:
+    :param: None
     :return:
         returns sorted list of strings of regions
 
@@ -96,15 +103,15 @@ def regions_print(incr=5,tab='    '):
     """
     print the regions as a list of sort strings INCR number per line
     
-    :param incr: int number of elements to print per line
-    :param tab:  string of spaces at beginning of line
+    :param: incr -- int number of elements to print per line
+    :param: tab --  string of spaces at beginning of line
     :return:
         returns None
     """
     start = 0; stop = incr
     valid_regions = regions_list()
     while start < len( valid_regions ):
-        print('{}{}'.format(tab,' '.join(valid_regions[start:stop])))
+        print('{}{}'.format(tab, ' '.join(valid_regions[start:stop])))
         start = stop
         stop = stop + 5
     return None
@@ -130,22 +137,22 @@ def valid_region(region):
         return False
 
 
-def desc_avz(RegionConfig):
+def desc_avz(regionconfig):
     """
     get all the region's default availability zones
 
-    :param RegionConfig: Config object which defines the region to query
-    :return: json object describing the AZs and their attributes
+    :param: regionconfig Config object which defines the region to query
+    :return: object describing the AZs and their attributes
     """
 
     # this returns dict with AvailabilityZones,Metadata keys
     # Images is a list of dicts containing each image's info
-    client = boto3.client( 'ec2', config=RegionConfig )
+    client = boto3.client( 'ec2', config=regionconfig )
     response = client.describe_availability_zones(
         Filters=[
             {
-            'Name': 'state',
-            'Values': [ 'available' ]
+                'Name': 'state',
+                'Values': [ 'available' ]
             },
         ],
         # DryRun=True|False
@@ -174,26 +181,26 @@ def desc_avz(RegionConfig):
 # }
 
 
-def desc_images(ProductCode,RegionConfig):
+def desc_images(productcode, regionconfig):
     """
     get all the Golden Image AMIs for a specific ProductCode
 
-    :param ProductCode: string of the ProductCode for a vendor's images
-    :param RegionConfig: Config object which defines the region to query
-    :return: json object describing the AMIs and their attributes
+    :param: productcode string of the ProductCode for a vendor's images
+    :param: regionconfig: Config object which defines the region to query
+    :return: object describing the AMIs and their attributes
     """
 
     # this returns dict with Images,Metadata keys
     # Images is a list of dicts containing each image's info
-    client = boto3.client( 'ec2', config=RegionConfig )
+    client = boto3.client( 'ec2', config=regionconfig )
     response = client.describe_images(
         Filters=[
-            { 'Name': 'product-code', 'Values': [ ProductCode ] },
+            { 'Name': 'product-code', 'Values': [ productcode ] },
             { 'Name': 'product-code.type', 'Values': [ 'marketplace' ] }
         ],
         Owners=[ 'aws-marketplace' ]
         # DryRun=True|False
-    ) # dict{Images(list of images)}
+    )  # dict{Images(list of images)}
     return response['Images'] # don't bother with Metadata key
 # {
 #     'Images': [
@@ -299,9 +306,9 @@ def main():
 
         # create a Config object defining region to use with a boto3 client
         region_config = Config(
-            region_name = args.REGION,
+            region_name       = args.REGION,
             signature_version = 'v4',
-            retries = {
+            retries           = {
                 'max_attempts': 10,
                 'mode'        : 'standard'
             }
@@ -349,11 +356,12 @@ def main():
             )
 
             if args.verbose:
-                print('{} {}'.format(60*'=',avzs_list['ZoneName']))
-                pprint.pprint(avzs_list)
+                for az in avzs_list:
+                    print('{} {}'.format(60*'=',az['ZoneName']))
+                    pprint.pprint(az)
 
         if args.verbose:
-            print('{} {}'.format(60*'<',distro))
+            print('{}'.format(60*'<'))
         else:
             print ('[done]',flush=True)
 

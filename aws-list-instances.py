@@ -9,9 +9,14 @@
 # allows for jinja2 templating with -t <TEMPLATE> option
 # You don't need AWS_ACCESS_KEY or AWS_SECRET_KEY environment variables to run this tool
 
-import sys, os, re, argparse
-import boto3, pprint, jinja2
+import argparse
+import re
+import os
+import sys
+import boto3
 from botocore.config import Config
+import jinja2
+import pprint
 
 # shell expands '~' but you need to do it explicitly in python
 CRED = os.path.expanduser( '~/.aws/credentials' )
@@ -27,27 +32,27 @@ def parse_arguments(default_region):
         a namespace with the arguments passed and their values
     """
     parser = argparse.ArgumentParser(
-             description='list running AWS instance information')
+             description='list running Linode instance information')
     parser.add_argument('REGION',
                         action="store",
                         default=default_region,
-                        help='region to use for running AMI images [default: {}]'.format(default_region),
+                        help='region to use for running Linodes [default: {}]'.format(default_region),
                         # choices=regions_list(),   # don't use...don't like error output
                         nargs="?",
                         )
     parser.add_argument('-l', '--list',
                         action="store_true",
-                        help=('List the valid AWS regions'),
+                        help='List the valid Linode regions',
                         required=False
                         )
     parser.add_argument('-t', '--template',
                         action="store",
-                        help=('JINJA2 template file to fill in with AMI info'),
+                        help='JINJA2 template file to fill in with Linode info',
                         required=False
                         )
     parser.add_argument('-v', '--verbose',
                         action="store_true",
-                        help=('show all the instance info'),
+                        help='show all the instance info',
                         required=False
                         )
     args = parser.parse_args()
@@ -61,9 +66,9 @@ def parse_arguments(default_region):
 
 def regions_list():
     """
-    list all the valid AWS regions as strings
+    list all the valid Linode regions as strings
 
-    :param none:
+    :param: None
     :return:
         returns sorted list of strings of regions
 
@@ -115,22 +120,21 @@ def valid_region(region):
     else:
         return False
 
-
-def descr_instances(RegionConfig):
+def descr_instances(regionconfig):
     """
     get a region's running instances for the owner of the account
 
-    :param RegionConfig: Config object which defines the region to query
+    :param: regionconfig Config object which defines the region to query
     :return: dict{ImageID} -- all the instance attributes
     """
     # this returns dict with Images,Metadata keys
     # Images is a list of dicts containing each image's info
-    client = boto3.client( 'ec2', config=RegionConfig )
+    client = boto3.client( 'ec2', config=regionconfig )
     response = client.describe_instances(
         Filters=[
             {
-            'Name': 'instance-state-name',
-            'Values': [ 'running' ]
+                'Name': 'instance-state-name',
+                'Values': [ 'running' ]
             },
         ],
         # DryRun=True|False
@@ -138,6 +142,7 @@ def descr_instances(RegionConfig):
     # list of dict{Reservations[dict{Group,Instances,OwnerId,ReservationId}], ResponseMetadata}
     # convert into:
     instances = []       # - list of dict{Instances}
+    instance_id = []
     for res in response['Reservations']:
         for ins in res['Instances']:
             # add duplicate Tags from list of dict{Key,Value} to Tag_KEY: VALUE
@@ -146,27 +151,9 @@ def descr_instances(RegionConfig):
                 ins['Tag_{}'.format(t['Key'])] = t['Value']
 
             # add instance to list of instances to return
-            instances.append(ins) 
+            instances.append(ins)
+            instance_id[ ins['InstanceId'] ] = ins
     return instances
-
-def dict_instances(RegionConfig):
-    """
-    get a region's running instances for the owner of the account
-
-    :param RegionConfig: Config object which defines the region to query
-    :return: dict{ImageID} -- all the instance attributes with ImageID as key
-    """
-    # this returns dict with Images,Metadata keys
-    # Images is a list of dicts containing each image's info
-    response = descr_instances(RegionConfig)
-
-    # list of dict{Reservations[dict{Group,Instances,OwnerId,ReservationId}], ResponseMetadata}
-    # convert into:
-    instance_id = []       # - list of dict{Instances}
-    for ins in responce:
-        # insert instance into dict{InstanceID}
-        instance_id[ ins['InstanceId'] ] = ins 
-    return instance_id
 
 
 def main():
@@ -208,17 +195,17 @@ def main():
 
         # create a Config object defining region to use with a boto3 client
         region_config = Config(
-            region_name = args.REGION,
+            region_name       = args.REGION,
             signature_version = 'v4',
-            retries = {
+            retries           = {
                 'max_attempts': 10,
                 'mode'        : 'standard'
-            }
+                }
         )
 
         instance_list = descr_instances(region_config)
         if not instance_list:
-            print('{} -- no instances found in {}'.format(PROG,args.REGION))
+            print('{} -- no instances found in {}'.format(PROG, args.REGION))
             return 0
 
         elif args.verbose:
@@ -282,44 +269,28 @@ def main():
                 dashes = 60*'-'
                 try:
                     size = os.get_terminal_size()
-                    print('{} {}'.format(dashes,'alma8'))
-                    pprint.pprint(templ_alma8,width=size.columns)
-                    print('{} {}'.format(dashes,'centos7'))
-                    pprint.pprint(templ_centos7,width=size.columns)
-                    print('{} {}'.format(dashes,'centos8'))
-                    pprint.pprint(templ_centos8,width=size.columns)
-                    print('{} {}'.format(dashes,'debian9'))
-                    pprint.pprint(templ_debian9,width=size.columns)
-                    print('{} {}'.format(dashes,'debian10'))
-                    pprint.pprint(templ_debian10,width=size.columns)
-                    print('{} {}'.format(dashes,'ubuntu16'))
-                    pprint.pprint(templ_ubuntu16,width=size.columns)
-                    print('{} {}'.format(dashes,'ubuntu18'))
-                    pprint.pprint(templ_ubuntu18,width=size.columns)
-                    print('{} {}'.format(dashes,'ubuntu20'))
-                    pprint.pprint(templ_ubuntu20,width=size.columns)
-                    print('{} {}'.format(dashes,'unk'))
-                    pprint.pprint(templ_unk,width=size.columns)
+                    print('{} {}'.format(dashes, 'alma'))
+                    pprint.pprint(templ_alma, width=size.columns)
+                    print('{} {}'.format(dashes, 'centos'))
+                    pprint.pprint(templ_centos, width=size.columns)
+                    print('{} {}'.format(dashes, 'debian'))
+                    pprint.pprint(templ_debian, width=size.columns)
+                    print('{} {}'.format(dashes, 'ubuntu'))
+                    pprint.pprint(templ_ubuntu, width=size.columns)
+                    print('{} {}'.format(dashes, 'unk'))
+                    pprint.pprint(templ_unk, width=size.columns)
 
                 except OSError:     # likely can't get terminal info in debugging session
-                    print('{} {}'.format(dashes,'alma8'))
-                    pprint.pprint(templ_alma8,width=132)
-                    print('{} {}'.format(dashes,'centos7'))
-                    pprint.pprint(templ_centos7,width=132)
-                    print('{} {}'.format(dashes,'centos8'))
-                    pprint.pprint(templ_centos8,width=132)
-                    print('{} {}'.format(dashes,'debian9'))
-                    pprint.pprint(templ_debian9,width=132)
-                    print('{} {}'.format(dashes,'debian10'))
-                    pprint.pprint(templ_debian10,width=132)
-                    print('{} {}'.format(dashes,'ubuntu16'))
-                    pprint.pprint(templ_ubuntu16,width=132)
-                    print('{} {}'.format(dashes,'ubuntu18'))
-                    pprint.pprint(templ_ubuntu18,width=132)
-                    print('{} {}'.format(dashes,'ubuntu20'))
-                    pprint.pprint(templ_ubuntu20,width=132)
-                    print('{} {}'.format(dashes,'unk'))
-                    pprint.pprint(templ_unk,width=132)
+                    print('{} {}'.format(dashes, 'alma'))
+                    pprint.pprint(templ_alma, width=132)
+                    print('{} {}'.format(dashes, 'centos'))
+                    pprint.pprint(templ_centos, width=132)
+                    print('{} {}'.format(dashes, 'debian'))
+                    pprint.pprint(templ_debian, width=132)
+                    print('{} {}'.format(dashes, 'ubuntu'))
+                    pprint.pprint(templ_ubuntu, width=132)
+                    print('{} {}'.format(dashes, 'unk'))
+                    pprint.pprint(templ_unk, width=132)
 
         return 0
 
