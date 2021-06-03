@@ -11,6 +11,8 @@
 ## ./aws-list-gold-ami.py -t aws-list-gold-template.j2 > aws-vars.tf
 # to generate vars below
 
+# os tag determines what part of the ansible inventory the instance gets sorted into
+
 # AWS uses hostnames in the form ip-xxx-xxx-xxx-xxx.REGION.compute.internal
 # with cloud-init setup to disallow setting the hostname
 # https://forums.aws.amazon.com/thread.jspa?threadID=165077
@@ -23,8 +25,8 @@ module "gitlab_alma8" {
   ami                    = var.aws_alma8_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain      # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
-  instance_count         = 2
+  instance_type          = "t2.medium"
+  instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
   vpc_security_group_ids = [ aws_security_group.gitlab_sg.id ]
@@ -53,7 +55,7 @@ module "gitlab_centos7" {
   ami                    = var.aws_centos7_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain      # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -82,7 +84,7 @@ module "gitlab_centos8" {
   ami                    = var.aws_centos8_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain      # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true

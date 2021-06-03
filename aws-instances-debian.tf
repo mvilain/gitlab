@@ -13,6 +13,8 @@
 ## ./aws-list-gold-ami.py -t aws-list-gold-template.j2 > aws-vars.tf
 # to generate vars below
 
+# os tag determines what part of the ansible inventory the instance gets sorted into
+
 module "gitlab_debian9" {
   source                 = "./terraform-modules/terraform-aws-ec2-instance"
 
@@ -20,7 +22,7 @@ module "gitlab_debian9" {
   ami                    = var.aws_debian9_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain        # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -47,7 +49,7 @@ module "gitlab_debian10" {
   ami                    = var.aws_debian10_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -76,7 +78,7 @@ module "gitlab_ubuntu16" {
   ami                    = var.aws_ubuntu16_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -103,7 +105,7 @@ module "gitlab_ubuntu18" {
   ami                    = var.aws_ubuntu18_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
@@ -130,7 +132,7 @@ module "gitlab_ubuntu20" {
   ami                    = var.aws_ubuntu20_ami   # defined in aws-vars.tf
   domain                 = var.aws_domain         # defined in aws-vars.tf
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   instance_count         = 1
   key_name               = aws_key_pair.gitlab_key.key_name
   monitoring             = true
