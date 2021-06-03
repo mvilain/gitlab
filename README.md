@@ -147,8 +147,6 @@ python3 -m venv venv
 . venv/bin/activate
 python3 -m pip install -r requirements.txt
 
-export ANSIBLE_HOSTS=./ec2.py
-export EC2\_INI\_PATH=./ec2.ini
 
 # export these variables with your keys
 export AWS_ACCESS_KEY_ID='YOUR_AWS_API_KEY'
@@ -159,6 +157,21 @@ aws configure
 ```
 
 When running EC2 instances exist, the ec2.py script will run the AWS `describe_instances` query for running instances are report back a variety of critera that can be used in the `inventory_aws` file.
+
+
+### Linode inventory generation
+
+The Linode list is available from 
+
+    curl -s https://api.linode.com/v4/images | jq ".data[]|.id" | sed -e 's/"//g'
+
+The full list of regions is available from
+
+    curl -s https://api.linode.com/v4/regions |jq ".data[]|.id" | sed -e 's/"//g'
+
+The full list of types is available from
+
+    curl -s https://api.linode.com/v4/linode/types | jq ".data[] | .id" | sed -e 's/"//g'
 
 
 
