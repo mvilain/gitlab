@@ -18,18 +18,6 @@ CRED = os.path.expanduser( '~/.aws/credentials' )
 CONFIG = os.path.expanduser( '~/.aws/config' )
 PROG = os.path.basename( sys.argv[0] )
 
-# user accounts for AWS access with key
-DISTROS = dict(
-    alma8    =  'ec2-user',
-    centos7  =  'centos',
-    centos8  =  'centos',
-    debian9  =  'admin',
-    debian10 =  'admin',
-    ubuntu16 =  'ubuntu',
-    ubuntu18 =  'ubuntu',
-    ubuntu20 =  'ubuntu'
-)
-
 def parse_arguments(default_region):
     """
     parse the argument list, build help and usage messages
