@@ -322,8 +322,10 @@ Since this repo has submodules, you'll need to clone it and populate the submodu
 
 This creates a HEADless snapshot of the submodule in the main repo.
 
-    cd ~/gitlab/tf/linode/modules
+    cd ~/gitlab/linode/terraform-modules
     git submodule add git@github.com:mvilain/terraform-linode-instance.git
+    cd ~/gitlib/aws/terraform-modules
+    git submodule add git@github.com:mvilain/terraform-aws-instance.git
 
 When you update the submodule and push it, the snapshot must be refreshed with the changes.
 
