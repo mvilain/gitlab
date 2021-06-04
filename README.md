@@ -325,7 +325,7 @@ This creates a HEADless snapshot of the submodule in the main repo.
     cd ~/gitlab/linode/terraform-modules
     git submodule add git@github.com:mvilain/terraform-linode-instance.git
     cd ~/gitlib/aws/terraform-modules
-    git submodule add git@github.com:mvilain/terraform-aws-instance.git
+    git submodule add git@github.com:mvilain/terraform-aws-ec2-instance.git
 
 When you update the submodule and push it, the snapshot must be refreshed with the changes.
 
