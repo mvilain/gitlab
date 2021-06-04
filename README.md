@@ -340,6 +340,5 @@ Here's how to remove submodules (from [How to delete a submodule](https://gist.g
 - Delete the relevant section from .git/config.
 - Run `git rm --cached path_to_submodule` (no trailing slash).
 - Run `rm -rf .git/modules/path_to_submodule` (no trailing slash).
-- remove the files from the directory `rm -rf path_to_submodule`
-- Commit `git commit -m "Removed submodule"`
 - Delete the now untracked submodule files `rm -rf path_to_submodule`
+- Commit `git commit -m "Removed submodule"`
