@@ -336,9 +336,10 @@ When you update the submodule and push it, the snapshot must be refreshed with t
 Here's how to remove submodules (from [How to delete a submodule](https://gist.github.com/myusuf3/7f645819ded92bda6677))
 
 - Delete the relevant section from the .gitmodules file.
-- Stage the .gitmodules changes git add .gitmodules
+- Stage the .gitmodules changes `git add .gitmodules`
 - Delete the relevant section from .git/config.
 - Run `git rm --cached path_to_submodule` (no trailing slash).
 - Run `rm -rf .git/modules/path_to_submodule` (no trailing slash).
+- remove the files from the directory `rm -rf path_to_submodule`
 - Commit `git commit -m "Removed submodule"`
 - Delete the now untracked submodule files `rm -rf path_to_submodule`
