@@ -13,6 +13,7 @@ import jinja2
 import linode_api4
 import os
 import pprint
+import re
 import sys
 
 # shell expands '~' but you need to do it explicitly in python
@@ -170,42 +171,16 @@ def descr_instances():
     requires
         LINODE_TOKEN must be defined
     """
-    # this returns dict with Images,Metadata keys
+    # this returns list pageinatedItems
     # Images is a list of dicts containing each image's info
     client = linode_api4.LinodeClient(TOKEN)
-    response = client.linode.instances( )
+    response = client.linode.instances()   # - list of paginatedItems
     # PaginatedList
-    # convert into:
-    instances = []       # - list of dict{Instances}
-    for res in response:
-        for ins in res:
-            # add duplicate Tags from list of dict{Key,Value} to Tag_KEY: VALUE
-            # which makes them easier to address
-            # for t in ins['Tags']:   # iterate through tag dicts
-            #     ins['Tag_{}'.format(t['Key'])] = t['Value']
-
-            # add instance to list of instances to return
-            instances.append(ins) 
-    return instances
-
-def dict_instances(RegionConfig):
-    """
-    get a region's running instances for the owner of the account
-
-    :param RegionConfig: Config object which defines the region to query
-    :return: dict{ImageID} -- all the instance attributes with ImageID as key
-    """
-    # this returns dict with Images,Metadata keys
-    # Images is a list of dicts containing each image's info
-    response = descr_instances()
-
-    # list of dict{Reservations[dict{Group,Instances,OwnerId,ReservationId}], ResponseMetadata}
-    # convert into:
-    instance_id = []       # - list of dict{Instances}
-    for ins in response:
-        # insert instance into dict{InstanceID}
-        instance_id[ ins['InstanceId'] ] = ins 
-    return instance_id
+    # for t in res.tags: res[ 'tag_{}'.format(t) ] = t
+    # instances = []
+    # for res in response:
+    #     instances.append(res)  # add instance to list of instances to return
+    return response
 
 
 def main():
@@ -245,46 +220,44 @@ def main():
             regions_print(incr=6)
             return 1
 
-        instance_list = descr_instances()
-        if not instance_list:
+        paginated_list = descr_instances()
+        if not paginated_list:
             print('{} -- no instances found in {}'.format(PROG,args.REGION))
             return 0
 
         elif args.verbose:
-            pprint.pprint(instance_list)
+            pprint.pprint(paginated_list)
             return 0
 
-        # convert list of dict with keys for template
-        #   Reservations[ dict{Group,Instances,OwnerId,ReservationId} ], ResponseMetadata}
+        # convert PaginatedList with keys for template
         # into list of strings with key fields
-        # this needs to know the OS' supported as each has their own list
-        # organized this way because each of these lists uses a different username to
-        # access the AWS instance which is part of the template
+        # While AWS has different user accounts depending on the AMI,
+        # linodes all give access to root, so this really isn't needed
         templ_alma = []
         templ_centos = []
         templ_debian  = []
         templ_ubuntu = []
         templ_unk = []
 
-        # apparently jinja2 can't handle a lot of variables, so process each section
-        for ins in instance_list:
+        for ins in paginated_list:
+            n = re.sub(r'_instance.*', '', str(ins.label))
+            o = str(ins.image).replace('Image: ','')
             d = dict(
-                region     = args.REGION,
-                os         = ins['Tag_os'],
-                name       = ins['Tag_Name'],
-                ImageID    = ins['ImageId'],
-                avz        = ins['Placement']['AvailabilityZone'],
-                public_ip  = ins['PublicIpAddress'],
-                dns        = ins['PublicDnsName']
+                region     = str(ins.region).replace('Region: ',''),
+                os         = o.replace('linode/','').replace('.04',''),
+                id         = ins.id,
+                name       = n.replace('Label: ',''),
+                type       = str(ins.type).replace('Type: ',''),
+                public_ip  = ins.ipv4[0]    # requires support to give 2nd IP
             )
-            if ins['Tag_os'] == 'alma8':
+
+            if d['os'] == 'almalinux8':
                 templ_alma.append(d)
-            elif ins['Tag_os'] == 'centos7' or ins['Tag_os'] == 'centos8':
+            elif d['os'] == 'centos7' or d['os'] == 'centos8':
                 templ_centos.append(d)
-            elif ins['Tag_os'] == 'debian9' or ins['Tag_os'] == 'debian10':
+            elif d['os'] == 'debian9' or d['os'] == 'debian10':
                 templ_debian.append(d)
-            elif ins['Tag_os'] == 'ubuntu16' or ins['Tag_os'] == 'ubuntu18' or \
-            ins['Tag_os'] == 'ubuntu20':
+            elif d['os'] == 'ubuntu16lts' or d['os'] == 'ubuntu18' or d['os'] == 'ubuntu20':
                 templ_ubuntu.append(d)
             else:
                 templ_unk.append(d)

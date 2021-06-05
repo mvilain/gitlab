@@ -1,6 +1,10 @@
 // linode.tf -- spin up the gitlab linode instances and define in DNS
 //================================================== VARIABLES (in linode-vars.tf)
 //================================================== PROVIDERS (in providers.tf)
+provider "linode" {
+  # Configuration options
+}
+
 //================================================== GENERATE KEYS AND SAVE
 resource "tls_private_key" "linode_ssh_key" {
   algorithm = "RSA"

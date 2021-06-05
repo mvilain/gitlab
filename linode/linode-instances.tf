@@ -11,18 +11,17 @@
 #  type      - Linode image size to use                          [default: "g6-nanode-1"]
 #  label     - label used to create the instance and hostname    [default: "example"]
 #  domain    - Linode-managed DNS domain used to assign host IP  [default: "example.com"]
-#  inventory - ansible inventory file to append host             [default: inventory]
-module "lin_gitlab7" {
+#  script    - linode stackscript to run on instance boot        [default: NONE ]
+module "lin_gitlab_alma8" {
   source   = "./terraform-modules/terraform-linode-instance"
 
-  password = random_password.linode_root_pass.result
-  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  domain   = var.linode_domain
-  image    = "linode/centos7"
-  type     = "g6-standard-2"
-  script   = "centos7.sh"       # gitlab-config/ is implied
-  label    = "gitlab7"
-  inventory = "inventory"
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/almalinux8"
+  type      = "g6-standard-1"
+  script    = linode_stackscript.rhel8.id
+  label     = "gitlab-a"
 }
 # outputs:
 #  id
@@ -33,81 +32,84 @@ module "lin_gitlab7" {
 #  ipv4
 #  backups (enabled, schedule, day, window)
 
-
-module "lin_gitlab8" {
+module "lin_gitlab_centos7" {
   source   = "./terraform-modules/terraform-linode-instance"
 
-  password = random_password.linode_root_pass.result
-  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  domain   = var.linode_domain
-  image    = "linode/centos8"
-  type     = "g6-standard-2"
-  script   = "centos8.sh"
-  label    = "gitlab8"
-  inventory = "inventory"
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/centos7"
+  type      = "g6-standard-1"
+  script    = linode_stackscript.rhel7.id
+  label     = "gitlab7"
 }
 
-# gitlab recommends running the app in 4GB machine
-# nanodes are to small...worked OK in the 2GB linode
-module "lin_gitlab9" {
+module "lin_gitlab_centos8" {
   source   = "./terraform-modules/terraform-linode-instance"
 
-  password = random_password.linode_root_pass.result
-  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  domain   = var.linode_domain
-  image    = "linode/debian9"
-  type     = "g6-standard-2"
-  script   = "debian.sh"
-  label    = "gitlab9"
-  inventory = "inventory_py3"
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/centos8"
+  type      = "g6-standard-2"
+  script    = linode_stackscript.rhel8.id
+  label     = "gitlab8"
 }
 
-module "lin_gitlab10" {
+module "lin_gitlab_debian9" {
   source   = "./terraform-modules/terraform-linode-instance"
 
-  password = random_password.linode_root_pass.result
-  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  domain   = var.linode_domain
-  image    = "linode/debian10"
-  type     = "g6-standard-2"
-  script   = "debian.sh"
-  label    = "gitlab10"
-  inventory = "inventory_py3"
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/debian9"
+  type      = "g6-standard-2"
+  script    = linode_stackscript.debian.id
+  label     = "gitlab9"
 }
 
-module "lin_gitlab16" {
+module "lin_gitlab_debian10" {
   source   = "./terraform-modules/terraform-linode-instance"
 
-  password = random_password.linode_root_pass.result
-  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  domain   = var.linode_domain
-  image    = "linode/ubuntu16.04lts"
-  type     = "g6-standard-2"
-  script   = "ubuntu.sh"
-  label    = "gitlab16"
-  inventory = "inventory_py3"
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/debian10"
+  type      = "g6-standard-2"
+  script    = linode_stackscript.debian.id
+  label     = "gitlab10"
 }
-module "lin_gitlab18" {
+
+module "lin_gitlab_ubuntu16" {
   source   = "./terraform-modules/terraform-linode-instance"
 
-  password = random_password.linode_root_pass.result
-  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  domain   = var.linode_domain
-  image    = "linode/ubuntu18.04"
-  type     = "g6-standard-2"
-  script   = "ubuntu.sh"
-  label    = "gitlab18"
-  inventory = "inventory_py3"
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/ubuntu16.04lts"
+  type      = "g6-standard-2"
+  script    = linode_stackscript.ubuntu.id
+  label     = "gitlab16"
 }
-module "lin_gitlab20" {
+module "lin_gitlab_ubuntu18" {
   source   = "./terraform-modules/terraform-linode-instance"
 
-  password = random_password.linode_root_pass.result
-  ssh_key  = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
-  domain   = var.linode_domain
-  image    = "linode/ubuntu20.04"
-  type     = "g6-standard-2"
-  script   = "ubuntu.sh"
-  label    = "gitlab20"
-  inventory = "inventory_py3"
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/ubuntu18.04"
+  type      = "g6-standard-2"
+  script    = linode_stackscript.ubuntu.id
+  label     = "gitlab18"
+}
+module "lin_gitlab_ubuntu20" {
+  source   = "./terraform-modules/terraform-linode-instance"
+
+  password  = random_password.linode_root_pass.result
+  ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
+  domain    = var.linode_domain
+  image     = "linode/ubuntu20.04"
+  type      = "g6-standard-2"
+  script    = linode_stackscript.ubuntu.id
+  label     = "gitlab20"
 }
