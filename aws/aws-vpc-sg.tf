@@ -56,7 +56,7 @@
 #   from_port      = 22
 #   to_port        = 22
 # }
-# resource "aws_network_acl_rule" "gitlab_acl_ssh_nord" {
+# resource "aws_network_acl_rule" "gitlab_acl_ssh_nord8524" {
 #   network_acl_id = aws_network_acl.gitlab_acl.id
 #   rule_number    = 130
 #   egress         = false
@@ -168,9 +168,9 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_nord5324" {
 }
 
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8860-80" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8857" {
   type              = "ingress"
-  description       = "gitlab ssh nord8860-80"
+  description       = "gitlab ssh nord8857"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
@@ -208,9 +208,9 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_nord6929" {
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord145" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8524" {
   type              = "ingress"
-  description       = "gitlab ssh nord145"
+  description       = "gitlab ssh nord8524"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
