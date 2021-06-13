@@ -19,7 +19,7 @@ module "lin_gitlab_alma8" {
   ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain    = var.linode_domain
   image     = "linode/almalinux8"
-  type      = "g6-standard-1"
+  type      = "g6-standard-2"
   script    = linode_stackscript.rhel8.id
   label     = "gitlab-a"
 }
@@ -39,7 +39,7 @@ module "lin_gitlab_centos7" {
   ssh_key   = chomp(tls_private_key.linode_ssh_key.public_key_openssh)
   domain    = var.linode_domain
   image     = "linode/centos7"
-  type      = "g6-standard-1"
+  type      = "g6-standard-2"
   script    = linode_stackscript.rhel7.id
   label     = "gitlab7"
 }
