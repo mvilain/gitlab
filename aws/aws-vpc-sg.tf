@@ -157,93 +157,114 @@ resource "aws_security_group_rule" "gitlab_sgr_ssh_att" {
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord5324" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_mul_la" {
   type              = "ingress"
-  description       = "gitlab ssh nord5324"
+  description       = "gitlab ssh tor la"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "66.114.176.0/20" ]
+  cidr_blocks       = [ "89.45.90.0/24" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_mul_sf" {
+  type              = "ingress"
+  description       = "gitlab ssh tor sf"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "199.116.112.0/21" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_mul_sj198" {
+  type              = "ingress"
+  description       = "gitlab ssh tor sj"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "198.54.134.0/24" ]
+  security_group_id = aws_security_group.gitlab_sg.id
+}
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_mul_sj199" {
+  type              = "ingress"
+  description       = "gitlab ssh tor sj"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [ "199.116.118.0/24" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8857" {
+
+resource "aws_security_group_rule" "gitlab_sgr_ssh_mul_wa" {
   type              = "ingress"
-  description       = "gitlab ssh nord8857"
+  description       = "gitlab ssh tor Sea"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "23.80.0.0/15" ]
+  cidr_blocks       = [ "192.252.208.0/20" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8860-82" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_tor_la" {
   type              = "ingress"
-  description       = "gitlab ssh nord8860-82"
+  description       = "gitlab ssh tor LA"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "23.82.0.0/16" ]
+  cidr_blocks       = [ "37.120.147.0/24" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8860-83" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_tor_sf" {
   type              = "ingress"
-  description       = "gitlab ssh nord8860-83"
+  description       = "gitlab ssh tor SF"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "23.83.0.0/18" ]
+  cidr_blocks       = [ "206.189.0.0/16" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord6929" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_tor_nv" {
   type              = "ingress"
-  description       = "gitlab ssh nord6929"
+  description       = "gitlab ssh tor NV"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "107.181.160.0/19" ]
+  cidr_blocks       = [ "185.242.5.0/24" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord5650" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_tor_tx" {
   type              = "ingress"
-  description       = "gitlab ssh nord5650"
+  description       = "gitlab ssh tor TX"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "173.244.192.0/19" ]
+  cidr_blocks       = [ "96.44.128.0/18" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord8524" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_tor_ut" {
   type              = "ingress"
-  description       = "gitlab ssh nord8524"
+  description       = "gitlab ssh tor UT"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "192.145.118.0/24" ]
+  cidr_blocks       = [ "209.95.32.0/19" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
 
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord6067" {
+resource "aws_security_group_rule" "gitlab_sgr_ssh_tor_wa" {
   type              = "ingress"
-  description       = "gitlab ssh nord6067"
+  description       = "gitlab ssh tor WA"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [ "198.8.80.0/20" ]
-  security_group_id = aws_security_group.gitlab_sg.id
-}
-
-resource "aws_security_group_rule" "gitlab_sgr_ssh_nord58" {
-  type              = "ingress"
-  description       = "gitlab ssh nord58"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  cidr_blocks       = [ "209.58.128.0/20" ]
+  cidr_blocks       = [ "199.229.248.0/21" ]
   security_group_id = aws_security_group.gitlab_sg.id
 }
