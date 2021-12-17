@@ -4,7 +4,6 @@
 [gitlab]
 gitlab7  ansible_host=192.168.10.107
 gitlab8  ansible_host=192.168.10.108
-gitlabr8 ansible_host=192.168.10.208
 
 [gitlab:vars]
 # look in group_vars/gitlab
@@ -29,7 +28,7 @@ lbr1 ansible_host=192.168.10.100
 
 # Group 'all' with all servers
 [all:children]
-gitlab
+gitlab 
 gitlab_py3
 lbr
 
