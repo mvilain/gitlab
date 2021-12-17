@@ -26,7 +26,7 @@ PROG = os.path.basename( sys.argv[0] )
 def parse_arguments(default_region):
     """
     parse the argument list, build help and usage messages
-    
+
     :param default_region: string containing a valid default region (from config file)
     :return:
         a namespace with the arguments passed and their values

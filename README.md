@@ -8,30 +8,54 @@ keep their database of users and repositories in the database server.
 
 ### ansible-role-haproxy  --> haproxy
 
-This role sets up haproxy without any monitoring page and doesn't automatically add servers to the configuration from an ansible group.  If you use the http health check provided, the default install of apache 2.4 will return 'Forbidden' which will fail.
+This role sets up haproxy without any monitoring page and doesn't automatically 
+add servers to the configuration from an ansible group.  If you use the http 
+health check provided, the default install of apache 2.4 will return 'Forbidden' 
+which will fail.
 
-Also, the haproxy process doesn't agregate logs in a separate file.
+Also, the haproxy process doesn't aggregate logs in a separate file.
 
-Instead of using this managed role as is, I combine it's features with my own module.
+Instead of using this managed role as is, I combine its features with my own module.
 
 ### [ansible-role-gitlab](https://github.com/geerlingguy/ansible-role-gitlab) 
 
-This ansible role was created in 2014 and is a bit old. It doesn't use the gitlab installation scripts
+This ansible role was created in 2014 and is a bit old. It doesn't use the 
+gitlab installation scripts
 
 - https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh
 - https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh
 
-from [Installing Gitlab](https://about.gitlab.com/install) which depends on the OS being installed.
+from [Installing Gitlab](https://about.gitlab.com/install) which depends on the OS 
+being installed.
 
-The code from Guy's role has been enhanced and updated to run using CentOS (both 7 and AlamaLinux which is a straight port of CentOS 8), Debian 9 and 10, and Ubuntu 16.04 (deprecated in Gitlab 14), 18.04, and 20.04.
+The code from Guy's role has been enhanced and updated to run using CentOS (both 7, 
+Almalinux, and Rocky Linux which is a straight port of CentOS 8), Debian 9 & 10, 
+ Ubuntu 18.04, and 20.04.
 
-All the versions of the gitlab VM run setup and run the stand-alone http version of gitlab.  The https version requires the install to have a valid email address, FQDN for each VM, and access into the VM from the outside. Since this was tested with Vagrant on uVerse NAT network, I was unable to get ports open to allow for the Let's Encrypt code to validate the https certificate.  It still installs gitlab but the https certificate is invalid.
+All the versions of the gitlab VM run setup and run the stand-alone http version 
+of gitlab.  The https version requires the installation to have a valid email 
+address, FQDN for each VM, and access into the VM from the outside. Since this was 
+tested with Vagrant on uVerse NAT network, I was not able to get ports open to 
+allow for the Let's Encrypt code to validate the https certificate.  It still 
+installs gitlab but the https certificate is invalid.
 
-To work around this problem, instead of using Vagrant to run the project, use a Terraform model to deploy machines in AWS and the ansible playbook to deploy gitlab to the AWS machines.
+To work around this problem, instead of using Vagrant to run the project, use 
+a Terraform model to deploy machines in AWS and the ansible playbook to deploy 
+gitlab to the AWS machines.
 
 ### aws-list-gold-ami tool
 
-The shell version of this tool exists as a testbed before coding the python version, which uses the AWS boto3 python library to access AWS services.  It requires specific python libraries to run.  You can run the script with in a python virtual environment. It will install the libraries in the virtual environment directory without impacting the system.
+The shell version of this tool exists as a testbed before coding the python 
+version, which uses the AWS boto3 python library to access AWS services.  
+Prior versions used the embedded Amazon Marketplace ProductID to scan for 
+all the releases of particular OS and select the most current. As of 12/17/2021, 
+Amazon has added an AMI_alias feature which allows for specifying a specific 
+version or the 'latest' version of an AMI in whatever region is requested 
+in the automation script.
+
+It requires specific python libraries to run.  You can run the script with in 
+a python virtual environment. It will install the libraries in the virtual 
+environment directory without impacting the system.
 
 ```
 python3 -m venv venv
@@ -73,18 +97,21 @@ optional arguments:
 This tool queries the AWS Marketplace for the latest gold AMIs for 
 
 - CentOS 7
-- CentOS 8 + AlmaLinux 8.3
+- CentOS 8 + AlmaLinux 8.5 + Rocky 8.4
 - Debian 9
 - Debian 10
-- Ubuntu 16.04 (deprecated in Gitlab 14+)
 - Ubuntu 18.04
 - Ubuntu 20.04
 
-It displays the instance information for each distro. In some cases, there may be multiple copies, each with a separate creation date. The tool selects the most current AMI to display.  
+It displays the instance information for each distro. In some cases, there may 
+be multiple copies, each with a separate creation date. The tool selects the 
+most current AMI to display.  
 
-It requires the files `~/.aws/{credentials,config}` be present in order to run. These files are also used by the aws-cli tool.
+It requires the files `~/.aws/{credentials,config}` be present in order to run. 
+These files are also used by the aws-cli tool.
 
-In addition, it can create a terraform vars file from a jinja2 template.  Currently, the template creates variables for use with the Terraform Modules.
+In addition, it can create terraform vars file from a jinja2 template.  
+Currently, the template creates variables for use with the Terraform Modules.
 
 ```
 // generated from gitlab-aws-vars.j2 -- jinja2 template to provide gitlab aws instances
@@ -127,7 +154,7 @@ variable "aws_{{ image.distro }}_name" {
 
 ### AWS inventory generation
 
-The [link to AWS version](https://aws.amazon.com/blogs/apn/getting-started-with-ansible-and-dynamic-amazon-ec2-inventory-management/) of this script is no longer valid.  The [ansible plugin](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py) and it's [corresponding ini file](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini) are maintained code. Ansible also has some [old documentation](https://web.archive.org/web/20170630221334/http://docs.ansible.com/ansible/intro_dynamic_inventory.html#example-aws-ec2-external-inventory-script) on how to setup the inventory file and playbooks using this script.
+The [link to AWS version](https://aws.amazon.com/blogs/apn/getting-started-with-ansible-and-dynamic-amazon-ec2-inventory-management/) of this script is no longer valid.  The [ansible plugin](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.py) and it's [corresponding ini file](https://raw.githubusercontent.com/ansible/ansible/stable-2.9/contrib/inventory/ec2.ini) are maintained code. Ansible also has some [old documentation](https://web.archive.org/web/20170630221334/http://docs.ansible.com/ansible/intro_dynamic_inventory.html#example-aws-ec2-external-inventory-script) on how to set up the inventory file and playbooks using this script.
 
 The [updated fork](https://raw.githubusercontent.com/vshn/ansible-dynamic-inventory-ec2/master/ec2.py) that allows for a sorted list. But it has drawbacks:
 
@@ -135,12 +162,16 @@ The [updated fork](https://raw.githubusercontent.com/vshn/ansible-dynamic-invent
 - requires ansible 2.9 and uses old boto library to connect to AWS
 - generates ansible hostvars and groupvars with "-" which are invalid
 - could not get it to work solely as an inventory source from command-line or playbook
-- can't differentiate between 4 different OS' and two different python interpeters
+- can't differentiate between 4 different OS' and two different python interpreters
 
-This points to a custom pythons script that collects the running instance's info and populates a inventory file from a template, similar to the python script to scan for the GOLD AMIs.
+This points to a custom pythons script that collects the running instance's info 
+and populates an inventory file from a template, similar to the python script 
+to scan for the GOLD AMIs.
 
 
-To use this script, install the required python modules either under a virtual environment or directly onto your system.  Then define the following along with the AWS authentication keys:
+To use this script, install the required python modules either under a virtual 
+environment or directly onto your system.  Then define the following along with 
+the AWS authentication keys:
 
 ```bash
 python3 -m venv venv
@@ -156,7 +187,9 @@ aws configure
 #[answer the questions and supply the keys and default region]
 ```
 
-When running EC2 instances exist, the ec2.py script will run the AWS `describe_instances` query for running instances are report back a variety of critera that can be used in the `inventory_aws` file.
+When running EC2 instances exist, the ec2.py script will run the AWS `describe_instances` 
+query for running instances are report back a variety of criterion that can 
+be used in the `inventory_aws` file.
 
 
 ### Linode inventory generation
@@ -181,11 +214,19 @@ The full list of types is available from
 
 formed from https://registry.terraform.io/modules/JamesWoolfenden/instance/linode/latest
 
-Initially, the original module didn't work due to version incompatibilities.  I reported the issue and the author fixed it. Then I discovered I wanted to enhance the features of the module, so I forked it.
+Initially, the original module didn't work due to version incompatibilities.  
+I reported the issue and the author fixed it. Then I discovered I wanted to 
+enhance the features of the module, so I forked it.
 
-It now runs a pre-install script to configure nodes so they'll run ansible and adds the nodes to a pre-existing Linode-managed DNS domain.
+It now runs a preinstallation script to configure nodes so that they'll run 
+ansible and adds the nodes to a pre-existing Linode-managed DNS domain.
 
-If you define a DNS domain and assign it a SOA email address in linode's DNS service, update the the play-linode.yml playbook accordingly.  After terraform has created the nodes and inserted them into DNS domain, you can run the ansible playbook for the CentOS systems using the `inventory` file and the Debian/Ubuntu systems using the `inventory_py3` file.  These will correctly create the gitlab service on these hosts with https enabled.
+If you define a DNS domain and assign it a SOA email address in linode's DNS 
+service, be sure to update the play-linode.yml playbook accordingly. After 
+terraform has created the nodes and inserted them into DNS domain, you can 
+run the ansible playbook for the CentOS systems using the `inventory` file 
+and the Debian/Ubuntu systems using the `inventory_py3` file.  These will 
+correctly create the gitlab service on these hosts with https enabled.
 
 Inputs:
 
@@ -211,7 +252,9 @@ Outputs:
 
 #### [ec2-instance](https://github.com/terraform-aws-modules/terraform-aws-ec2-instance)
 
-I had to fork this repository to add the provisioner commands and augment the inputs. Now this will append to the inventory file and rather than using scripts, the `user_data` input to `aws_instance` will be passed a text string.
+I had to fork this repository to add the provisioner commands and augment 
+the inputs. Now this will append to the inventory file and rather than 
+using scripts, the `user_data` input to `aws_instance` will be passed a text string.
 
 ```
 module "ec2_cluster" {
@@ -251,7 +294,12 @@ see the module [README](https://github.com/mvilain/terraform-aws-ec2-instance/bl
 
 #### [vpc](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 
-This module is way overkill used to create subnets for public, private, database, elastic cache, and other services.  Also, it outputs things that you can't just plug into other modules as their types are incompatible. Since this is a demo project rather than something that will be run in production, the `aws-vpc.tf` file will create a simple vpc with a publicly accessible subnet, gateway, routes, and security group to access it.
+This module is way overkill used to create subnets for public, private, 
+database, elastic cache, and other services.  Also, it outputs things that 
+you can't just plug into other modules as their types are incompatible. 
+Since this is a demo project rather than something that will be run in 
+production, the `aws-vpc.tf` file will create a simple vpc with a publicly 
+accessible subnet, gateway, routes, and security group to access it.
 
 ```
 provider "aws" {
@@ -292,16 +340,19 @@ module "vpc" {
 }
 ```
 
-See the [README](https://github.com/terraform-aws-modules/terraform-aws-vpc) on github for a full list of all 159 inputs (18 required) and 108 outputs.
+See the [README](https://github.com/terraform-aws-modules/terraform-aws-vpc) 
+on GitHub for a full list of all 159 inputs (18 required) and 108 outputs.
 
 
 ## TODO
 
 - haproxy round-robin will not cycle if a host in the proxy list is down
 
-won't respond to ping?  It's OK if node is up but http doesn't respond to heartbeat
+won't respond to ping?  It's OK if node is up but http does not respond 
+to heartbeat
 
-- setup gitlab instances to point to a single postgresql server and use haproxy to load balance between them.
+- setup gitlab instances to point to a single postgresql server and use 
+- haproxy to load balance between them.
 
 
 - refactor the linode inventory build design to use
@@ -320,7 +371,7 @@ Since this repo has submodules, you'll need to clone it and populate the submodu
 
 ### adding submodule to git
 
-This creates a HEADless snapshot of the submodule in the main repo.
+This creates a HEAD-less snapshot of the submodule in the main repo.
 
     cd ~/gitlab/linode/terraform-modules
     git submodule add git@github.com:mvilain/terraform-linode-instance.git
