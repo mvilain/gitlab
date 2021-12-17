@@ -3,6 +3,7 @@
 
 # gitlab demo Vagrant file to spin up multiple machines and OS'
 # Maintainer Michael Vilain [202104.28]
+# 202112.14 removed ubuntu 16.04 as no longer supported; added rockylinux
 
 Vagrant.configure("2") do |config|
   # config.vm.network 'forwarded_port', guest: 80, host: 8080
@@ -65,10 +66,29 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  config.vm.define "gitlabr8" do |gitlabr8|
+#     gitlab8.vm.box = "centos/8"
+    gitlabr8.vm.box = "rockylinux/8"
+    gitlabr8.ssh.insert_key = false
+    gitlabr8.vm.network 'private_network', ip: '192.168.10.208'
+    gitlabr8.vm.hostname = 'gitlabr8'
+    gitlabr8.vm.provision "shell", inline: <<-SHELL
+      dnf install -y epel-release
+      dnf config-manager --set-enabled powertools
+      dnf makecache
+      dnf install -y ansible
+      alternatives --set python /usr/bin/python3
+    SHELL
+    gitlabr8.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
+      ansible.playbook = "site.yml"
+      ansible.inventory_path = "./inventory_vagrant"
+    end
+  end
 
   # https://stackoverflow.com/questions/56460494/apt-get-install-apt-transport-https-fails-in-docker
   config.vm.define "gitlab9" do |gitlab9|
-    gitlab9.vm.box = "debian/stretch64"
+    gitlab9.vm.box = "bento/debian-9"
     gitlab9.ssh.insert_key = false
     gitlab9.vm.network 'private_network', ip: '192.168.10.109'
     gitlab9.vm.hostname = 'gitlab9'
@@ -86,7 +106,7 @@ Vagrant.configure("2") do |config|
   # don't use apt: update_cache=yes here because it won't work to trap
   # repo change errors like with Debian 10 because of apt-secure server
   config.vm.define "gitlab10" do |gitlab10|
-    gitlab10.vm.box = "debian/buster64"
+    gitlab10.vm.box = "bento/debian-10"
     gitlab10.ssh.insert_key = false
     gitlab10.vm.network 'private_network', ip: '192.168.10.110'
     gitlab10.vm.hostname = 'gitlab10'
@@ -101,15 +121,16 @@ Vagrant.configure("2") do |config|
     end
   end
 
-# deprecated notice for gitlab 14 on Ubuntu 16 4/15/2021
-  config.vm.define "gitlab16" do |gitlab16|
-    gitlab16.vm.box = "ubuntu/xenial64"
-    gitlab16.vm.network 'private_network', ip: '192.168.10.116'
-    gitlab16.vm.hostname = 'gitlab16'
-    gitlab16.vm.provision "shell", inline: <<-SHELL
-      apt-get -y install python3
+  config.vm.define "gitlab11" do |gitlab11|
+    gitlab11.vm.box = "bento/debian-11"
+    gitlab11.ssh.insert_key = false
+    gitlab11.vm.network 'private_network', ip: '192.168.10.111'
+    gitlab11.vm.hostname = 'gitlab11'
+    gitlab11.vm.provision "shell", inline: <<-SHELL
+      apt-get update --allow-releaseinfo-change -y
+      apt-get install -y apt-transport-https python-apt
     SHELL
-    gitlab16.vm.provision "ansible" do |ansible|
+    gitlab11.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
       ansible.inventory_path = "./inventory_vagrant"
@@ -133,7 +154,7 @@ Vagrant.configure("2") do |config|
 
   # https://www.reddit.com/r/Ubuntu/comments/ga187h/focal64_vagrant_box_issues/
   # 1/7/21 earlier focal64 didn't work w/ vagrant, fixed
-  # requires setting ansible_python_interpreter=/usr/bin/python3 
+  # requires setting ansible_python_interpreter=/usr/bin/python3
   config.vm.define "gitlab20" do |gitlab20|
     gitlab20.vm.box = "ubuntu/focal64"
     #gitlab20.vm.box = "bento/ubuntu-20.04"
