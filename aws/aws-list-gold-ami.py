@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
 """
-202107.06MeV
+20212.23MeV
 uses aws boto3 to crawl through AWS' marketplace and list instances for
 - centos7 almalinux (centos8 replacement)
 - debian9 debian10
 - fedora32, fedora33, fedora34
-- ubuntu16.04 ubuntu18.04 ubuntu20.04
+- ubuntu18.04 ubuntu20.04
 
 python3 and the boto3 library are required to run this tool
 uses region defined in awscli's credentials if not specified in REGION
@@ -30,6 +30,7 @@ PROG = os.path.basename( sys.argv[0] )
 
 # distro and ProductCode for each vpn-supported distros
 DISTROS = dict(
+    aws2     =  'aws2',      # images don't have a productcode so use special case
     alma8    =  'be714bpjscoj5uvqz0of5mscl',
     centos7  =  'aw0evgkw8e5c1q413zgy5pjce',
     centos8  =  '47k9ia2igxpcce2bzo8u3kj03',
@@ -38,19 +39,33 @@ DISTROS = dict(
     fedora32 =  '633jhlnyl61qp9ukyefuy0a07',
     fedora33 =  '7qjerp2ue62lxpstjf287pwk9',
     fedora34 =  '4qwehlrxvcsc9mxvcn5sx08zi',
-    ubuntu16 =  'csv6h7oyg29b7epjzg7qdr7no',
+#     ubuntu16 =  'csv6h7oyg29b7epjzg7qdr7no',
     ubuntu18 =  '3iplms73etrdhxdepv72l6ywj',
     ubuntu20 =  'a8jyynf4hjutohctm41o2z18m'
 )
-
+AMI_ALIAS = dict(  # this should work with describe_images(image_ids=[])
+    aws2     =  '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2',
+    alma8    =  '/aws/service/marketplace/prod-fai27pconxer6/8.5.20211116',
+    centos7  =  '/aws/service/marketplace/prod-4ayzuj4ynrix4/2002_01',
+    centos8  =  '/aws/service/marketplace/prod-ibe2h3pxekg4g/2004_01',
+    rocky8   =  '/aws/service/marketplace/prod-tpv5g4ekkzf2c/rockylinux-8-latest-20211116-8gib',
+    debian9  =  '/aws/service/marketplace/prod-sg65pfzx4g6ae/debian-gnulinux-9-lts-20210623',
+    debian10 =  '/aws/service/marketplace/prod-3wthj7laq6zjg/debian-10-amd64-20211011-792',
+    # debian11='none as of 12/17/2021',
+    fedora32 =  '/aws/service/marketplace/prod-xggqxtam76tpq/32-1.6',
+    fedora33 =  '/aws/service/marketplace/prod-2b7jtv6rwwspm/33-1.2',
+    fedora34 =  '/aws/service/marketplace/prod-uagyvng2faltq/34-1.2',
+#     ubuntu16 =  '/aws/service/marketplace/prod-aq7wy7l65auna/ubuntu-16.04-20210928',
+    ubuntu18 =  '/aws/service/marketplace/prod-43pfd7pfsijnm/ubuntu-18.04-20211129',
+    ubuntu20 =  '/aws/service/marketplace/prod-x7h6cigkuiul6/ubuntu-20.04-20211129'
+)
 
 def parse_arguments(default_region):
     """
     parse the argument list, build help and usage messages
-    
-    :param default_region: string containing a valid default region (from config file)
-    :return:
-        a namespace with the arguments passed and their values
+
+    :param: default_region string containing a valid default region (from config file)
+    :return: a namespace with the arguments passed and their values
     """
     parser = argparse.ArgumentParser(
              description='display the AMI strings for supported virtual machines')
@@ -85,6 +100,7 @@ def parse_arguments(default_region):
     #else:
     return args
 
+
 def regions_list():
     """
     list all the valid AWS regions as strings
@@ -104,16 +120,18 @@ def regions_list():
         valid_regions.append(r['RegionName'])
     return sorted(valid_regions)
 
+
 def regions_print(incr=5,tab='    '):
     """
     print the regions as a list of sort strings INCR number per line
-    
+
     :param: incr -- int number of elements to print per line
     :param: tab --  string of spaces at beginning of line
     :return:
         returns None
     """
-    start = 0; stop = incr
+    start = 0
+    stop = incr
     valid_regions = regions_list()
     while start < len( valid_regions ):
         print('{}{}'.format(tab, ' '.join(valid_regions[start:stop])))
@@ -121,11 +139,12 @@ def regions_print(incr=5,tab='    '):
         stop = stop + 5
     return None
 
+
 def valid_region(region):
     """
     check if a region is valid
 
-    :param region: the region to check
+    :param: region the region to check
     :return:
         returns True if region is valid
         returns False if region is invalid
@@ -142,13 +161,21 @@ def valid_region(region):
         return False
 
 
-def desc_avz(regionconfig):
+def desc_avz(region):
     """
     get all the region's default availability zones
 
-    :param: regionconfig Config object which defines the region to query
+    :param: region string which defines the region to query
     :return: object describing the AZs and their attributes
     """
+    regionconfig = Config(
+        region_name=region,
+        signature_version='v4',
+        retries={
+            'max_attempts': 10,
+            'mode': 'standard'
+        }
+    )
 
     # this returns dict with AvailabilityZones,Metadata keys
     # Images is a list of dicts containing each image's info
@@ -186,27 +213,62 @@ def desc_avz(regionconfig):
 # }
 
 
-def desc_images(productcode, regionconfig):
+def desc_images(productcode, region):
     """
     get all the Golden Image AMIs for a specific ProductCode
+    PLUS search using the AMI_alias for the AWS Linux 2 AMI if productcode=AWS2
 
     :param: productcode string of the ProductCode for a vendor's images
-    :param: regionconfig: Config object which defines the region to query
+            search for AWS2 Linux2 AMI using ssm alias if productcode='aws2'
+    :param: region string which defines the region to query
     :return: object describing the AMIs and their attributes
+
+    aws ssm get-parameters-by-path \
+        --path /aws/service/ami-amazon-linux-latest \
+        --query "Parameters[].Name"
+    # public parameters for latest amazon-linux
+    aws ssm get-parameters \
+        --names /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 \
+        --region us-east-2
+    https://docs.aws.amazon.com/marketplace/latest/buyerguide/buyer-ami-aliases.html
     """
+    # create a Config object defining region to use with a boto3 client
+    regionconfig = Config(
+        region_name=region,
+        signature_version='v4',
+        retries={
+            'max_attempts': 10,
+            'mode': 'standard'
+        }
+    )
 
     # this returns dict with Images,Metadata keys
     # Images is a list of dicts containing each image's info
-    client = boto3.client( 'ec2', config=regionconfig )
-    response = client.describe_images(
-        Filters=[
-            { 'Name': 'product-code', 'Values': [ productcode ] },
-            { 'Name': 'product-code.type', 'Values': [ 'marketplace' ] }
-        ],
-        Owners=[ 'aws-marketplace' ]
-        # DryRun=True|False
-    )  # dict{Images(list of images)}
-    return response['Images'] # don't bother with Metadata key
+    client = boto3.client('ec2', config=regionconfig)
+    if productcode.lower() != 'aws2':
+        response = client.describe_images(
+            Filters=[
+                {'Name': 'product-code', 'Values': [productcode]},
+                {'Name': 'product-code.type', 'Values': ['marketplace']}
+            ]
+            # ,Owners=['amazon', 'aws-marketplace']
+            # DryRun=True|False
+        )  # dict{Images(list of images)}
+
+    else:  # AWS Linux2 doesn't have productcode...use session manager to get public AMI
+        ssm = boto3.client('ssm', config=regionconfig)
+        response = ssm.get_parameter(
+            Name='/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+        )
+        for k, v in response['Parameter'].items():  # kludgy way to get the ami from 'Value' key
+            if k == 'Value':
+                # use the ami from Value returns dict{Images(list of images)}
+                response = client.describe_images(ImageIds=[v]
+                                                  # ,DryRun=True|False
+                                                  )
+                break
+
+    return response['Images']  # don't bother with Metadata key
 # {
 #     'Images': [
 #         {
@@ -218,10 +280,10 @@ def desc_images(productcode, regionconfig):
 #             'Public': True|False,
 #             'KernelId': 'string',
 #             'OwnerId': 'string',
-#             'Platform': 'Windows',
+#             'Platform': 'Windows', # Windows only...key absent for linux
 #             'PlatformDetails': 'string',
 #             'UsageOperation': 'string',
-#             'ProductCodes': [
+#             'ProductCodes': [      # not for AWS Linux2 AMI
 #                 {
 #                     'ProductCodeId': 'string',
 #                     'ProductCodeType': 'devpay'|'marketplace'
@@ -310,14 +372,14 @@ def main():
             return 1
 
         # create a Config object defining region to use with a boto3 client
-        region_config = Config(
-            region_name       = args.REGION,
-            signature_version = 'v4',
-            retries           = {
-                'max_attempts': 10,
-                'mode'        : 'standard'
-            }
-        )
+#         region_config = Config(
+#             region_name       = args.REGION,
+#             signature_version = 'v4',
+#             retries           = {
+#                 'max_attempts': 10,
+#                 'mode'        : 'standard'
+#             }
+#         )
 
         gold_ami = []
         if args.template:
@@ -330,7 +392,7 @@ def main():
                 print('{}'.format(distro),end='...', flush=True)
 
             distro_list = []  # store distro entries in list so it can be sorted
-            for im in desc_images(prodcode,region_config):
+            for im in desc_images(prodcode,args.REGION):
                 distro_list.append(
                     im['CreationDate'] + '|' + im['ImageId'] + '|' + im['Description']
                 )
@@ -352,7 +414,7 @@ def main():
             )
 
         avzs_list = []   # store region's availability zones
-        for az in desc_avz(region_config):
+        for az in desc_avz(args.REGION):
             avzs_list.append(
                 dict(
                     ZoneName     = az['ZoneName'],
@@ -394,4 +456,5 @@ def main():
         return 0
 
 
-if __name__ == '__main__': sys.exit(main())
+if __name__ == '__main__':
+    sys.exit(main())
