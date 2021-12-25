@@ -2,5 +2,8 @@ boto3
 botocore
 jinja2
 jmespath
-
 linode_api4
+
+#MarkupSafe 
+#s3transfer 
+#python-dateutil
