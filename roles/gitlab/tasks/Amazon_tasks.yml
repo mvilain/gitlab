@@ -1,0 +1,77 @@
+---
+- name: install RedHat common packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "{{ gitlab_dependencies }}"
+
+# gitlab_dependencies includes openssh-server and postfix,
+# so ensure they're enabled and running
+- name: start postfix and sshd
+  service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - postfix
+    - sshd
+
+# no firewall on AWS Linux, so don't install or configure it
+# - name: start firewalld
+#   service:
+#     name: firewalld
+#     enabled: true
+#     state: started
+#   when: not is_aws_environment
+
+# firewalld has migrated to the community posix collection
+# which can be installed with ansible-galaxy
+#    ansible-galaxy collection install ansible.posix
+# use command instead even if this isn't idempotent
+# - name: enable firewalld http and https
+#   command: firewall-cmd --permanent --add-service="{{ item }}"
+#   args:
+#     warn: no
+#   register: firewall
+#   loop:
+#     - http
+#     - https
+#   when: not is_aws_environment
+# #- debug: var=firewall
+
+# - name: reload firewalld
+#   command: firewall-cmd --reload
+#   args:
+#     warn: no
+#   register: reload
+#   when: not is_aws_environment
+# #- debug: var=reload
+
+# specifically because AWS sets the hostname to ip-xxx-xxx-xxx-xxx.REGION.compute.internal
+- name: set hostname on AWS
+  lineinfile:
+    path: /etc/hostname
+    regexp: 'ip.*.compute.internal'
+    line: "{{ inventory_hostname }}"
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: is_aws_environment
+
+- name: Install GitLab (this will take a while)
+  package:
+    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
+    state: present
+  when: not gitlab_file.stat.exists
+  ignore_errors: True
+  register: gitlab_install
+#  check_mode: yes
+
+# output on CentOS7 is a mess, so don't do it
+- debug:
+    var: gitlab_install
+  when:
+    - gitlab_install|selectattr("stdout_lines", "defined")|list|length >0
+    - ansible_distribution_major_version | int == 8
