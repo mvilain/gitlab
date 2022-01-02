@@ -1,6 +1,6 @@
 ---
 - assert:
-    that: "ansible_distribution_major_version is version_compare('16', '>=')"
+    that: "ansible_distribution_major_version is version_compare('18', '>=')"
     msg: "Ubuntu version supported"
 #- debug: var=ansible_distribution_major_version
 
@@ -45,6 +45,6 @@
   ignore_errors: True
   register: gitlab_install
 #  check_mode: yes
-- debug: 
+- debug:
     var: gitlab_install.stderr_lines
   when: gitlab_install|selectattr("stderr_lines", "defined")|list|length >0
