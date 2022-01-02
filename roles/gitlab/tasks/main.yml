@@ -88,7 +88,7 @@
 
 
 - name: Check if GitLab configuration file already exists.
-  stat: 
+  stat:
     path: /etc/gitlab/gitlab.rb
   register: gitlab_config_file
 #- debug: var=gitlab_config_file
