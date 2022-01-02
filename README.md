@@ -72,11 +72,11 @@ optional arguments:
 
 This tool queries the AWS Marketplace for the latest gold AMIs for 
 
+- Amazon Linux 2
 - CentOS 7
 - CentOS 8 + AlmaLinux 8.3
 - Debian 9
 - Debian 10
-- Ubuntu 16.04 (deprecated in Gitlab 14+)
 - Ubuntu 18.04
 - Ubuntu 20.04
 

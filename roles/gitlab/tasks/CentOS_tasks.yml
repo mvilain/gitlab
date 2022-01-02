@@ -49,7 +49,7 @@
     state: started
   when: not is_aws_environment
 
-# firewalld has migrated to the community posix collection 
+# firewalld has migrated to the community posix collection
 # which can be installed with ansible-galaxy
 #    ansible-galaxy collection install ansible.posix
 # use command instead even if this isn't idempotent
@@ -94,8 +94,8 @@
 #  check_mode: yes
 
 # output on CentOS7 is a mess, so don't do it
-- debug: 
+- debug:
     var: gitlab_install
-  when: 
+  when:
     - gitlab_install|selectattr("stdout_lines", "defined")|list|length >0
     - ansible_distribution_major_version | int == 8

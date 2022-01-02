@@ -24,6 +24,23 @@ Vagrant.configure("2") do |config|
     sed -i.orig -e "s/#   CheckHostIP yes/CheckHostIP no/" /etc/ssh/ssh_config
   SHELLALL
 
+  config.vm.define "gitlab2" do |gitlab2|
+    gitlab2.vm.box = "bento/amazonlinux-2"
+    gitlab2.ssh.insert_key = false
+    gitlab2.vm.network 'private_network', ip: '192.168.10.102'
+    gitlab2.vm.hostname = 'gitlab2'
+    gitlab2.vm.provision "shell", inline: <<-SHELL
+      amazon-linux-extras install epel #ansible2=2.8 kernel-ng python3.8
+      yum-config-manager --enable epel
+      # alternatives --set python /usr/bin/python3.8
+      # python3.8 -m pip install --upgrade pip setuptools
+    SHELL
+    gitlab2.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
+      ansible.playbook = "site.yml"
+      ansible.inventory_path = "./inventory_vagrant"
+    end
+  end
 
 # vagrant box has python2.7 installed with /usr/libexec/platform-python
   config.vm.define "gitlab7" do |gitlab7|
@@ -31,10 +48,10 @@ Vagrant.configure("2") do |config|
     gitlab7.ssh.insert_key = false
     gitlab7.vm.network 'private_network', ip: '192.168.10.107'
     gitlab7.vm.hostname = 'gitlab7'
-#     gitlab7.vm.provision "shell", inline: <<-SHELL
+    gitlab7.vm.provision "shell", inline: <<-SHELL
 #      yum install -y epel-release
 #       yum install -y python3 libselinux-python3 #python36-rpm
-#     SHELL
+    SHELL
     # still uses python2 for ansible
     gitlab7.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
