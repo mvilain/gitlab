@@ -35,7 +35,7 @@
     enabled: true
     state: started
 
-# firewalld has migrated to the community posix collection 
+# firewalld has migrated to the community posix collection
 # which can be installed with ansible-galaxy
 #    ansible-galaxy collection install ansible.posix
 # use command instead even if this isn't idempotent
@@ -72,6 +72,6 @@
   ignore_errors: True
   register: gitlab_install
 #  check_mode: yes
-- debug: 
+- debug:
     var: gitlab_install
 #  when: gitlab_install|selectattr("stdout_lines", "defined")|list|length >0
