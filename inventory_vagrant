@@ -4,16 +4,15 @@
 [gitlab]
 gitlab2  ansible_host=192.168.10.102
 gitlab7  ansible_host=192.168.10.107
-gitlab8  ansible_host=192.168.10.108
 
 [gitlab:vars]
 ansible_python_interpreter=/usr/bin/python
 
 
 [gitlab_py3]
+gitlab8  ansible_host=192.168.10.108
 gitlab9  ansible_host=192.168.10.109
 gitlab10 ansible_host=192.168.10.110
-gitlab16 ansible_host=192.168.10.116
 gitlab18 ansible_host=192.168.10.118
 gitlab20 ansible_host=192.168.10.120
 
@@ -22,10 +21,10 @@ ansible_python_interpreter=/usr/bin/python3
 
 
 [lbr]
-lbr1 ansible_host=192.168.10.100
+lbr20 ansible_host=192.168.10.100
 
 [lbr:vars]
-# look in group_vars/lbr
+ansible_python_interpreter=/usr/bin/python3
 
 # Group 'all' with all servers
 [all:children]
