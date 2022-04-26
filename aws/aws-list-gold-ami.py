@@ -32,32 +32,39 @@ PROG = os.path.basename( sys.argv[0] )
 DISTROS = dict(
     aws2     =  'aws2',      # images don't have a productcode so use special case
     alma8    =  'be714bpjscoj5uvqz0of5mscl',
-    centos7  =  'aw0evgkw8e5c1q413zgy5pjce',
+    centos7  =  'cvugziknvmxgqna9noibqnnsy',
     centos8  =  '47k9ia2igxpcce2bzo8u3kj03',
     debian9  =  '55q52qvgjfpdj2fpfy9mb1lo4',
     debian10 =  'auhljmclkudu651zy27rih2x2',
+    debian11 =  '9m3tff1jneeyfykcbnsnmkbz6',
     fedora32 =  '633jhlnyl61qp9ukyefuy0a07',
     fedora33 =  '7qjerp2ue62lxpstjf287pwk9',
     fedora34 =  '4qwehlrxvcsc9mxvcn5sx08zi',
-#     ubuntu16 =  'csv6h7oyg29b7epjzg7qdr7no',
+    # fedora35 =  '',   # only available from fedora web site 
+    rocky8   =  'cotnnspjrsi38lfn8qo4ibnnm',
+    # ubuntu16 =  'csv6h7oyg29b7epjzg7qdr7no',
     ubuntu18 =  '3iplms73etrdhxdepv72l6ywj',
-    ubuntu20 =  'a8jyynf4hjutohctm41o2z18m'
+    ubuntu20 =  'a8jyynf4hjutohctm41o2z18m',
+    ubuntu22 =  '47xbqns9xujfkkjt189a13aqe'
 )
 AMI_ALIAS = dict(  # this should work with describe_images(image_ids=[])
     aws2     =  '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2',
     alma8    =  '/aws/service/marketplace/prod-fai27pconxer6/8.5.20211116',
-    centos7  =  '/aws/service/marketplace/prod-4ayzuj4ynrix4/2002_01',
-    centos8  =  '/aws/service/marketplace/prod-ibe2h3pxekg4g/2004_01',
+    centos7  =  'aws/service/marketplace/prod-a77hqdkwpdk3o/centos-7.2009',
+    centos8  =  '//aws/service/marketplace/prod-ibe2h3pxekg4g/2004_01',
     rocky8   =  '/aws/service/marketplace/prod-tpv5g4ekkzf2c/rockylinux-8-latest-20211116-8gib',
-    debian9  =  '/aws/service/marketplace/prod-sg65pfzx4g6ae/debian-gnulinux-9-lts-20210623',
-    debian10 =  '/aws/service/marketplace/prod-3wthj7laq6zjg/debian-10-amd64-20211011-792',
-    # debian11='none as of 12/17/2021',
+    debian9  =  '/aws/service/marketplace/prod-sg65pfzx4g6ae/debian-gnulinux-9-lts-20220325',
+    debian10 =  '/aws/service/marketplace/prod-3wthj7laq6zjg/debian-10-amd64-20220328-962',
+    debian11 =  '/aws/service/marketplace/prod-imijfjfywz37w/debian-11-amd64-20220328-962',
     fedora32 =  '/aws/service/marketplace/prod-xggqxtam76tpq/32-1.6',
     fedora33 =  '/aws/service/marketplace/prod-2b7jtv6rwwspm/33-1.2',
     fedora34 =  '/aws/service/marketplace/prod-uagyvng2faltq/34-1.2',
-#     ubuntu16 =  '/aws/service/marketplace/prod-aq7wy7l65auna/ubuntu-16.04-20210928',
-    ubuntu18 =  '/aws/service/marketplace/prod-43pfd7pfsijnm/ubuntu-18.04-20211129',
-    ubuntu20 =  '/aws/service/marketplace/prod-x7h6cigkuiul6/ubuntu-20.04-20211129'
+    # rocky8   =  '', # no alias as of 4/25/22
+    # fedora35 =  '', # no alias as of 4/25/22
+    # ubuntu16 =  '/aws/service/marketplace/prod-aq7wy7l65auna/ubuntu-16.04-20210928',
+    ubuntu18 =  '/aws/service/marketplace/prod-43pfd7pfsijnm/ubuntu-18.04-20220411',
+    ubuntu20 =  '/aws/service/marketplace/prod-x7h6cigkuiul6/ubuntu-20.04-20220404'
+    # ubuntu22 =  '' # no alias as of 4/25/22
 )
 
 def parse_arguments(default_region):

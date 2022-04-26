@@ -239,10 +239,10 @@ def main():
                 templ_alma.append(d)
             elif ins['Tag_os'] == 'centos7' or ins['Tag_os'] == 'centos8':
                 templ_centos.append(d)
-            elif ins['Tag_os'] == 'debian9' or ins['Tag_os'] == 'debian10':
+            elif ins['Tag_os'] == 'debian9' or ins['Tag_os'] == 'debian10' or ins['Tag_os'] == 'debian11':
                 templ_debian.append(d)
             elif ins['Tag_os'] == 'ubuntu16' or ins['Tag_os'] == 'ubuntu18' or \
-            ins['Tag_os'] == 'ubuntu20':
+                ins['Tag_os'] == 'ubuntu20' or ins['Tag_os'] == 'ubuntu22':
                 templ_ubuntu.append(d)
             else:
                 templ_unk.append(d)
