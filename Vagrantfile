@@ -64,7 +64,7 @@ Vagrant.configure("2") do |config|
   # centos/8, almalinux/7, and rockylinux/8 have no /usr/bin/python or /usr/bin/python3 installed
   config.vm.define "gitlab8" do |gitlab|
     # requires setting ansible_python_interpreter=/usr/bin/python3
-    gitlab.vm.box = "geerlingguy/centos8"   # python3
+    gitlab.vm.box = "almalinux/8"   # python3
     gitlab.ssh.insert_key = false
     gitlab.vm.network 'private_network', ip: '192.168.10.108'
     gitlab.vm.hostname = 'gitlab8.text'
@@ -122,7 +122,7 @@ Vagrant.configure("2") do |config|
   # don't use apt: update_cache=yes here because it won't work to trap
   # repo change errors like with Debian 10 because of apt-secure server
   config.vm.define "gitlab10" do |gitlab10|
-    gitlab10.vm.box = "bento/debian-10"
+    gitlab10.vm.box = "debian/buster64"
     gitlab10.ssh.insert_key = false
     gitlab10.vm.network 'private_network', ip: '192.168.10.110'
     gitlab10.vm.hostname = 'gitlab10.text'
@@ -138,7 +138,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "gitlab11" do |gitlab11|
-    gitlab11.vm.box = "bento/debian-11"
+    gitlab11.vm.box = "debian/bullseye64"
     gitlab11.ssh.insert_key = false
     gitlab11.vm.network 'private_network', ip: '192.168.10.111'
     gitlab11.vm.hostname = 'gitlab11.text'
@@ -180,6 +180,21 @@ Vagrant.configure("2") do |config|
       apt-get -y install python3
     SHELL
     gitlab20.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
+      ansible.playbook = "site.yml"
+      ansible.inventory_path = "./inventory_vagrant"
+    end
+  end
+
+    config.vm.define "gitlab22" do |gitlab22|
+    gitlab22.vm.box = "ubuntu/jammy64"
+    #gitlab20.vm.box = "bento/ubuntu-20.04"
+    gitlab22.vm.network 'private_network', ip: '192.168.10.122'
+    gitlab22.vm.hostname = 'gitlab22.text'
+    gitlab22.vm.provision "shell", inline: <<-SHELL
+      apt-get -y install python3
+    SHELL
+    gitlab22.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
       ansible.playbook = "site.yml"
       ansible.inventory_path = "./inventory_vagrant"

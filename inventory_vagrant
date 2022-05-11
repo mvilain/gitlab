@@ -13,8 +13,10 @@ ansible_python_interpreter=/usr/bin/python
 gitlab8  ansible_host=192.168.10.108
 gitlab9  ansible_host=192.168.10.109
 gitlab10 ansible_host=192.168.10.110
+gitlab11 ansible_host=192.168.10.111
 gitlab18 ansible_host=192.168.10.118
 gitlab20 ansible_host=192.168.10.120
+gitlab22 ansible_host=192.168.10.122
 
 [gitlab_py3:vars]
 ansible_python_interpreter=/usr/bin/python3
