@@ -26,7 +26,7 @@ This ansible role was created in 2014 and is a bit old. It doesn't use the gitla
 from [Installing Gitlab](https://about.gitlab.com/install) which depends on the OS being installed.
 
 The code from Guy's role has been enhanced and updated to run using CentOS (both 7 and AlamaLinux which 
-is a straight port of CentOS 8), Debian 9 and 10, and Ubuntu 18.04 and 20.04.
+is a straight port of CentOS 8), Debian 9, 10, 11, and Ubuntu 18.04, 20.04, and 22.04.
 
 All the versions of the gitlab VM run setup and run the stand-alone http version of gitlab.  
 The https version requires the install to have a valid email address, FQDN for each VM, and 
