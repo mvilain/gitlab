@@ -1,0 +1,4 @@
+# group_vars for gitlab python3 servers group
+---
+group_vars: "gitlab_py3"
+
