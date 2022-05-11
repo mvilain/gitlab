@@ -144,7 +144,7 @@ Vagrant.configure("2") do |config|
     gitlab11.vm.hostname = 'gitlab11.text'
     gitlab11.vm.provision "shell", inline: <<-SHELL
       apt-get update --allow-releaseinfo-change -y
-      apt-get install -y apt-transport-https python-apt
+      apt-get install -y apt-transport-https python3-apt
     SHELL
     gitlab11.vm.provision "ansible" do |ansible|
       ansible.compatibility_mode = "2.0"
